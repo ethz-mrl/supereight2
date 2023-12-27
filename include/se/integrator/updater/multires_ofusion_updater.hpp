@@ -74,6 +74,15 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
      */
     void updateBlock(OctantBase* octant_ptr, bool low_variance, bool project_inside);
 
+    /** Update all voxels of \p block with centre \p block_centre_C at \p scale. The template
+     * argument \p UpdateBuffer determines whether the update happens on the block buffer or on the
+     * actual block data.
+     */
+    template<bool UpdateBuffer>
+    void updateBlockData(BlockType& block,
+                         const int scale,
+                         const bool low_variance,
+                         const bool project_inside);
 
     /**
      * \brief Recursively reduce all children by the minimum occupancy log-odd for a single integration.

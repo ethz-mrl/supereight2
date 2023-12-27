@@ -326,13 +326,6 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
     const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
 
-    // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
-    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
-
-    // Compute the surface thickness value (tau) for the block.
-    float tau =
-        compute_tau(block_point_C_m, config_.tau_min, config_.tau_max, map_.getDataConfig());
-
     // Compute the integration scale
     // The last integration scale
     const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
@@ -417,105 +410,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
             }
         }
 
-        // Integrate data into buffer.
-        const unsigned int recommended_stride = octantops::scale_to_size(recommended_scale);
-        const unsigned int size_at_recommended_scale_li = BlockType::size >> recommended_scale;
-        const unsigned int size_at_recommended_scale_sq = math::sq(size_at_recommended_scale_li);
-
-        const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
-        Eigen::Vector3f sample_point_base_W;
-        map_.voxelToPoint(voxel_coord_base, recommended_stride, sample_point_base_W);
-        const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;
-
-        const Eigen::Matrix3f sample_point_delta_matrix_C =
-            (T_CW_.linear()
-             * (map_res_
-                * (Eigen::Matrix3f() << recommended_stride,
-                   0,
-                   0,
-                   0,
-                   recommended_stride,
-                   0,
-                   0,
-                   0,
-                   recommended_stride)
-                      .finished()));
-
-        for (unsigned int z = 0; z < size_at_recommended_scale_li; z++) {
-            for (unsigned int y = 0; y < size_at_recommended_scale_li; y++) {
-                for (unsigned int x = 0; x < size_at_recommended_scale_li; x++) {
-                    const Eigen::Vector3f sample_point_C = sample_point_base_C
-                        + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
-
-                    // Get the depth value this voxel projects into.
-                    Eigen::Vector2f depth_pixel_f;
-                    if (sensor_.model.project(sample_point_C, &depth_pixel_f)
-                        != srl::projection::ProjectionStatus::Successful) {
-                        continue;
-                    }
-                    const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
-                    const float depth_value = depth_img_(depth_pixel.x(), depth_pixel.y());
-                    if (depth_value < sensor_.near_plane) {
-                        continue;
-                    }
-                    const float three_sigma =
-                        3.0f * (*sigma_img_)(depth_pixel.x(), depth_pixel.y());
-
-                    const int buffer_idx =
-                        x + y * size_at_recommended_scale_li + z * size_at_recommended_scale_sq;
-                    auto& buffer_data = block_ptr->bufferData(buffer_idx);
-
-                    if (low_variance) {
-                        block_ptr->incrBufferObservedCount(
-                            updater::free_voxel(buffer_data, map_.getDataConfig()));
-                    }
-                    else {
-                        const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
-                        const float range = sample_point_C.norm();
-                        const float range_diff =
-                            (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                        block_ptr->incrBufferObservedCount(updater::update_voxel(
-                            buffer_data, range_diff, tau, three_sigma, map_.getDataConfig()));
-                        const bool field_updated = range_diff < tau;
-
-                        // Never update colour or semantics beyond the far plane.
-                        if (depth_value > sensor_.far_plane) {
-                            continue;
-                        }
-
-                        // Compute the coordinates of the depth hit in the depth sensor frame C if
-                        // data other than depth needs to be integrated.
-                        Eigen::Vector3f hit_C;
-                        if constexpr (ColB == Colour::On || SemB == Semantics::On) {
-                            if (has_colour_ && field_updated) {
-                                sensor_.model.backProject(depth_pixel_f, &hit_C);
-                                hit_C.array() *= depth_value;
-                            }
-                        }
-
-                        // Update the colour data if possible and only if the field was updated,
-                        // that is if we have corresponding depth information.
-                        if constexpr (ColB == Colour::On) {
-                            if (has_colour_ && field_updated) {
-                                // Project the depth hit onto the colour image.
-                                const Eigen::Vector3f hit_Cc = T_CcC_ * hit_C;
-                                Eigen::Vector2f colour_pixel_f;
-                                if (colour_sensor_->model.project(hit_Cc, &colour_pixel_f)
-                                    == srl::projection::ProjectionStatus::Successful) {
-                                    const Eigen::Vector2i colour_pixel =
-                                        se::round_pixel(colour_pixel_f);
-                                    buffer_data.colour.update(
-                                        (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
-                                        map_.getDataConfig().field.max_weight);
-                                }
-                            }
-                        }
-                    }
-                } // x
-            }     // y
-        }         // z
-
-        block_ptr->incrBufferIntegrCount(project_inside);
+        updateBlockData<true>(*block_ptr, recommended_scale, low_variance, project_inside);
 
         if (block_ptr->switchData()) {
             return;
@@ -525,32 +420,41 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->resetBuffer();
     }
 
-    const unsigned int integration_stride = octantops::scale_to_size(integration_scale);
-    const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
-    const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
+    updateBlockData<false>(*block_ptr, integration_scale, low_variance, project_inside);
+}
 
-    const Eigen::Vector3i voxel_coord_base = block_ptr->coord;
+
+
+template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+template<bool UpdateBuffer>
+void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+             SensorT>::updateBlockData(BlockType& block,
+                                       const int scale,
+                                       const bool low_variance,
+                                       const bool project_inside)
+{
+    Eigen::Vector3f block_centre_point_W;
+    map_.voxelToPoint(block.coord, BlockType::size, block_centre_point_W);
+    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
+    const int stride = octantops::scale_to_size(scale);
+    const int size_at_scale = BlockType::size >> scale;
+    const int size_at_scale_sq = math::sq(size_at_scale);
     Eigen::Vector3f sample_point_base_W;
-    map_.voxelToPoint(voxel_coord_base, integration_stride, sample_point_base_W);
+    map_.voxelToPoint(block.coord, stride, sample_point_base_W);
     const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;
-
     const Eigen::Matrix3f sample_point_delta_matrix_C =
         (T_CW_.linear()
-         * (map_res_
-            * (Eigen::Matrix3f() << integration_stride,
-               0,
-               0,
-               0,
-               integration_stride,
-               0,
-               0,
-               0,
-               integration_stride)
-                  .finished()));
+         * (map_res_ * (Eigen::Matrix3f() << stride, 0, 0, 0, stride, 0, 0, 0, stride).finished()));
 
-    for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
-        for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
-            for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
+    // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
+    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
+    // Compute the surface thickness value (tau) for the block.
+    const float tau =
+        compute_tau(block_point_C_m, config_.tau_min, config_.tau_max, map_.getDataConfig());
+
+    for (int z = 0; z < size_at_scale; z++) {
+        for (int y = 0; y < size_at_scale; y++) {
+            for (int x = 0; x < size_at_scale; x++) {
                 const Eigen::Vector3f sample_point_C =
                     sample_point_base_C + sample_point_delta_matrix_C * Eigen::Vector3f(x, y, z);
 
@@ -567,13 +471,16 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 }
                 const float three_sigma = 3.0f * (*sigma_img_)(depth_pixel.x(), depth_pixel.y());
 
-                // Update the voxel data based using the depth measurement
-                const int voxel_idx =
-                    x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
-                auto& voxel_data = block_ptr->currData(voxel_idx);
+                const int idx = x + y * size_at_scale + z * size_at_scale_sq;
+                auto& data = UpdateBuffer ? block.bufferData(idx) : block.currData(idx);
                 if (low_variance) {
-                    block_ptr->incrCurrObservedCount(
-                        updater::free_voxel(voxel_data, map_.getDataConfig()));
+                    const bool newly_observed = updater::free_voxel(data, map_.getDataConfig());
+                    if constexpr (UpdateBuffer) {
+                        block.incrBufferObservedCount(newly_observed);
+                    }
+                    else {
+                        block.incrCurrObservedCount(newly_observed);
+                    }
                     // We don't update colour or semantics in free space.
                 }
                 else {
@@ -581,8 +488,14 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     const float range = sample_point_C.norm();
                     const float range_diff =
                         (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                    block_ptr->incrCurrObservedCount(updater::update_voxel(
-                        voxel_data, range_diff, tau, three_sigma, map_.getDataConfig()));
+                    const bool newly_observed = updater::update_voxel(
+                        data, range_diff, tau, three_sigma, map_.getDataConfig());
+                    if constexpr (UpdateBuffer) {
+                        block.incrBufferObservedCount(newly_observed);
+                    }
+                    else {
+                        block.incrCurrObservedCount(newly_observed);
+                    }
                     const bool field_updated = range_diff < tau;
 
                     // Never update colour or semantics beyond the far plane.
@@ -611,7 +524,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                                 == srl::projection::ProjectionStatus::Successful) {
                                 const Eigen::Vector2i colour_pixel =
                                     se::round_pixel(colour_pixel_f);
-                                voxel_data.colour.update(
+                                data.colour.update(
                                     (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
                                     map_.getDataConfig().field.max_weight);
                             }
@@ -622,7 +535,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         }     // y
     }         // z
 
-    block_ptr->incrCurrIntegrCount();
+    if constexpr (UpdateBuffer) {
+        block.incrBufferIntegrCount(project_inside);
+    }
+    else {
+        block.incrCurrIntegrCount();
+    }
 }
 
 
