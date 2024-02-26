@@ -140,21 +140,6 @@ se::LeicaReader::LeicaReader(const se::Reader::Config& c) : se::Reader(c)
         return;
     }
     std::string line;
-    int numberOfLines = 0;
-    while (std::getline(lidar_stream_, line))
-        numberOfLines++;
-    if (numberOfLines - 1 <= 0) {
-        status_ = se::ReaderStatus::error;
-        std::cerr << "Error: No LiDAR Measurements present in: " << sequence_path_ + "/lidar.csv\n";
-        return;
-    }
-    else if (verbose_ >= 1) {
-        std::clog << "Found " << numberOfLines << " measurement points\n";
-    }
-
-    // set reading position to second line
-    lidar_stream_.clear();
-    lidar_stream_.seekg(0, std::ios::beg);
     std::getline(lidar_stream_, line);
 
     // initialise current LiDAR timestamp_
@@ -176,9 +161,6 @@ se::LeicaReader::LeicaReader(const se::Reader::Config& c) : se::Reader(c)
         status_ = se::ReaderStatus::error;
         std::cerr << "Error: No Pose Data present in: " << sequence_path_ + "/trajectory.csv\n";
         return;
-    }
-    else if (verbose_ >= 1) {
-        std::clog << "Found " << numberOfLines << " VIO poses\n";
     }
 
     // set reading position to second line
