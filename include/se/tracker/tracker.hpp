@@ -13,6 +13,7 @@
 #include <se/map/preprocessor.hpp>
 #include <se/map/raycaster.hpp>
 #include <se/sensor/sensor.hpp>
+#include <se/tracker/icp.hpp>
 
 namespace se {
 
@@ -35,48 +36,6 @@ std::ostream& operator<<(std::ostream& os, const TrackerConfig& c);
 
 
 
-struct TrackData {
-    int result;
-    float error;
-    float J[6];
-
-    TrackData() : result(0), error(0.0f), J{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
-    {
-    }
-};
-
-
-
-static inline Eigen::Matrix<float, 6, 6> makeJTJ(const Eigen::Matrix<float, 1, 21>& v)
-{
-    Eigen::Matrix<float, 6, 6> C = Eigen::Matrix<float, 6, 6>::Zero();
-    C.row(0) = v.segment(0, 6);
-    C.row(1).segment(1, 5) = v.segment(6, 5);
-    C.row(2).segment(2, 4) = v.segment(11, 4);
-    C.row(3).segment(3, 3) = v.segment(15, 3);
-    C.row(4).segment(4, 2) = v.segment(18, 2);
-    C(5, 5) = v(20);
-
-    for (int r = 1; r < 6; ++r)
-        for (int c = 0; c < r; ++c)
-            C(r, c) = C(c, r);
-    return C;
-}
-
-
-
-static inline Eigen::Matrix<float, 6, 1> solve(const Eigen::Matrix<float, 1, 27>& vals)
-{
-    const Eigen::Matrix<float, 6, 1> b = vals.segment(0, 6);
-    const Eigen::Matrix<float, 6, 6> C = makeJTJ(vals.segment(6, 21));
-    Eigen::LLT<Eigen::Matrix<float, 6, 6>> llt;
-    llt.compute(C);
-    Eigen::Matrix<float, 6, 1> res = llt.solve(b);
-    return llt.info() == Eigen::Success ? res : Eigen::Matrix<float, 6, 1>::Zero();
-}
-
-
-
 template<typename MapT, typename SensorT>
 class Tracker {
     public:
@@ -84,7 +43,7 @@ class Tracker {
             map_(map),
             sensor_(sensor),
             config_(config),
-            tracking_result(sensor_.model.imageWidth() * sensor_.model.imageHeight(), TrackData())
+            tracking_result(sensor_.model.imageWidth() * sensor_.model.imageHeight(), icp::Data())
     {
     }
 
@@ -118,41 +77,10 @@ class Tracker {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    void newReduce(const int block_idx,
-                   float* output_data,
-                   const Eigen::Vector2i& output_res,
-                   TrackData* J_data,
-                   const Eigen::Vector2i& J_res);
-
-    void reduceKernel(float* output_data,
-                      const Eigen::Vector2i& output_res,
-                      TrackData* J_data,
-                      const Eigen::Vector2i& J_res);
-
-    void trackKernel(TrackData* output_data,
-                     const se::Image<Eigen::Vector3f>& input_point_cloud_S,
-                     const se::Image<Eigen::Vector3f>& input_normals_S,
-                     const se::Image<Eigen::Vector3f>& surface_point_cloud_M_ref,
-                     const se::Image<Eigen::Vector3f>& surface_normals_M_ref,
-                     const Eigen::Isometry3f& T_WS,
-                     const Eigen::Isometry3f& T_WS_ref,
-                     const float dist_threshold,
-                     const float normal_threshold);
-
-    bool updatePoseKernel(Eigen::Isometry3f& T_WS,
-                          const float* reduction_output_data,
-                          const float icp_threshold);
-
-    bool checkPoseKernel(Eigen::Isometry3f& T_WS,
-                         Eigen::Isometry3f& previous_T_WS,
-                         const float* reduction_output_data,
-                         const Eigen::Vector2i& reduction_output_res,
-                         const float track_threshold);
-
     MapT& map_;
     const SensorT& sensor_;
     const TrackerConfig config_;
-    std::vector<TrackData> tracking_result;
+    std::vector<icp::Data> tracking_result;
 };
 
 } // namespace se
