@@ -26,7 +26,7 @@ struct SemanticData {
 // Semantic data
 template<>
 struct SemanticData<Semantics::On> {
-    semantics_t sem = semantics_t(0);
+    segment_id_t segment_id = g_not_segmented;
 
     struct Config {
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the

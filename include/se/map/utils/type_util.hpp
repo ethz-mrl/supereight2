@@ -56,7 +56,15 @@ typedef int timestamp_t; ///< The type of the time stamp
 
 typedef RGB colour_t; ///< The type of the colour
 
-typedef uint8_t semantics_t; ///< The type of the semantic class
+/** The type used to represent identifiers. */
+typedef uint16_t segment_id_t;
+/** Indicates the absence of an identifier.
+ * XXX: rename to g_no_id
+ */
+inline constexpr segment_id_t g_not_segmented = 0;
+/** Used to distinguish a region that's unmapped from a region without an identifier. Underflow is
+ * well-defined for unsigned integers. */
+inline constexpr segment_id_t g_not_mapped = -1;
 
 } // namespace se
 
