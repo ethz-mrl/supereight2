@@ -28,6 +28,11 @@ template<>
 struct SemanticData<Semantics::On> {
     segment_id_t segment_id = g_not_segmented;
 
+    /** Set the segment ID to \p segment_id if \p segment_id is non-zero and return whether the data
+     * was updated.
+     */
+    bool update(const segment_id_t segment_id);
+
     struct Config {
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
@@ -40,5 +45,7 @@ std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::Off>::C
 std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::On>::Config& c);
 
 } // namespace se
+
+#include "impl/data_semantics_impl.hpp"
 
 #endif // SE_DATA_SEMANTICS_HPP
