@@ -870,6 +870,11 @@ marching_cube_kernel(const OctreeT& octree,
                                 }
                             }
                         }
+                        if constexpr (Face::sem == Semantics::On) {
+                            face.semantic.segment_id =
+                                visitor::getData(octree, block_ptr, Eigen::Vector3i(x, y, z))
+                                    .semantic.segment_id;
+                        }
 #pragma omp critical(marching_cubes)
                         {
                             mesh.push_back(face);
@@ -955,6 +960,13 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                     face.colour.vertexes[v] = *colour;
                                 }
                             }
+                        }
+                        if constexpr (Face::sem == Semantics::On) {
+                            int _;
+                            face.semantic.segment_id =
+                                visitor::getData(
+                                    octree, block_ptr, Eigen::Vector3i(x, y, z), voxel_scale, _)
+                                    .semantic.segment_id;
                         }
 #pragma omp critical(dual_marching_cubes)
                         {

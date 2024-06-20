@@ -14,6 +14,7 @@
 #include <optional>
 #include <se/common/rgb.hpp>
 #include <se/map/utils/setup_util.hpp>
+#include <se/map/utils/type_util.hpp>
 #include <vector>
 
 namespace se {
@@ -31,6 +32,11 @@ struct MeshFaceColourData<NumVertexes, Colour::On> {
 
 template<size_t NumVertexes, Semantics SemB>
 struct MeshFaceSemanticData {
+};
+
+template<size_t NumVertexes>
+struct MeshFaceSemanticData<NumVertexes, Semantics::On> {
+    segment_id_t segment_id = segment_id_t(0);
 };
 
 

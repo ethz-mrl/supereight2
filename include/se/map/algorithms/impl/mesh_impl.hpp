@@ -26,6 +26,9 @@ TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_
                 if constexpr (ColB == Colour::On) {
                     triangle.colour.vertexes[i] = quad.colour.vertexes[indices[i]];
                 }
+                if constexpr (SemB == Semantics::On) {
+                    triangle.semantic.segment_id = quad.semantic.segment_id;
+                }
             }
         }
     }
