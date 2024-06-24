@@ -27,6 +27,15 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         }
     }
 
+    const bool has_segments = SemB == Semantics::On && measurements.segments;
+    Eigen::Isometry3f T_CsC;
+    if constexpr (SemB == Semantics::On) {
+        if (has_segments) {
+            T_CsC = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
+        }
+    }
+
+
     const float truncation_boundary =
         map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
     const Eigen::Isometry3f T_CW = measurements.depth.T_WC.inverse();
@@ -69,6 +78,9 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                 if constexpr (ColB == Colour::On) {
                     data_union.past_data.colour.colour = data_union.data.colour.colour;
                     data_union.past_data.colour.weight = 0;
+                }
+                if constexpr (SemB == Semantics::On) {
+                    data_union.past_data.semantic.segment_id = data_union.data.semantic.segment_id;
                 }
             };
 
@@ -117,6 +129,12 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                                     child_data_union.data.colour.colour;
                                 child_data_union.past_data.colour.weight = 0;
                             }
+                        }
+                        if constexpr (SemB == Semantics::On) {
+                            child_data_union.data.semantic.segment_id =
+                                parent_data_union.data.semantic.segment_id;
+                            child_data_union.past_data.semantic.segment_id =
+                                child_data_union.data.semantic.segment_id;
                         }
                     }
                 }
@@ -170,7 +188,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                     // other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
                     if constexpr (ColB == Colour::On || SemB == Semantics::On) {
-                        if (has_colour && field_updated) {
+                        if ((has_colour || has_segments) && field_updated) {
                             measurements.depth.sensor.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
                         }
@@ -190,6 +208,24 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                                 data_union.data.colour.update(
                                     measurements.colour->image(colour_pixel.x(), colour_pixel.y()),
                                     map.getDataConfig().field.max_weight);
+                            }
+                        }
+                    }
+
+                    // Update the segment data if possible and only if the field was updated, that
+                    // is if we have corresponding depth information.
+                    if constexpr (SemB == Semantics::On) {
+                        if (has_segments && field_updated) {
+                            // Project the depth hit onto the segment image.
+                            const Eigen::Vector3f hit_Cs = T_CsC * hit_C;
+                            Eigen::Vector2f segment_pixel_f;
+                            if (measurements.segments->sensor.model.project(hit_Cs,
+                                                                            &segment_pixel_f)
+                                == srl::projection::ProjectionStatus::Successful) {
+                                const Eigen::Vector2i segment_pixel =
+                                    se::round_pixel(segment_pixel_f);
+                                data_union.data.semantic.update(measurements.segments->image(
+                                    segment_pixel.x(), segment_pixel.y()));
                             }
                         }
                     }
