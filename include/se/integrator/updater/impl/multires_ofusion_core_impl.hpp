@@ -81,7 +81,11 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
 {
     const bool newly_observed = !voxel_data.field.observed;
     voxel_data.field.update(config.field.log_odd_min, config.field.max_weight);
-    // We don't update colour or semantics in free space.
+    // Don't update colour in free space.
+    // Reset the segment ID to keep the map consistent in case something went from occupied to free.
+    if constexpr (DataT::sem_ == Semantics::On) {
+        voxel_data.semantic = typename DataT::SemanticType();
+    }
     return newly_observed;
 }
 

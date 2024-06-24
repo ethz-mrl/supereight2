@@ -29,6 +29,9 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         colour_sensor_(measurements.colour ? &measurements.colour->sensor : nullptr),
         colour_img_(measurements.colour ? &measurements.colour->image : nullptr),
         has_colour_(measurements.colour),
+        feature_sensor_(measurements.segments ? &measurements.segments->sensor : nullptr),
+        feature_img_(measurements.segments ? &measurements.segments->image : nullptr),
+        has_features_(measurements.segments),
         timestamp_(timestamp),
         map_res_(map.getRes()),
         config_(map),
@@ -38,6 +41,12 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
     if constexpr (ColB == Colour::On) {
         if (has_colour_) {
             T_CcC_ = measurements.colour->T_WC.inverse() * measurements.depth.T_WC;
+        }
+    }
+
+    if constexpr (SemB == Semantics::On) {
+        if (has_features_) {
+            T_CsC_ = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
         }
     }
 }
@@ -481,7 +490,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                     // data other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
                     if constexpr (ColB == Colour::On || SemB == Semantics::On) {
-                        if (has_colour_ && field_updated) {
+                        if ((has_colour_ || has_features_) && field_updated) {
                             sensor_.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
                         }
@@ -501,6 +510,27 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                                 data.colour.update(
                                     (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
                                     map_.getDataConfig().field.max_weight);
+                            }
+                        }
+                    }
+
+                    // Update the segment data if possible and only if the field was updated,
+                    // that is if we have corresponding depth information.
+                    if constexpr (SemB == Semantics::On) {
+                        if (has_features_ && field_updated) {
+                            const bool near_surface = data.field.occupancy
+                                > 0.95 * map_.getDataConfig().field.log_odd_min;
+                            if (near_surface) {
+                                // Project the depth hit onto the segment image.
+                                const Eigen::Vector3f hit_Cs = T_CsC_ * hit_C;
+                                Eigen::Vector2f segment_pixel_f;
+                                if (feature_sensor_->model.project(hit_Cs, &segment_pixel_f)
+                                    == srl::projection::ProjectionStatus::Successful) {
+                                    const Eigen::Vector2i segment_pixel =
+                                        se::round_pixel(segment_pixel_f);
+                                    data.semantic.update(
+                                        (*feature_img_)(segment_pixel.x(), segment_pixel.y()));
+                                }
                             }
                         }
                     }
@@ -543,6 +573,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         // We don't update colour or semantics in free space.
         node_ptr->min_data = node_data;
         node_ptr->max_data = node_ptr->min_data;
+        // Don't update colour in free space.
+        // Reset the segment ID to keep the map consistent in case something went from occupied to free.
+        if constexpr (SemB == Semantics::On) {
+            node_data.semantic = typename NodeType::DataType::SemanticType();
+        }
 #pragma omp critical(node_lock)
         { // Add node to node list for later up-propagation (finest node for this tree-branch)
             node_set_[depth - 1].insert(node_ptr->parent());
