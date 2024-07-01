@@ -221,7 +221,13 @@ int main(int argc, char** argv)
                 || last_frame) {
                 if (!config.app.mesh_path.empty()) {
                     stdfs::create_directories(config.app.mesh_path);
-                    map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+                    const auto mesh = map.mesh();
+                    se::io::save_mesh(
+                        mesh, config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+                    se::perfstats.sample("mesh size",
+                                         mesh.size() * sizeof(decltype(mesh)::value_type)
+                                             / (1024.0 * 1024.0),
+                                         se::PerfStats::MEMORY);
                 }
                 if (!config.app.slice_path.empty()) {
                     stdfs::create_directories(config.app.slice_path);
