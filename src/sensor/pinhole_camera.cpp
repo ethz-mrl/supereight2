@@ -58,6 +58,23 @@ template class srl::projection::PinholeCamera<srl::projection::NoDistortion>;
 // Used for initializing a PinholeCamera.
 const srl::projection::NoDistortion _distortion;
 
+// Return whether point_S is inside the frustum defined by frustum_normals_S offset by offset. If
+// offset is positive the frustum if offset outwards, otherwise it's offset inwards.
+static const auto point_in_offset_frustum = [](const Eigen::Vector3f& point_S,
+                                               const auto& frustum_normals_S,
+                                               const float offset) {
+    // An exact point-frustum intersection test can be implemented by computing the dot product of
+    // the point point_S with all inwards-pointing frustum face normals frustum_normals_S. A
+    // positive dot product indicates that the point lies in the halfspace pointed to by the normal,
+    // while a zero dot product indicates that the point is on the plane defined by the face. If all
+    // dot products are non-negative, then the point is inside the frustum. Comparing the dot
+    // products against some value other than zero is equivalent to translating the frustum faces
+    // along their normals.
+    return ((frustum_normals_S.array().colwise() * point_S.homogeneous().array()).colwise().sum()
+            >= -offset)
+        .all();
+};
+
 
 
 se::PinholeCamera::PinholeCamera(const Config& c) :
@@ -155,33 +172,15 @@ int se::PinholeCamera::blockIntegrationScaleImpl(const Eigen::Vector3f& block_ce
 
 bool se::PinholeCamera::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
-    for (int i = 0; i < FrustumNormal::Num; ++i) {
-        // Compute the signed distance between the point and the plane
-        const float distance = point_S.homogeneous().dot(frustum_normals_S.col(i));
-        if (distance < 0.0f) {
-            // A negative distance means that the point is located on the opposite
-            // halfspace than the one the plane normal is pointing towards
-            return false;
-        }
-    }
-    return true;
+    return point_in_offset_frustum(point_S, frustum_normals_S, 0.0f);
 }
 
 
 
 bool se::PinholeCamera::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
 {
-    // Skip the far plane normal
-    for (int i = 0; i < FrustumNormal::Far; ++i) {
-        // Compute the signed distance between the point and the plane
-        const float distance = point_S.homogeneous().dot(frustum_normals_S.col(i));
-        if (distance < 0.0f) {
-            // A negative distance means that the point is located on the opposite
-            // halfspace than the one the plane normal is pointing towards
-            return false;
-        }
-    }
-    return true;
+    // Same as se::PinholeCamera::pointInFrustumImpl() but skipping the far plane normal.
+    return point_in_offset_frustum(point_S, frustum_normals_S.leftCols<FrustumNormal::Far>(), 0.0f);
 }
 
 
@@ -189,18 +188,13 @@ bool se::PinholeCamera::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) co
 bool se::PinholeCamera::sphereInFrustumImpl(const Eigen::Vector3f& center_S,
                                             const float radius) const
 {
-    for (int i = 0; i < FrustumNormal::Num; ++i) {
-        // Compute the signed distance between the point and the plane
-        const float distance = center_S.homogeneous().dot(frustum_normals_S.col(i));
-        if (distance < -radius) {
-            // Instead of testing for negative distance as in
-            // se::PinholeCamera::pointInFrustum, test for distance smaller than
-            // -radius so that the test is essentially performed on the plane offset
-            // by radius.
-            return false;
-        }
-    }
-    return true;
+    // Instead of testing if center_S is inside the Minkowski sum of the frustum with the sphere, we
+    // test whether it is inside the frustum offset outwards by radius. The offset frustum is
+    // slightly larger in volume than the Minkowski sum, which will result in a small number of
+    // false positives. This approximate test is much faster than computing the Minkowski sum. Since
+    // we only use this test to quickly skip nodes outside the frustum, a small number of false
+    // positives will just result in unnecessary testing of some nodes.
+    return point_in_offset_frustum(center_S, frustum_normals_S, radius);
 }
 
 
@@ -208,19 +202,9 @@ bool se::PinholeCamera::sphereInFrustumImpl(const Eigen::Vector3f& center_S,
 bool se::PinholeCamera::sphereInFrustumInfImpl(const Eigen::Vector3f& center_S,
                                                const float radius) const
 {
-    // Skip the far plane normal
-    for (int i = 0; i < FrustumNormal::Far; ++i) {
-        // Compute the signed distance between the point and the plane
-        const float distance = center_S.homogeneous().dot(frustum_normals_S.col(i));
-        if (distance < -radius) {
-            // Instead of testing for negative distance as in
-            // se::PinholeCamera::pointInFrustum, test for distance smaller than
-            // -radius so that the test is essentially performed on the plane offset
-            // by radius.
-            return false;
-        }
-    }
-    return true;
+    // Same as se::PinholeCamera::sphereInFrustumImpl() but skipping the far plane normal.
+    return point_in_offset_frustum(
+        center_S, frustum_normals_S.leftCols<FrustumNormal::Far>(), radius);
 }
 
 
