@@ -56,7 +56,8 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    se::Image<colour_t>* surface_colour = nullptr);
+                    se::Image<colour_t>* surface_colour = nullptr,
+                    se::Image<segment_id_t>* surface_segment_id = nullptr);
 
 /** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render.
  * The colour of each point is returned by the functor \p get_diffuse_colour which must have the

@@ -541,7 +541,8 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_point_cloud_W,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
-                    se::Image<colour_t>* surface_colour)
+                    se::Image<colour_t>* surface_colour,
+                    se::Image<segment_id_t>* surface_segment_id)
 {
     assert(surface_point_cloud_W.width() == surface_normals_W.width());
     assert(surface_point_cloud_W.height() == surface_normals_W.height());
@@ -551,6 +552,12 @@ void raycast_volume(const MapT& map,
         if (surface_colour) {
             assert(surface_point_cloud_W.width() == surface_colour->width());
             assert(surface_point_cloud_W.height() == surface_colour->height());
+        }
+    }
+    if constexpr (MapT::sem_ == Semantics::On) {
+        if (surface_segment_id) {
+            assert(surface_point_cloud_W.width() == surface_segment_id->width());
+            assert(surface_point_cloud_W.height() == surface_segment_id->height());
         }
     }
     const typename MapT::OctreeType& octree = map.getOctree();
@@ -595,6 +602,12 @@ void raycast_volume(const MapT& map,
                         (*surface_colour)[idx] = result ? *result : colour_t();
                     }
                 }
+                if constexpr (MapT::sem_ == Semantics::On) {
+                    if (surface_segment_id) {
+                        (*surface_segment_id)[idx] =
+                            map.getData(surface_intersection_W->head<3>()).semantic.segment_id;
+                    }
+                }
             }
             else {
                 surface_point_cloud_W[idx] = Eigen::Vector3f::Zero();
@@ -602,6 +615,11 @@ void raycast_volume(const MapT& map,
                 if constexpr (MapT::col_ == Colour::On) {
                     if (surface_colour) {
                         (*surface_colour)[idx] = colour_t();
+                    }
+                }
+                if constexpr (MapT::sem_ == Semantics::On) {
+                    if (surface_segment_id) {
+                        (*surface_segment_id)[idx] = g_not_mapped;
                     }
                 }
             }
