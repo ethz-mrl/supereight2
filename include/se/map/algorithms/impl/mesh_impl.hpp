@@ -39,6 +39,87 @@ TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_
     return triangle_mesh;
 }
 
+
+
+namespace segment {
+
+template<typename FaceT, typename>
+std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh)
+{
+    std::map<segment_id_t, SegmentInfo> info;
+    for (const auto& face : mesh) {
+        const auto id = face.semantic.segment_id;
+        if (id) {
+            const auto [it, _] = info.try_emplace(id);
+            for (size_t v = 0; v < FaceT::num_vertexes; v++) {
+                const auto& vertex = face.vertexes[v];
+                it->second.centroid += vertex;
+                it->second.aabb.extend(vertex);
+                it->second.num_vertices++;
+            }
+        }
+    }
+    for (auto& p : info) {
+        p.second.centroid /= p.second.num_vertices;
+    }
+    return info;
+}
+
+
+
+template<typename FaceT, typename>
+std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh)
+{
+    return extract_segment_meshes(mesh, [](const segment_id_t id) { return id > 0; });
+}
+
+
+
+template<typename FaceT, typename ExtractSegmentF, typename>
+std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh,
+                                                           ExtractSegmentF extract_segment)
+{
+    std::map<segment_id_t, Mesh<FaceT>> meshes;
+    for (const auto& face : mesh) {
+        const auto id = face.semantic.segment_id;
+        if (extract_segment(id)) {
+            const auto [it, _] = meshes.try_emplace(id);
+            it->second.push_back(face);
+        }
+    }
+    return meshes;
+}
+
+
+
+template<typename FaceT, typename>
+void colour_mesh_by_segment(Mesh<FaceT>& mesh,
+                            const bool enable_shading,
+                            const Eigen::Vector3f& light_dir_W,
+                            const RGB ambient_light)
+{
+    const Eigen::Vector3f ambient_light_f(ambient_light.r, ambient_light.g, ambient_light.b);
+    for (auto& face : mesh) {
+        face.colour.face = segment_id_colour(face.semantic.segment_id);
+        if (enable_shading) {
+            const Eigen::Vector3f diffuse_colour(
+                face.colour.face.r, face.colour.face.g, face.colour.face.b);
+            const Eigen::Vector3f surface_normal_W =
+                math::plane_normal(face.vertexes[0], face.vertexes[1], face.vertexes[2]);
+            const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
+            Eigen::Vector3f col = intensity * diffuse_colour + ambient_light_f;
+            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
+            face.colour.face.r = col.x();
+            face.colour.face.g = col.y();
+            face.colour.face.b = col.z();
+        }
+    }
+}
+
+} // namespace segment
+
+
+
 namespace meshing {
 
 template<size_t NumFaceVertices>

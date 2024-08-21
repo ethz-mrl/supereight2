@@ -11,7 +11,11 @@
 
 #include <Eigen/StdVector>
 #include <array>
+#include <cstdint>
+#include <map>
 #include <optional>
+#include <se/common/eigen_utils.hpp>
+#include <se/common/math_util.hpp>
 #include <se/common/rgb.hpp>
 #include <se/map/utils/setup_util.hpp>
 #include <se/map/utils/type_util.hpp>
@@ -20,8 +24,7 @@
 namespace se {
 
 template<size_t NumVertexes, Colour ColB>
-struct MeshFaceColourData {
-};
+struct MeshFaceColourData {};
 
 template<size_t NumVertexes>
 struct MeshFaceColourData<NumVertexes, Colour::On> {
@@ -32,8 +35,7 @@ struct MeshFaceColourData<NumVertexes, Colour::On> {
 
 
 template<size_t NumVertexes, Semantics SemB>
-struct MeshFaceSemanticData {
-};
+struct MeshFaceSemanticData {};
 
 template<size_t NumVertexes>
 struct MeshFaceSemanticData<NumVertexes, Semantics::On> {
@@ -84,6 +86,50 @@ using QuadMesh = Mesh<Quad<ColB, SemB>>;
 /** Return a triangle mesh containig two triangles for each face of \p quad_mesh. */
 template<Colour ColB, Semantics SemB>
 TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_mesh);
+
+
+
+namespace segment {
+
+struct SegmentInfo {
+    Eigen::Vector3f centroid = Eigen::Vector3f::Zero();
+    Eigen::AlignedBox3f aabb;
+    size_t num_vertices = 0;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+/** Return information about all segments in \p mesh. The spatial information is in the same
+ * coordinate frame as \p mesh.
+ */
+template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh);
+
+/** Extract per-segment meshes for all segments in \p mesh. */
+template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh);
+
+/** Extract per-segment meshes for all segments in \p mesh for whose IDs \p extract_segment returns
+ * true. \p extract_segment must be a functor with the following signature:
+ * \code{.cpp}
+ * bool extract_segment(const segment_id_t);
+ * \endcode
+ */
+template<typename FaceT,
+         typename ExtractSegmentF,
+         typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh,
+                                                           ExtractSegmentF extract_segment);
+
+/** Colour the faces of \p mesh by their segment ID. */
+template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+void colour_mesh_by_segment(Mesh<FaceT>& mesh,
+                            const bool enable_shading = true,
+                            const Eigen::Vector3f& light_dir_W = Eigen::Vector3f(-1, 0, -1),
+                            const RGB ambient = RGB{0x40, 0x40, 0x40});
+
+} // namespace segment
+
+
 
 namespace meshing {
 
