@@ -21,10 +21,14 @@ TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_
         for (const auto& indices : tri_to_quad) {
             auto& triangle = triangle_mesh.emplace_back();
             triangle.scale = quad.scale;
+            if constexpr (ColB == Colour::On) {
+                triangle.colour.face = quad.colour.face;
+            }
             for (size_t i = 0; i < indices.size(); i++) {
                 triangle.vertexes[i] = quad.vertexes[indices[i]];
                 if constexpr (ColB == Colour::On) {
                     triangle.colour.vertexes[i] = quad.colour.vertexes[indices[i]];
+                    triangle.colour.face = quad.colour.face;
                 }
                 if constexpr (SemB == Semantics::On) {
                     triangle.semantic.segment_id = quad.semantic.segment_id;
