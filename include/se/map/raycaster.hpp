@@ -10,11 +10,15 @@
 #define SE_RAYCASTER_HPP
 
 #include <optional>
+#include <se/common/colour_utils.hpp>
 #include <se/common/eigen_utils.hpp>
 #include <se/common/math_util.hpp>
+#include <se/common/rgb.hpp>
+#include <se/common/rgba.hpp>
 #include <se/image/image.hpp>
 #include <se/map/octree/visitor.hpp>
 #include <se/map/octree/voxel_block_ray_iterator.hpp>
+#include <se/map/preprocessor.hpp>
 
 
 
@@ -103,6 +107,16 @@ void render_volume_colour(se::Image<RGBA>& render,
                           const se::Image<RGB>& surface_colour,
                           const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                           const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
+
+/** Given a map \p map and a depth image \p depth and the sensor characteristics
+ * as provided by \p sensor and the pose in the map frame \p T_WC,
+ * this function extracts the ids for each pixel in the depth image.
+ */
+template<typename MapT, typename SensorT>
+Image<segment_id_t> lookup_segment_ids(const MapT& map,
+                                       const Image<float>& depth,
+                                       const SensorT& sensor,
+                                       const Eigen::Isometry3f& T_WC);
 
 } // namespace raycaster
 } // namespace se

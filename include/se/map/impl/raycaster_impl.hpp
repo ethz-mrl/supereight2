@@ -664,6 +664,31 @@ void render_volume(se::Image<RGBA>& render,
     }
 }
 
+
+
+template<typename MapT, typename SensorT>
+Image<segment_id_t> lookup_segment_ids(const MapT& map,
+                                       const Image<float>& depth,
+                                       const SensorT& sensor,
+                                       const Eigen::Isometry3f& T_WC)
+{
+    Image<Eigen::Vector3f> point_cloud_C(depth.width(), depth.height());
+    preprocessor::depth_to_point_cloud(point_cloud_C, depth, sensor);
+    Image<segment_id_t> segment_id(depth.width(), depth.height());
+    for (size_t i = 0; i < point_cloud_C.size(); i++) {
+        const bool valid_depth = depth[i] >= sensor.near_plane && depth[i] <= sensor.far_plane;
+        const Eigen::Vector3f point_W = T_WC * point_cloud_C[i];
+        if (valid_depth && map.contains(point_W)) {
+            const auto& data = map.getData(point_W);
+            segment_id[i] = is_valid(data) ? data.semantic.segment_id : g_not_mapped;
+        }
+        else {
+            segment_id[i] = g_not_mapped;
+        }
+    }
+    return segment_id;
+}
+
 } // namespace raycaster
 } // namespace se
 
