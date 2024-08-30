@@ -78,13 +78,9 @@ struct BaseIterator {
     // Find the next Volume with valid data.
     void nextData();
 
-    // The 3 stacks should always be kept in sync.
-    // Pointers to the Nodes that haven't been checked yet.
-    std::stack<OctantBase*> octant_stack_;
-
-    OctantBase* octant_ = nullptr;
-
     OctreeType* octree_ptr_ = nullptr;
+    OctantBase* current_octant_ptr_ = nullptr;
+    std::stack<OctantBase*> octant_stack_;
 };
 
 

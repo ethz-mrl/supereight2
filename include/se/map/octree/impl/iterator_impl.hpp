@@ -50,7 +50,8 @@ bool BaseIterator<DerivedT>::operator==(const BaseIterator& other) const
 {
     // The volume_ is obtained from the current place in the octree so checking
     // it would be redundant.
-    return (octant_stack_ == other.octant_stack_ && octant_ == other.octant_);
+    return (octant_stack_ == other.octant_stack_
+            && current_octant_ptr_ == other.current_octant_ptr_);
 }
 
 
@@ -66,7 +67,7 @@ bool BaseIterator<DerivedT>::operator!=(const BaseIterator& other) const
 template<typename DerivedT>
 OctantBase* BaseIterator<DerivedT>::operator*() const
 {
-    return octant_;
+    return current_octant_ptr_;
 }
 
 
@@ -110,11 +111,11 @@ void BaseIterator<DerivedT>::nextData()
         }
 
         if (underlying()->isNext(octant)) {
-            octant_ = octant;
+            current_octant_ptr_ = octant;
             return;
         }
     }
-    octant_ = nullptr;
+    current_octant_ptr_ = nullptr;
 }
 
 } // namespace se
