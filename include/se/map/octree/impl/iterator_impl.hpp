@@ -74,33 +74,10 @@ OctantBase* BaseIterator<DerivedT>::operator*() const
 template<typename DerivedT>
 void BaseIterator<DerivedT>::init()
 {
-    if (octree_ptr_ != nullptr) {
-        NodeType* root = static_cast<NodeType*>((octree_ptr_)->getRoot());
-        if (root != nullptr) {
-            // Push the root's children on the stack
-            for (unsigned int child_idx = 0; child_idx < 8; ++child_idx) {
-                OctantBase* child_ptr = root->getChild(child_idx);
-                if (child_ptr) {
-                    octant_stack_.push(child_ptr);
-                }
-            }
-
-            // Check if root is part of iterator
-            if constexpr (DerivedT::has_ignore_condition == true) {
-                if (underlying()->doIgnore(root)) {
-                    nextData();
-                    return;
-                }
-            }
-
-            if (underlying()->isNext(root)) {
-                octant_ = root;
-                return;
-            }
-
-            // Find the next Volume
-            nextData();
-        }
+    if (octree_ptr_) {
+        assert(octree_ptr_->getRoot());
+        octant_stack_.push(octree_ptr_->getRoot());
+        nextData();
     }
 }
 
