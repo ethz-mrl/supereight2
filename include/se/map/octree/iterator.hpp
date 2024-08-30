@@ -62,12 +62,10 @@ struct BaseIterator {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    void init();
-
-    private:
     // Find the next Volume with valid data.
     void nextData();
 
+    private:
     OctreeType* octree_ptr_ = nullptr;
     OctantBase* current_octant_ptr_ = nullptr;
     std::stack<OctantBase*> octant_stack_;
@@ -77,12 +75,14 @@ struct BaseIterator {
 
 template<typename OctreeT>
 struct OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
-    OctreeIterator() : BaseIterator<OctreeIterator<OctreeT>>(){};
+    OctreeIterator() : BaseIterator<OctreeIterator<OctreeT>>()
+    {
+    }
 
     OctreeIterator(OctreeT* octree_ptr) : BaseIterator<OctreeIterator<OctreeT>>(octree_ptr)
     {
-        this->init();
-    };
+        this->nextData();
+    }
 
     bool isNext(OctantBase* /* octant_ptr */)
     {
@@ -96,12 +96,14 @@ struct OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
-    NodesIterator() : BaseIterator<NodesIterator<OctreeT>>(){};
+    NodesIterator() : BaseIterator<NodesIterator<OctreeT>>()
+    {
+    }
 
     NodesIterator(OctreeT* octree_ptr) : BaseIterator<NodesIterator<OctreeT>>(octree_ptr)
     {
-        this->init();
-    };
+        this->nextData();
+    }
 
     bool isNext(OctantBase* octant_ptr)
     {
@@ -115,12 +117,14 @@ struct NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
-    BlocksIterator() : BaseIterator<BlocksIterator<OctreeT>>(){};
+    BlocksIterator() : BaseIterator<BlocksIterator<OctreeT>>()
+    {
+    }
 
     BlocksIterator(OctreeT* octree_ptr) : BaseIterator<BlocksIterator<OctreeT>>(octree_ptr)
     {
-        this->init();
-    };
+        this->nextData();
+    }
 
     bool isNext(OctantBase* octant_ptr)
     {
@@ -134,12 +138,14 @@ struct BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
-    LeavesIterator() : BaseIterator<LeavesIterator<OctreeT>>(){};
+    LeavesIterator() : BaseIterator<LeavesIterator<OctreeT>>()
+    {
+    }
 
     LeavesIterator(OctreeT* octree_ptr) : BaseIterator<LeavesIterator<OctreeT>>(octree_ptr)
     {
-        this->init();
-    };
+        this->nextData();
+    }
 
     bool isNext(OctantBase* octant_ptr)
     {
@@ -153,13 +159,15 @@ struct LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
-    UpdateIterator() : BaseIterator<UpdateIterator<OctreeT>>(), time_stamp_(0){};
+    UpdateIterator() : BaseIterator<UpdateIterator<OctreeT>>(), time_stamp_(0)
+    {
+    }
 
     UpdateIterator(OctreeT* octree_ptr, timestamp_t time_stamp) :
             BaseIterator<UpdateIterator<OctreeT>>(octree_ptr), time_stamp_(time_stamp)
     {
-        this->init();
-    };
+        this->nextData();
+    }
 
     bool isNext(OctantBase* octant_ptr)
     {
@@ -181,7 +189,9 @@ template<typename MapT, typename SensorT>
 struct FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     typedef typename MapT::OctreeType OctreeType;
 
-    FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>(){};
+    FrustumIterator() : BaseIterator<FrustumIterator<MapT, SensorT>>()
+    {
+    }
 
     FrustumIterator(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_SM) :
             BaseIterator<FrustumIterator<MapT, SensorT>>(&map.getOctree()),
@@ -189,7 +199,7 @@ struct FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
             sensor_ptr_(&sensor),
             T_SM_(T_SM)
     {
-        this->init();
+        this->nextData();
     }
 
     bool isNext(OctantBase* octant_ptr)

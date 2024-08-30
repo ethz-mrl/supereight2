@@ -77,14 +77,6 @@ OctantBase* BaseIterator<DerivedT>::operator*() const
 
 
 template<typename DerivedT>
-void BaseIterator<DerivedT>::init()
-{
-    nextData();
-}
-
-
-
-template<typename DerivedT>
 void BaseIterator<DerivedT>::nextData()
 {
     while (!octant_stack_.empty()) {
