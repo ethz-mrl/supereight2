@@ -15,8 +15,6 @@ namespace se {
 template<typename DerivedT>
 BaseIterator<DerivedT>::BaseIterator()
 {
-    // Reset to an invalid (end) iterator
-    clear();
 }
 
 
@@ -24,8 +22,6 @@ BaseIterator<DerivedT>::BaseIterator()
 template<typename DerivedT>
 BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octree_ptr)
 {
-    // Reset to an invalid (end) iterator
-    clear();
 }
 
 
