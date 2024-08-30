@@ -38,10 +38,6 @@ struct BaseIterator {
     typedef typename BaseTraits<DerivedT>::OctreeType OctreeType;
     typedef typename OctreeType::NodeType NodeType;
 
-    BaseIterator();
-
-    BaseIterator(OctreeType* octree_ptr);
-
     BaseIterator& operator++();
 
     BaseIterator operator++(int);
@@ -62,6 +58,10 @@ struct BaseIterator {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
+    BaseIterator();
+
+    BaseIterator(OctreeType* octree_ptr);
+
     // Find the next Volume with valid data.
     void nextData();
 
