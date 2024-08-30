@@ -94,7 +94,7 @@ void BaseIterator<DerivedT>::nextData()
         octant_stack_.pop();
 
         if constexpr (DerivedT::has_ignore_condition == true) {
-            if (underlying()->doIgnore(octant)) {
+            if (static_cast<DerivedT*>(this)->doIgnore(octant)) {
                 continue;
             }
         }
@@ -110,7 +110,7 @@ void BaseIterator<DerivedT>::nextData()
             // Then continue until a leaf is found
         }
 
-        if (underlying()->isNext(octant)) {
+        if (static_cast<DerivedT*>(this)->isNext(octant)) {
             current_octant_ptr_ = octant;
             return;
         }

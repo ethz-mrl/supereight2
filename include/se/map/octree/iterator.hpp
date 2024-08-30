@@ -65,16 +65,6 @@ struct BaseIterator {
     void init();
 
     private:
-    DerivedT* underlying()
-    {
-        return static_cast<DerivedT*>(this);
-    }
-
-    const DerivedT* underlying() const
-    {
-        return static_cast<const DerivedT*>(this);
-    }
-
     // Find the next Volume with valid data.
     void nextData();
 
