@@ -29,10 +29,6 @@ BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octre
 template<typename DerivedT>
 BaseIterator<DerivedT>& BaseIterator<DerivedT>::operator++()
 {
-    if (octant_stack_.empty()) {
-        clear();
-        return *this;
-    }
     nextData();
     return *this;
 }
@@ -42,10 +38,6 @@ BaseIterator<DerivedT>& BaseIterator<DerivedT>::operator++()
 template<typename DerivedT>
 BaseIterator<DerivedT> BaseIterator<DerivedT>::operator++(int)
 {
-    if (octant_stack_.empty()) {
-        clear();
-        return *this;
-    }
     BaseIterator<DerivedT> previous_state(*this);
     nextData();
     return previous_state;
@@ -117,11 +109,7 @@ void BaseIterator<DerivedT>::init()
 template<typename DerivedT>
 void BaseIterator<DerivedT>::nextData()
 {
-    while (true) {
-        if (octant_stack_.empty()) {
-            clear();
-            return;
-        }
+    while (!octant_stack_.empty()) {
         // Get the data from the top of the stacks
         OctantBase* octant = octant_stack_.top();
         // Pop the node since we'll be done with it after this call
@@ -149,14 +137,6 @@ void BaseIterator<DerivedT>::nextData()
             return;
         }
     }
-}
-
-
-
-template<typename DerivedT>
-void BaseIterator<DerivedT>::clear()
-{
-    octant_stack_ = std::stack<OctantBase*>();
     octant_ = nullptr;
 }
 
