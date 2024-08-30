@@ -80,9 +80,7 @@ template<typename DerivedT>
 void BaseIterator<DerivedT>::nextData()
 {
     while (!octant_stack_.empty()) {
-        // Get the data from the top of the stacks
         OctantBase* const octant_ptr = octant_stack_.top();
-        // Pop the node since we'll be done with it after this call
         octant_stack_.pop();
 
         if constexpr (DerivedT::has_ignore_condition == true) {
@@ -91,16 +89,14 @@ void BaseIterator<DerivedT>::nextData()
             }
         }
 
-        if (octant_ptr != nullptr && !octant_ptr->is_block) {
-            // Non-leaf Node, push all children to the stack
+        if (octant_ptr && !octant_ptr->is_block) {
+            // Node found, push all children to the stack.
             for (int child_idx = 0; child_idx < 8; child_idx++) {
-                OctantBase* const child_ptr =
-                    static_cast<NodeType*>(octant_ptr)->getChild(child_idx);
+                auto* const child_ptr = static_cast<NodeType*>(octant_ptr)->getChild(child_idx);
                 if (child_ptr) {
                     octant_stack_.push(child_ptr);
                 }
             }
-            // Then continue until a leaf is found
         }
 
         if (static_cast<DerivedT*>(this)->isNext(octant_ptr)) {
