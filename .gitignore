@@ -7,3 +7,5 @@ build
 datasets
 doc/html
 tags
+.vscode/
+jj.txt

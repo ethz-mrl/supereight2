@@ -119,3 +119,33 @@ target_compile_definitions(supereight_occupancy_multi_lidar PRIVATE _FILE_OFFSET
 add_executable(supereight2_sizes src/supereight2_sizes.cpp)
 target_compile_options(supereight2_sizes PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_link_libraries(supereight2_sizes PRIVATE SRL::Supereight2 ${LIB_NAME})
+# For the main_mvs.cpp
+find_package(OpenCV REQUIRED)
+find_package(Torch REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+add_executable(mvs_test 
+    src/main_mvs.cpp
+    src/reader_tum.cpp
+    src/reader_leica.cpp
+    src/reader_newercollege.cpp
+    src/reader_raw.cpp
+    src/montage.cpp
+    src/reader_interiornet.cpp
+    src/reader_openni.cpp
+    src/config.cpp
+    src/reader.cpp
+    src/reader_base.cpp)
+
+target_include_directories(mvs_test
+    PUBLIC
+        include
+        ${EIGEN3_INCLUDE_DIRS}
+    )
+
+target_link_libraries(mvs_test 
+    ${OpenCV_LIBS}
+    ${TORCH_LIBRARIES}
+    SRL::Supereight2
+    SRL::Projection
+    )

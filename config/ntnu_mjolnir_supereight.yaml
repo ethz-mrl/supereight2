@@ -1,0 +1,61 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+general:
+  sensor_type:                "depth"  # depth | leica
+  results_directory:          "/usr/wiss/juja/storage/local/juja/euroc/MH_02_easy/results/submaps-tmp"
+  write_dbg_output:           true
+  depth_image_resolution_downsampling: 2
+  sensor_measurement_downsampling: 2
+  submap_kf_threshold:        10
+  submap_overlap_ratio:       0.2
+  submap_min_frames:          100
+  submap_state_buffer:        1 # Buffer, if in 10 states we have not created a submap we start integrating it into supereight
+  use_map_to_map_factors:  true
+  use_map_to_live_factors: true
+  n_factors_per_state:     200 # number of points per depth images
+  sensor_error:            0.4 # 1-sigma for obsv. noise [m]
+  use_uncertainty:         true
+  need_rectify:            true
+
+map:
+  dim:            [25.6, 25.6, 25.6]
+  res:            0.025
+  free_space_res: 0.05
+
+data:
+  # occupancy data
+  surface_boundary:        0
+  min_occupancy:           -100
+  max_occupancy:            100
+  log_odd_min:             -5.015
+  log_odd_max:              5.015
+  fs_integr_scale:         1
+  const_surface_thickness: false
+  uncertainty_model:       quadratic
+  tau_min_factor:          3
+  tau_max_factor:          12
+  k_tau:                   0.02
+  sigma_min_factor:        1      # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:        20     # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                 0.05
+
+  # lidar ray integration
+  k_scale: 6e-03
+
+sensor:
+  # Rectified camera parameters in euroc dataset
+  width:                      512
+  height:                     384
+  fx:                         429.829
+  fy:                         429.829
+  cx:                         256.110
+  cy:                         201.854
+  near_plane:                 0.4
+  far_plane:                  4.0
+  scale:      1.0 # Scale factor to apply to the depth images received from the camera to convert them to meters
+  T_BS:      [0.002973454542938,  -0.009217997585886,   0.999953092444135,   0.058716167950141,
+             -0.999976687286619,  -0.006173999406430,   0.002916610123073,   0.063292561772877,
+              0.006146824494134,  -0.999938453231916,  -0.009236140795934,   0.024364656330018,
+                            0.0,                 0.0,                 0.0,   1.000000000000000]

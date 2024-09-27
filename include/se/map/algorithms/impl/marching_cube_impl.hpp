@@ -27,7 +27,8 @@ static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
     // 1 occupied vertex (valid and inside).
     std::uint8_t edge_index = 0;
     for (int i = 0; i < 8; i++) {
-        if (!is_valid(data[i])) {
+        // if (!is_valid(data[i])) {
+        if (data[i].field.weight < 3) {
             return 0;
         }
         if (is_inside(data[i])) {
