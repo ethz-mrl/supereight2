@@ -273,6 +273,51 @@ interpColour(const OctreeT& octree,
 
 
 
+/** Return the gradient of a member of se::Data of \p octree at \p voxel_coord_f in voxels and scale
+ * \p desired_scale. The scale the gradient is computed at may be coarser than \p desired_scale and
+ * is written into \p returned_scale.
+ *
+ * \param[in] octree          The octree whose data will be used for the gradient computation the data.
+ * \param[in] voxel_coord_f   The voxel coordinates the data gradient will be computed at. The
+ *                            coordinates may have a fractional part.
+ * \param[in] valid           A functor with the following declaration, returning whether the
+ *                            supplied data is valid and should be used for gradient computation:
+ *                            \code{.cpp}
+ *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+ *                            bool valid(const typename se::Data<FldT, ColB, IdB>& data);
+ *                            \endcode
+ * \param[in] get             A functor with the following declaration, returning the data of type
+ *                            \p T the gradient of which will be computed:
+ *                            \code{.cpp}
+ *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+ *                            T get(const typename se::Data<FldT, ColB, IdB>& data);
+ *                            \endcode
+ *                            Type \p T must implement the following operators:
+ *                            \code{.cpp}
+ *                            T operator+(const T& a, const T& b);
+ *                            T operator-(const T& a, const T& b);
+ *                            T operator*(const T& a, const float b);
+ *                            \endcode
+ * \param[in]  desired_scale  The finest scale the data gradient should be computed at. Ignored for
+ *                            se::Res::Single octrees.
+ * \param[out] returned_scale The actual scale the gradient was computed at will be stored into \p
+ *                            *returned_scale if \p returned_scale is non-null. \p *returned_scale
+ *                            is not modified if \p std::nullopt is returned. The value of \p
+ *                            *returned_scale will not be less than \p desired_scale in
+ *                            se::Res::Multi octrees.
+ * \return The data gradient if valid, \p std::nullopt otherwise.
+ */
+template<typename OctreeT, typename ValidF, typename GetF>
+std::optional<Eigen::Matrix<std::invoke_result_t<GetF, typename OctreeT::DataType>, 3, 1>>
+grad(const OctreeT& octree,
+     const Eigen::Vector3f& voxel_coord_f,
+     ValidF valid,
+     GetF get,
+     const Scale desired_scale = 0,
+     Scale* const returned_scale = nullptr);
+
+
+
 /// Single-res get gradient functions
 
 /**

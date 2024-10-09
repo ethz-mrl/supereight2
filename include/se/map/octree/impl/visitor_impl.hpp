@@ -814,6 +814,270 @@ interpImpl(const OctreeT& octree,
     return std::nullopt;
 }
 
+
+
+template<typename OctreeT>
+std::array<Eigen::Vector3i, 32>
+gradient_sample_coords(const OctreeT& octree, const Eigen::Vector3i& base_coord, const int scale)
+{
+    assert(base_coord.x() >= 0);
+    assert(base_coord.y() >= 0);
+    assert(base_coord.z() >= 0);
+    assert(base_coord.x() < octree.getSize());
+    assert(base_coord.y() < octree.getSize());
+    assert(base_coord.z() < octree.getSize());
+    assert(scale >= 0);
+
+    const int stride = octantops::scale_to_size(scale);
+    const Eigen::Vector3i octree_min_coord = Eigen::Vector3i::Zero();
+    const Eigen::Vector3i octree_max_coord = Eigen::Vector3i::Constant(octree.getSize() - 1);
+
+    // XXX: Is the gradient computation still correct near the octree boundaries given the
+    // coordinate clamping below?
+    const Eigen::Vector3i lower_lower =
+        (base_coord - Eigen::Vector3i::Constant(stride)).cwiseMax(octree_min_coord);
+    const Eigen::Vector3i& lower_upper = base_coord;
+    const Eigen::Vector3i upper_lower =
+        (base_coord + Eigen::Vector3i::Constant(stride)).cwiseMin(octree_max_coord);
+    const Eigen::Vector3i upper_upper =
+        (base_coord + Eigen::Vector3i::Constant(2 * stride)).cwiseMin(octree_max_coord);
+
+    // Compute the coordinates of the 32 points used for the gradient computation.
+    return std::array<Eigen::Vector3i, 32>{
+        Eigen::Vector3i(lower_lower.x(), lower_upper.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(lower_lower.x(), upper_lower.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(lower_lower.x(), lower_upper.y(), upper_lower.z()), // Unique
+        Eigen::Vector3i(lower_lower.x(), upper_lower.y(), upper_lower.z()), // Unique
+
+        Eigen::Vector3i(lower_upper.x(), lower_lower.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), lower_lower.y(), upper_lower.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), lower_upper.y(), lower_lower.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), lower_upper.y(), lower_upper.z()), // Non-unique 3x
+        Eigen::Vector3i(lower_upper.x(), lower_upper.y(), upper_lower.z()), // Non-unique 3x
+        Eigen::Vector3i(lower_upper.x(), lower_upper.y(), upper_upper.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), upper_lower.y(), lower_lower.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), upper_lower.y(), lower_upper.z()), // Non-unique 3x
+        Eigen::Vector3i(lower_upper.x(), upper_lower.y(), upper_lower.z()), // Non-unique 3x
+        Eigen::Vector3i(lower_upper.x(), upper_lower.y(), upper_upper.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), upper_upper.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(lower_upper.x(), upper_upper.y(), upper_lower.z()), // Unique
+
+        Eigen::Vector3i(upper_lower.x(), lower_lower.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), lower_lower.y(), upper_lower.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), lower_upper.y(), lower_lower.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), lower_upper.y(), lower_upper.z()), // Non-unique 3x
+        Eigen::Vector3i(upper_lower.x(), lower_upper.y(), upper_lower.z()), // Non-unique 3x
+        Eigen::Vector3i(upper_lower.x(), lower_upper.y(), upper_upper.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), upper_lower.y(), lower_lower.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), upper_lower.y(), lower_upper.z()), // Non-unique 3x
+        Eigen::Vector3i(upper_lower.x(), upper_lower.y(), upper_lower.z()), // Non-unique 3x
+        Eigen::Vector3i(upper_lower.x(), upper_lower.y(), upper_upper.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), upper_upper.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(upper_lower.x(), upper_upper.y(), upper_lower.z()), // Unique
+
+        Eigen::Vector3i(upper_upper.x(), lower_upper.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(upper_upper.x(), upper_lower.y(), lower_upper.z()), // Unique
+        Eigen::Vector3i(upper_upper.x(), lower_upper.y(), upper_lower.z()), // Unique
+        Eigen::Vector3i(upper_upper.x(), upper_lower.y(), upper_lower.z())  // Unique
+    };
+}
+
+
+
+template<typename T>
+Eigen::Matrix<T, 3, 1>
+gradient(const Eigen::Vector3f& t, const std::array<T, 32>& data, const int scale)
+{
+    assert(t.x() >= 0.0f);
+    assert(t.y() >= 0.0f);
+    assert(t.z() >= 0.0f);
+    assert(t.x() <= 1.0f);
+    assert(t.y() <= 1.0f);
+    assert(t.z() <= 1.0f);
+    assert(scale >= 0);
+
+    // Divide by 2 for the numerical gradient computation and then divide by the size in voxels at
+    // this scale to get a correctly scaled result for scales greater than 0.
+    const float scaling = 0.5f / octantops::scale_to_size(scale);
+    const Eigen::Vector3f tc = Eigen::Vector3f::Ones() - t;
+    Eigen::Matrix<T, 3, 1> grad;
+
+    grad.x() = scaling
+        * ((((data[19] - data[0]) * tc.x() + (data[28] - data[7]) * t.x()) * tc.y()
+            + ((data[23] - data[1]) * tc.x() + (data[29] - data[11]) * t.x()) * t.y())
+               * tc.z()
+           + (((data[20] - data[2]) * tc.x() + (data[30] - data[8]) * t.x()) * tc.y()
+              + ((data[24] - data[3]) * tc.x() + (data[31] - data[12]) * t.x()) * t.y())
+               * t.z());
+
+    grad.y() = scaling
+        * ((((data[11] - data[4]) * tc.x() + (data[23] - data[16]) * t.x()) * tc.y()
+            + ((data[14] - data[7]) * tc.x() + (data[26] - data[19]) * t.x()) * t.y())
+               * tc.z()
+           + (((data[12] - data[5]) * tc.x() + (data[24] - data[17]) * t.x()) * tc.y()
+              + ((data[15] - data[8]) * tc.x() + (data[27] - data[20]) * t.x()) * t.y())
+               * t.z());
+
+    grad.z() = scaling
+        * ((((data[8] - data[6]) * tc.x() + (data[20] - data[18]) * t.x()) * tc.y()
+            + ((data[12] - data[10]) * tc.x() + (data[24] - data[22]) * t.x()) * t.y())
+               * tc.z()
+           + (((data[9] - data[7]) * tc.x() + (data[21] - data[19]) * t.x()) * tc.y()
+              + ((data[13] - data[11]) * tc.x() + (data[25] - data[23]) * t.x()) * t.y())
+               * t.z());
+
+    return grad;
+}
+
+
+
+template<typename OctreeT, typename ValidF, typename GetF>
+typename std::enable_if_t<
+    OctreeT::res_ == Res::Single,
+    std::optional<Eigen::Matrix<std::invoke_result_t<GetF, typename OctreeT::DataType>, 3, 1>>>
+gradImpl(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF valid, GetF get)
+{
+    assert(voxel_coord_f.x() >= 0.0f);
+    assert(voxel_coord_f.y() >= 0.0f);
+    assert(voxel_coord_f.z() >= 0.0f);
+    assert(voxel_coord_f.x() < octree.getSize());
+    assert(voxel_coord_f.y() < octree.getSize());
+    assert(voxel_coord_f.z() < octree.getSize());
+    // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out of
+    // the 8 voxels nearest to the query point.
+    const Eigen::Vector3f base_coord_f = voxel_coord_f - sample_offset_frac;
+    const Eigen::Vector3i base_coord = base_coord_f.template cast<int>();
+    // Gather the data at the sample points.
+    const auto sample_coords = detail::gradient_sample_coords(octree, base_coord, 0);
+    std::array<std::invoke_result_t<GetF, typename OctreeT::DataType>, sample_coords.size()>
+        sample_data;
+    for (size_t i = 0; i < sample_coords.size(); i++) {
+        const auto& data = getData(octree, sample_coords[i]);
+        if (!valid(data)) {
+            return std::nullopt;
+        }
+        sample_data[i] = get(data);
+    }
+    return detail::gradient(math::fracf(base_coord_f), sample_data, 0);
+}
+
+
+
+template<typename OctreeT, typename ValidF, typename GetF>
+typename std::enable_if_t<
+    OctreeT::res_ == Res::Multi,
+    std::optional<Eigen::Matrix<std::invoke_result_t<GetF, typename OctreeT::DataType>, 3, 1>>>
+gradImpl(const OctreeT& octree,
+         const Eigen::Vector3f& voxel_coord_f,
+         ValidF valid,
+         GetF get,
+         const Scale desired_scale,
+         Scale* const returned_scale)
+{
+    assert(voxel_coord_f.x() >= 0.0f);
+    assert(voxel_coord_f.y() >= 0.0f);
+    assert(voxel_coord_f.z() >= 0.0f);
+    assert(voxel_coord_f.x() < octree.getSize());
+    assert(voxel_coord_f.y() < octree.getSize());
+    assert(voxel_coord_f.z() < octree.getSize());
+    assert(desired_scale >= 0);
+
+    typedef typename OctreeT::BlockType BlockType;
+    typedef Eigen::Matrix<std::invoke_result_t<GetF, typename OctreeT::DataType>, 3, 1> GradType;
+    const OctantBase* const octant = fetcher::template finest_octant<OctreeT>(
+        voxel_coord_f.cast<int>(), desired_scale, octree.getRoot());
+    if (!octant) {
+        // Nothing is allocated here, can't compute a gradient.
+        return std::nullopt;
+    }
+    if (!octant->is_block) {
+        // The octree is not allocated down to the Block level.
+        if constexpr (OctreeT::DataType::fld_ == Field::Occupancy) {
+            // Test the Node data.
+            const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant);
+            if (is_valid(node.data())) {
+                // The Node has valid data which should be free space. This part of the map has
+                // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
+                // boundary of the node where there can be small non-zero gradients. It's a rather
+                // good and simple approximation though.
+                if (returned_scale) {
+                    *returned_scale = octantops::size_to_scale(node.size);
+                }
+                return GradType::Zero();
+            }
+            else {
+                // The Node has no valid data (unkown space), can't compute a gradient.
+                return std::nullopt;
+            }
+        }
+        else {
+            // Node-level data is only available in occupancy maps, can't compute a gradient.
+            return std::nullopt;
+        }
+    }
+
+    // Compute the gradient at the finest possible scale.
+    const auto* const block_ptr = static_cast<const BlockType*>(octant);
+    const Scale init_scale = std::max(desired_scale, block_ptr->current_scale);
+    for (Scale scale = init_scale; scale <= BlockType::max_scale; scale++) {
+        const int stride = octantops::scale_to_size(scale);
+        const Eigen::Vector3f scaled_voxel_coord_f =
+            1.0f / stride * voxel_coord_f - sample_offset_frac;
+        const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
+
+        const OctantBase* const octant_ptr =
+            fetcher::template finest_octant<OctreeT>(base_coord, scale, octree.getRoot());
+        if (!octant_ptr) {
+            // If this octant isn't allocated there's still a chance a gradient exists at a coarser
+            // scale.
+            continue;
+        }
+        // TODO: Is it expected that a node might be queried while computing the gradient or is
+        // there some bug in the algorithm?
+        if (!octant_ptr->is_block) {
+            const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
+            if (node.isLeaf() && is_valid(node.data())) {
+                // Attempting to compute the gradient at a node, approximate with 0 as before.
+                if (returned_scale) {
+                    *returned_scale = octantops::size_to_scale(node.size);
+                }
+                return GradType::Zero();
+            }
+            else {
+                // If this node isn't observed there's still a chance a gradient exists at a coarser
+                // scale.
+                continue;
+            }
+        }
+        const auto* const block_ptr = static_cast<const BlockType*>(octant);
+
+        // Gather the data at the sample points.
+        const auto sample_coords = detail::gradient_sample_coords(octree, base_coord, scale);
+        std::array<typename GradType::Scalar, sample_coords.size()> sample_data;
+        bool data_valid = true;
+        for (size_t i = 0; i < sample_coords.size(); i++) {
+            Scale returned_scale;
+            const auto& data = getData(octree, block_ptr, sample_coords[i], scale, returned_scale);
+            if (returned_scale != scale || !valid(data)) {
+                data_valid = false;
+                break;
+            }
+            sample_data[i] = get(data);
+        }
+        if (!data_valid) {
+            // There might be valid data at a coarser scale.
+            continue;
+        }
+
+        if (returned_scale) {
+            *returned_scale = scale;
+        }
+        return detail::gradient(math::fracf(scaled_voxel_coord_f), sample_data, scale);
+    }
+
+    return std::nullopt;
+}
+
 } // namespace detail
 
 
@@ -1076,6 +1340,29 @@ interpColour(const OctreeT& octree,
         [](const typename OctreeT::DataType& d) { return d.colour.colour; },
         desired_scale,
         returned_scale);
+}
+
+
+
+template<typename OctreeT, typename ValidF, typename GetF>
+std::optional<Eigen::Matrix<std::invoke_result_t<GetF, typename OctreeT::DataType>, 3, 1>>
+grad(const OctreeT& octree,
+     const Eigen::Vector3f& voxel_coord_f,
+     ValidF valid,
+     GetF get,
+     [[maybe_unused]] const Scale desired_scale,
+     Scale* const returned_scale)
+{
+    if constexpr (OctreeT::res_ == Res::Single) {
+        const auto result = detail::gradImpl(octree, voxel_coord_f, valid, get);
+        if (result && returned_scale) {
+            *returned_scale = 0;
+        }
+        return result;
+    }
+    else {
+        return detail::gradImpl(octree, voxel_coord_f, valid, get, desired_scale, returned_scale);
+    }
 }
 
 
