@@ -31,13 +31,23 @@ struct LeicaPoseEntry {
     LeicaPoseEntry(const std::string& s)
     {
         const std::vector<std::string> columns = se::str_utils::split_str(s, ',', true);
-        timestamp = std::stol(columns[1].c_str());
+        // timestamp = std::stol(columns[1].c_str());
+        // position =
+        //     Eigen::Vector3f(std::stof(columns[2]), std::stof(columns[3]), std::stof(columns[4]));
+        // orientation = Eigen::Quaternionf(std::stof(columns[5]),
+        //                                  std::stof(columns[6]),
+        //                                  std::stof(columns[7]),
+        //                                  std::stof(columns[8]));
+
+        // This is based on OKVIS2 trajectory output format
+        timestamp = std::stol(columns[0].c_str());
         position =
-            Eigen::Vector3f(std::stof(columns[2]), std::stof(columns[3]), std::stof(columns[4]));
-        orientation = Eigen::Quaternionf(std::stof(columns[5]),
-                                         std::stof(columns[6]),
-                                         std::stof(columns[7]),
-                                         std::stof(columns[8]));
+            Eigen::Vector3f(std::stof(columns[1]), std::stof(columns[2]), std::stof(columns[3]));
+        // Eigen::Quaternionf(w,x,y,z)
+        orientation = Eigen::Quaternionf(std::stof(columns[7]),
+                                         std::stof(columns[4]),
+                                         std::stof(columns[5]),
+                                         std::stof(columns[6]));
     }
 
     /** Return a single-line string representation of the ground truth (VIO) pose.
@@ -161,6 +171,9 @@ se::LeicaReader::LeicaReader(const se::Reader::Config& c) : se::Reader(c)
         status_ = se::ReaderStatus::error;
         std::cerr << "Error: No Pose Data present in: " << sequence_path_ + "/trajectory.csv\n";
         return;
+    }
+    else if (verbose_ >= 1) {
+        std::clog << "Found " << numberOfLines2 << " VIO poses\n";
     }
 
     // set reading position to second line

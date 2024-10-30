@@ -542,10 +542,10 @@ int main(int argc, char **argv) {
             // cv::imwrite(saveLeftPath, left_i);
             // cv::imwrite(saveRightPath, right_i);
             
-            cv::Mat saveDepthfMat = 5000.0f * fuseDepth;
-            cv::Mat saveDepthMat;
-            saveDepthfMat.convertTo(saveDepthMat, CV_16U);
-            cv::imwrite(saveDepthPath, saveDepthMat);
+            // cv::Mat saveDepthfMat = 5000.0f * fuseDepth;
+            // cv::Mat saveDepthMat;
+            // saveDepthfMat.convertTo(saveDepthMat, CV_16U);
+            // cv::imwrite(saveDepthPath, saveDepthMat);
         }
         auto stopFusion = std::chrono::high_resolution_clock::now();
 

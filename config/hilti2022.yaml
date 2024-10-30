@@ -1,0 +1,70 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+map:
+  dim:                        [30.72, 30.72, 30.72]
+  res:                        0.03
+
+data:
+  # tsdf
+  truncation_boundary_factor: 8
+  max_weight:                 100
+
+  # occupancy
+  log_odd_min:                -5.015
+  log_odd_max:                 5.015
+  fs_integr_scale:            1
+  uncertainty_model:          linear
+  tau_min_factor:             3
+  tau_max_factor:             12
+  k_tau:                      0.05
+  sigma_min_factor:           1         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:           3         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                    0.05
+
+sensor:
+  width:                      360
+  height:                     180
+  elevation_angles:           []
+  azimuth_angles:             []
+  near_plane:                 0.6
+  far_plane:                  30.0
+  T_BS:                       [ 0.0, -1.0,  0.0, -0.0007,
+                               -1.0,  0.0,  0.0, -0.0086,
+                                0.0,  0.0, -1.0,  0.0550,
+                                0.0,  0.0,  0.0,  1.0] # Body (=IMU) - to - sensor (=LiDAR) for integration into OKVIS
+  elevation_resolution_angle: 1.0 # only used for ray-based integration [degree]
+  azimuth_resolution_angle:   0.18 # only used for ray-based integration [degree]
+
+tracker:
+  iterations:                 [10, 5, 4]
+  dist_threshold:             0.1
+  normal_threshold:           0.8
+  track_threshold:            0.15
+  icp_threshold:              0.00001
+
+reader:
+  reader_type:                "leica"
+  sequence_path:              "/usr/wiss/juja/storage/local/juja/hilti-2022-dataset/exp04_construction_upper_level/supereight2"
+  ground_truth_file:          ""
+  fps:                        0.0
+  drop_frames:                false
+  verbose:                    1
+  # following parameters are only used for Leica BLK LiDAR sensor
+  scan_time_interval:         1.0 # size of interval that lidar measurements are clustered together
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  mesh_path:                  "/usr/wiss/juja/storage/local/juja/hilti-2022-dataset/exp04_construction_upper_level/supereight2/meshes"
+  slice_path:                 "./meshes"
+  structure_path:             "./meshes"
+  sensor_downsampling_factor: 1
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             1
+  meshing_rate:               50
+  max_frames:                 -1
+  log_file:                   "/usr/wiss/juja/storage/local/juja/hilti-2022-dataset/exp04_construction_upper_level/supereight2/log.tsv"

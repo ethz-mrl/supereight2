@@ -27,8 +27,8 @@ static constexpr auto occupied = [](const auto data[8]) -> std::uint8_t {
     // 1 occupied vertex (valid and inside).
     std::uint8_t edge_index = 0;
     for (int i = 0; i < 8; i++) {
-        // if (!is_valid(data[i])) {
-        if (data[i].field.weight < 3) {
+        if (!is_valid(data[i])) {
+        // if (data[i].field.weight < 3) {
             return 0;
         }
         if (is_inside(data[i])) {
@@ -771,7 +771,19 @@ void compute_dual_index(const OctreeT& octree,
                         std::array<Eigen::Vector3i, 8>& dual_corner_coords_i,
                         DataToIndexF data_to_index)
 {
-    const unsigned int block_size = block_ptr->size;
+    // // only meshing when enough gradient
+    // int scale_returned;
+    // Eigen::Vector3f voxel_coord_f = primal_corner_coord.cast<float>();
+    // const std::optional<Eigen::Vector3f> gradient =
+    //     se::visitor::getFieldGrad(octree, voxel_coord_f, scale, scale_returned);
+    // if (gradient) {
+    //     if (gradient.value().norm() < 0.3f) {
+    //         edge_pattern_idx = 0;
+    //         return;
+    //     }
+    // }
+
+    const unsigned int block_size = block_ptr->getSize();
     // The local case is independent of the scale.
     // lower or upper x boundary (block_coord.x() +0 or +block size) -> (binary) 100 -> local += 4
     // lower or upper y boundary (block_coord.y() +0 or +block size) -> (binary) 010 -> local += 2

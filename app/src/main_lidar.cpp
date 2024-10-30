@@ -89,13 +89,13 @@ int main(int argc, char** argv)
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
                 integrator.integrateRayBatch(frame, ray_pose_batch, sensor);
+                std::cout << "[" << frame << "] " << " integrated batch size = " << ray_pose_batch.size() << std::endl;
             }
             TOCK("integration")
 
             // Save logs, mesh, slices and struct (if enabled)
             TOCK("total")
-            const bool last_frame =
-                frame == config.app.max_frames || static_cast<size_t>(frame) == reader->numFrames();
+            const bool last_frame = frame == config.app.max_frames;
             if ((config.app.meshing_rate > 0 && frame % config.app.meshing_rate == 0)
                 || last_frame) {
                 if (!config.app.mesh_path.empty()) {
@@ -122,7 +122,12 @@ int main(int argc, char** argv)
                                  se::PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
         }
-
+        
+        // Save the mesh at the end.
+        if (!config.app.mesh_path.empty()) {
+            stdfs::create_directories(config.app.mesh_path);
+            map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+        }
         return 0;
     }
     catch (const std::exception& e) {
