@@ -403,6 +403,11 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
                         x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
                     auto& parent_data = data_at_parent_scale[parent_data_idx];
 
+                    // TODO: this should not occur if last integration scale for this block correct
+                    if (!parent_data.field.observed) {
+                        continue;
+                    }
+
                     // Access all 8 children per parent
                     for (int k = 0; k < 2; k++) {
                         for (int j = 0; j < 2; j++) {
