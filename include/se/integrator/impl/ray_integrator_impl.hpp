@@ -203,7 +203,13 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
                                                                          block_ptr->getMaxScale());
         if (rayState == se::RayState::FreeSpace
             && (computed_integration_scale < free_space_scale_)) {
-            computed_integration_scale = free_space_scale_;
+            if (block_ptr->getMinScale() == -1) {
+                computed_integration_scale = free_space_scale_;
+            }
+            else {
+                computed_integration_scale =
+                    std::min(free_space_scale_, block_ptr->getCurrentScale());
+            }
         }
 
         /// (2.b) Update Block
