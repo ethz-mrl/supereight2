@@ -140,6 +140,9 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         file << "property uchar green\n";
         file << "property uchar blue\n";
     }
+    if constexpr (FaceT::sem == Semantics::On) {
+        file << "property int segment_id\n";
+    }
     file << "element face " << num_faces << "\n";
     file << "property list uchar int vertex_index\n";
     file << "property uchar red\n";
@@ -155,6 +158,10 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
             if constexpr (FaceT::col == Colour::On) {
                 const auto colour = face.colour.vertexes[v];
                 file << " " << int(colour.r) << " " << int(colour.g) << " " << int(colour.b);
+            }
+            if constexpr (FaceT::sem == Semantics::On) {
+                const auto segment_id = face.semantic.segment_id;
+                file << " " << int(segment_id);
             }
             file << "\n";
         }
