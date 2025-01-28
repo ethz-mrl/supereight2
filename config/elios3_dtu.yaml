@@ -46,7 +46,7 @@ tracker:
 
 reader:
   reader_type:                "leica"
-  sequence_path:              "/usr/wiss/juja/storage/local/juja/AutoAssess/dataset/Odense-DTU/2024-02-Odense/rosbags/19022024/EL300858804493_01050_047_1flight/supereight2"
+  sequence_path:              "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap"
   ground_truth_file:          ""
   fps:                        0.0
   drop_frames:                false

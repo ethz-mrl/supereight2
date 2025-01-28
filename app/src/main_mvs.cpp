@@ -193,10 +193,10 @@ int main(int argc, char **argv) {
     // Load network and set pose, landmarks paths
     // TODO: remove hard-coded directories.
     torch::jit::script::Module mvsModel, stereoModel;
-    std::string mvsFile = "/usr/wiss/juja/storage/www/group/srl-models/mvs/mvs-sigma.pt";
-    std::string stereoFile = "/usr/wiss/juja/storage/www/group/srl-models/unimatch/stereo-indoor-sigma.pt";
-    std::string posePath = basePath + "results/okvis2-mvs/okvis2-slam-final-ba_trajectory.csv";
-    std::string mapPath = basePath + "results/okvis2-mvs/okvis2-slam-final_map.csv";
+    std::string mvsFile = "/storage/www/group/srl-models/mvs/mvs-sigma.pt";
+    std::string stereoFile = "/storage/www/group/srl-models/unimatch/stereo-indoor-sigma.pt";
+    std::string posePath = "/storage/group/srl/slamAndMapping/tro24-results/euroc/V1_01_easy/df-updext-4e808fb/run0/okvis2-slam-final-ba_trajectory.csv";
+    std::string mapPath = "/storage/group/srl/slamAndMapping/tro24-results/euroc/V1_01_easy/df-updext-4e808fb/run0/okvis2-slam-final_map.csv";
 
     mvsModel = torch::jit::load(mvsFile);
     stereoModel = torch::jit::load(stereoFile, torch::kCUDA);
