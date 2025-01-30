@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 map:
-  dim:                        [30.72, 30.72, 30.72]
+  dim:                        [81.92, 81.92, 81.92]
   res:                        0.02
 
 data:
@@ -46,7 +46,7 @@ tracker:
 
 reader:
   reader_type:                "leica"
-  sequence_path:              "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap"
+  sequence_path:              "/usr/wiss/juja/storage/group/srl/slamAndMapping/Autoassess/Odense-DTU/EL300858804493_01047_044_1flight/se2"
   ground_truth_file:          ""
   fps:                        0.0
   drop_frames:                false
@@ -58,13 +58,13 @@ app:
   enable_ground_truth:        true
   enable_rendering:           true
   enable_gui:                 true
-  mesh_path:                  "/usr/wiss/juja/storage/local/juja/AutoAssess/dataset/Odense-DTU/2024-02-Odense/rosbags/19022024/EL300858804493_01050_047_1flight/supereight2/meshes"
-  slice_path:                 "/usr/wiss/juja/storage/local/juja/AutoAssess/dataset/Odense-DTU/2024-02-Odense/rosbags/19022024/EL300858804493_01050_047_1flight/supereight2/meshes"
-  structure_path:             "/usr/wiss/juja/storage/local/juja/AutoAssess/dataset/Odense-DTU/2024-02-Odense/rosbags/19022024/EL300858804493_01050_047_1flight/supereight2/meshes"
+  mesh_path:                  "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap"
+  slice_path:                 "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap"
+  structure_path:             "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap"
   sensor_downsampling_factor: 1
   tracking_rate:              1
   integration_rate:           1
   rendering_rate:             1
   meshing_rate:               100
   max_frames:                 -1
-  log_file:                   "/usr/wiss/juja/storage/local/juja/AutoAssess/dataset/Odense-DTU/2024-02-Odense/rosbags/19022024/EL300858804493_01050_047_1flight/supereight2/log.tsv"
+  log_file:                   "/usr/wiss/juja/storage/local/juja/AutoAssess/results/EL300858804493_01047_044_1flight/se2-postmap/log.tsv"
