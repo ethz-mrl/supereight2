@@ -22,7 +22,13 @@ static const Eigen::Matrix<int, 3, 6> face_neighbour_offsets = (Eigen::Matrix<in
     -1,  0,  0,  0,  0,  1).finished();
 // clang-format on
 
-
+/** Unit-less relative offsets to the 26 adjacent neighbours of an octant. */
+// clang-format off
+static const Eigen::Matrix<int, 3, 26> all_neighbour_offsets = (Eigen::Matrix<int, 3, 26>() <<
+    0,  0,  0,  1,  1,  1, -1, -1, -1,  0,  0,  1,  1,  1, -1, -1, -1,  0,  0,  0,  1,  1,  1, -1, -1, -1,   
+    0,  1, -1,  0,  1, -1,  0,  1, -1,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,  0,  1, -1,
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1, -1, -1).finished();
+// clang-format on
 
 /** Return the octant with coordinates in voxels \p octant_coord and scale \p scale_desired.
  *

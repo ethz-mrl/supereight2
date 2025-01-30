@@ -315,6 +315,8 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
     rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
 
 
+    const int downsampleRate = 2;
+    unsigned int cnt = 0;
     // now get interval
     while ((ray_timestamp_ - t0) * 1e-09 <= batch_interval) {
         std::getline(lidar_stream_, lidarLine);
@@ -348,7 +350,10 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
             / static_cast<double>(ts_curr_ - ts_prev_);
         T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
         T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
-        rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
+        if (cnt % downsampleRate == 0) {
+            rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
+        }
+        cnt ++;
     }
 
     return se::ReaderStatus::ok;

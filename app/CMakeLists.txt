@@ -149,3 +149,31 @@ target_link_libraries(mvs_test
     SRL::Supereight2
     SRL::Projection
     )
+
+# For the main_detect.cpp
+add_executable(detect
+  src/main_detect.cpp
+  src/montage.cpp) 
+
+target_compile_options(detect PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+target_include_directories(detect BEFORE PRIVATE include)
+target_link_libraries(detect PRIVATE SRL::Supereight2 ${LIB_NAME})
+
+if(OPENMP_FOUND)
+  target_link_libraries(detect PRIVATE OpenMP::OpenMP_CXX)
+endif()
+# Allow handling large files in 32-bit systems
+target_compile_definitions(detect PRIVATE _FILE_OFFSET_BITS=64)
+
+# Compile with GUI support
+if(GLUT_FOUND)
+  target_link_libraries(detect
+    PRIVATE
+      ${GLUT_LIBRARIES}
+      ${OPENGL_LIBRARIES}
+  )
+  target_compile_definitions(detect PRIVATE "-DSE_GLUT")
+  if(NOT APPLE)
+    target_link_libraries(detect PRIVATE GL)
+  endif()
+endif()
