@@ -151,13 +151,14 @@ target_link_libraries(mvs_test
     )
 
 # For the main_detect.cpp
+find_package(nanoflann)
 add_executable(detect
   src/main_detect.cpp
   src/montage.cpp) 
 
 target_compile_options(detect PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_include_directories(detect BEFORE PRIVATE include)
-target_link_libraries(detect PRIVATE SRL::Supereight2 ${LIB_NAME})
+target_link_libraries(detect PRIVATE SRL::Supereight2 ${LIB_NAME} nanoflann::nanoflann)
 
 if(OPENMP_FOUND)
   target_link_libraries(detect PRIVATE OpenMP::OpenMP_CXX)
@@ -177,3 +178,9 @@ if(GLUT_FOUND)
     target_link_libraries(detect PRIVATE GL)
   endif()
 endif()
+
+# Test closed edge detector.
+add_executable(test_closed_edges src/test_closed_edges.cpp)
+
+# Make sure the include path is used:
+target_link_libraries(test_closed_edges PRIVATE ${LIB_NAME} nanoflann::nanoflann)

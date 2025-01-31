@@ -15,6 +15,7 @@
 
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
+#include <nanoflann.hpp>
 
 #include "config.hpp"
 #include "draw.hpp"
@@ -280,6 +281,9 @@ int main(int argc, char** argv)
                 savePoints(frame, threed_fedges, config.app.mesh_path, "edges");
                 savePoints(frame, test_points, config.app.mesh_path, "all");
                 std::cout << "[" << frame << "] " << threed_edges.size() << " edges3D detected in " << test_points.size() << std::endl;
+
+                // TODO: Detect closed edges.
+
             }
             TOCK("DetectSemantics")
 
