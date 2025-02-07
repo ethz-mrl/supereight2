@@ -3,12 +3,32 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <nanoflann.hpp>
+#include <random>
 
+
+bool estimatePlane(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points,
+    Eigen::Vector3f& normal) {
+    if (points.size() < 3) {
+        return false;
+    }
+
+    // Solve the normal equation: Ax = b.
+    Eigen::Matrix3f H = Eigen::Matrix3f::Zero(3,3);
+    Eigen::Vector3f ATb = Eigen::Vector3f::Zero(3);
+    for (size_t i = 0; i < points.size(); i ++) {
+        Eigen::Vector3f pt_i = points[i];
+        H += pt_i*pt_i.transpose();
+        ATb -= pt_i;
+    }
+    normal = H.llt().solve(ATb);
+
+    return true;
+}
 
 void savePoints(size_t id,
                 std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points,
                 std::string save_path,
-                std::string type_name) {
+                unsigned char color[3]) {
   size_t Npoints = points.size();
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_ptr(new pcl::PointCloud<pcl::PointXYZRGB>);
   cloud_ptr->width = Npoints;
@@ -21,20 +41,13 @@ void savePoints(size_t id,
     point.x = point_W(0);
     point.y = point_W(1);
     point.z = point_W(2);
+    point.r = color[0];
+    point.g = color[1];
+    point.b = color[2];
 
-    if (type_name == "edges") {
-        point.r = 255;
-        point.g = 0;
-        point.b = 0;
-    }
-    else if (type_name == "all") {
-        point.r = 255;
-        point.g = 255;
-        point.b = 255;
-    }
     tmpCnt ++;
   }  
-  std::string saveName = save_path + "/" + type_name + "_" + std::to_string(id) + ".ply";
+  std::string saveName = save_path + "/edges_" + std::to_string(id) + ".ply";
   pcl::io::savePLYFileASCII(saveName, *cloud_ptr);
 }
 
@@ -129,12 +142,12 @@ int main(int argc, char** argv) {
     // }
 
     // Loop over all edge pool.
-    std::map<uint32_t, std::vector<std::pair<uint32_t, Eigen::Vector3f>,
-        Eigen::aligned_allocator<std::pair<uint32_t, Eigen::Vector3f>>>> manhole_pts;
+    std::map<uint32_t, std::vector<Eigen::Vector3f,
+        Eigen::aligned_allocator<Eigen::Vector3f>>> closed_edges;
     const float resolution = 0.04;
     float search_radius = 15.0*resolution;
     search_radius *= search_radius;
-    uint32_t id_manhole = 0;
+    uint32_t id_edges = 0;
     uint32_t cnt_tmp = 0;
     while(!edge_pool.empty()) {
 
@@ -143,9 +156,8 @@ int main(int argc, char** argv) {
         auto edge_anchor = *edge_pool.begin();
         edge_pool.erase(edge_anchor.first);
         removed_ids.push_back(edge_anchor.first);
-        std::vector<std::pair<uint32_t, Eigen::Vector3f>,
-            Eigen::aligned_allocator<std::pair<uint32_t, Eigen::Vector3f>>> candidate_edges;
-        candidate_edges.push_back(std::pair(edge_anchor.first, edge_anchor.second)); // edge-id, position
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> candidate_edges;
+        candidate_edges.push_back(edge_anchor.second); // edge-id, position
         float* query_point = edge_anchor.second.data();
         float dist_to_anchor = 1.0e+4;
         float max_dist = -1;
@@ -191,7 +203,7 @@ int main(int argc, char** argv) {
                 Eigen::Vector3f tracking_edge = edge_pool[tracking_id];
                 dist_to_anchor = (edge_anchor.second - tracking_edge).norm();
                 query_point = tracking_edge.data(); // update the query point.
-                candidate_edges.push_back(std::pair(tracking_id, tracking_edge));
+                candidate_edges.push_back(tracking_edge);
                 edge_pool.erase(tracking_id);
                 removed_ids.push_back(tracking_id);
                 std::cout << "    Anchor-to-tracking edges: " << "[" << edge_anchor.second(0) << ", " << edge_anchor.second(1) << ", " << edge_anchor.second(2) << "] (" << edge_anchor.first 
@@ -217,11 +229,13 @@ int main(int argc, char** argv) {
         }
 
         // This is a set of closed 3d edges
-        std::cout << "dist_to_anchor = " << dist_to_anchor << ", " << "candidate_edges.size() = " << candidate_edges.size() << ", max_dist = " << max_dist  << ", min_dist = " << min_dist << std::endl;
+        std::cout << "dist_to_anchor = " << dist_to_anchor << ", " 
+            << "candidate_edges.size() = " << candidate_edges.size() 
+            << ", max_dist = " << max_dist  << ", min_dist = " << min_dist << std::endl;
         if (min_dist < 0.5 && max_dist < 1.0) {
             std::cout << "!!!! Closed edge detected !!!!" << "\n" << std::endl;
-            manhole_pts[id_manhole] = candidate_edges;
-            id_manhole ++;
+            closed_edges[id_edges] = candidate_edges;
+            id_edges ++;
         }
         std::cout << "========" << std::endl;
         std::cout << "\n";
@@ -230,15 +244,97 @@ int main(int argc, char** argv) {
         cnt_tmp ++;
     }
 
-    // Visualize detected manhole edges
-    for (int i = 0; i < manhole_pts.size(); i ++) {
+    // Visualize detected closed edges
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<u_char> uchar_ran(0,255);
+    for (int i = 0; i < closed_edges.size(); i ++) {
         std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
-        auto vec_i = manhole_pts[i];
+        auto vec_i = closed_edges[i];
         for (int j = 0; j < vec_i.size(); j ++) {
-            save_edges.push_back(vec_i[j].second);
+            // save_edges.push_back(vec_i[j].second);
+            save_edges.push_back(vec_i[j]);
         }
-        savePoints(i, save_edges, "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/manholes/", "edges");
+        unsigned char color[3];
+        color[0] = uchar_ran(gen);
+        color[1] = uchar_ran(gen);
+        color[2] = uchar_ran(gen);
+        savePoints(i, save_edges, "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/tmp-edges/", color);
     }
+
+    // Plane ransac for all clusters.
+    std::vector<uint32_t> outlier_ids;
+    for (auto it = closed_edges.begin(); it != closed_edges.end(); ++it) {
+        // log(1-p)/log(1-w^3) where p=0.99 (successful rate) and w=0.5 (outlier ratio)
+        const int num_iter = 35;
+        unsigned int vote_best = 0;
+        Eigen::Vector3f normal_best = Eigen::Vector3f::Zero();
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> inliers_best;
+        for (int ri = 0; ri < num_iter; ri ++) {
+            size_t num_edges =  it->second.size();
+            std::uniform_int_distribution<unsigned int> int_ran(0,num_edges);
+            const int num_sample = 5; // number of sampled points
+            std::vector<unsigned int> idx_ri;
+            std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points_ri;
+            idx_ri.push_back(int_ran(gen));
+
+            // Need at least 3 samples, let's take 5 here.
+            while (idx_ri.size() < 5) {
+                unsigned int ran_i = int_ran(gen);
+                bool is_duplicate = false;
+                for (int i = 0; i < idx_ri.size(); i ++) {
+                    if (idx_ri[i] == ran_i) {
+                        is_duplicate = true;
+                    }
+                }
+                if (!is_duplicate) {
+                    idx_ri.push_back(ran_i);
+                    points_ri.push_back(it->second[ran_i]);
+                }
+            }
+            Eigen::Vector3f normal_ri;
+            estimatePlane(points_ri, normal_ri);
+
+            // Test with other samples
+            unsigned int vote_i = 0;
+            std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> inliers_i;
+            for (int i = 0; i < num_edges; i ++) {
+                Eigen::Vector3f pt_i = it->second[i];
+                float cost_i = pt_i.transpose() * normal_ri + 1.0f;
+                if (cost_i*cost_i < 1.0e-8) {
+                    inliers_i.push_back(pt_i);
+                    vote_i ++;
+                }
+            }
+
+            if (vote_i > vote_best) {
+                estimatePlane(inliers_i, normal_best);
+                vote_best = vote_i;
+                inliers_best = inliers_i;
+                normal_best /= normal_best.norm();
+            }
+        }
+
+        if (vote_best < 10) {
+            outlier_ids.push_back(it->first);
+        }
+        else {
+            std::cout << "edge id[" << it->first 
+                << "], vote_best = " << vote_best 
+                << ", normal_best = " << normal_best << std::endl;
+            // TODO: create struct for semantic structures and save
+            // id, normal, center position, type(manhole, longitudinal)
+        }
+    }
+
+    // Remove outliers.
+    for (size_t i = 0; i < outlier_ids.size(); i ++) {
+        closed_edges.erase(outlier_ids[i]);
+    }
+
+    // TODO: project to the plane.
+
+    // TODO: fit to a ellipse
 
 
     return 0;
