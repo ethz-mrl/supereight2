@@ -1,26 +1,66 @@
 #include <iostream>
+#include <fstream>
 
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <nanoflann.hpp>
 #include <random>
+#include <cmath>
 
+struct geometricSemantics{
+    char type; // type (-1: not determined; 0: manhole; 1: longitudinals; ...)
+    uint32_t id; // id
+    Eigen::Vector3f position; // center position
+    Eigen::Vector3f normal_vector; // normal vector
+    std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> edges; // 3d edges
+};
+
+Eigen::Matrix3f skewMatrix(Eigen::Vector3f a) {
+    Eigen::Matrix3f R;
+    R << 0.0, -a(2), a(1),
+         a(2), 0.0, -a(0),
+        -a(1), a(0), 0.0;
+    return R;
+}
+
+bool solveRotationMatrix(const Eigen::Vector3f& a, const Eigen::Vector3f& b, Eigen::Matrix3f& R) {
+    // Make sure that a and b are normal vectors.
+    // This function returns R such that b = R * a.
+    Eigen::Vector3f a_norm = a / a.norm();
+    Eigen::Vector3f b_norm = b / b.norm();
+    Eigen::Vector3f v = a_norm.cross(b_norm);
+    float phi = std::acos(a_norm.dot(b_norm));
+
+    Eigen::Matrix3f R_transpose = std::cos(phi)*Eigen::Matrix3f::Identity()
+        + (1-std::cos(phi))*(v*v.transpose())
+        - std::sin(phi)*skewMatrix(v);
+    R = R_transpose.transpose();
+    if ((b - R * a).norm() > 1e-5) {
+        // std::cout << "The difference is " << (b - R * a).norm() << std::endl;
+        return false;
+    }
+
+    return true;
+}
 
 bool estimatePlane(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> points,
-    Eigen::Vector3f& normal) {
+    Eigen::Vector3f& normal, Eigen::Vector3f& position) {
     if (points.size() < 3) {
         return false;
     }
 
     // Solve the normal equation: Ax = b.
-    Eigen::Matrix3f H = Eigen::Matrix3f::Zero(3,3);
-    Eigen::Vector3f ATb = Eigen::Vector3f::Zero(3);
+    Eigen::Matrix3f H = Eigen::Matrix3f::Zero();
+    Eigen::Vector3f ATb = Eigen::Vector3f::Zero();
+    position = Eigen::Vector3f::Zero();
     for (size_t i = 0; i < points.size(); i ++) {
         Eigen::Vector3f pt_i = points[i];
         H += pt_i*pt_i.transpose();
         ATb -= pt_i;
+        position += pt_i;
     }
     normal = H.llt().solve(ATb);
+    position /= points.size();
 
     return true;
 }
@@ -99,6 +139,14 @@ int main(int argc, char** argv) {
     // Output the size of the cloud
     std::cout << "Loaded point cloud with " << in_cloud_ptr->width * in_cloud_ptr->height
         << " points." << std::endl;
+
+    // Define random seed.
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<u_char> uchar_ran(0,255);
+
+    // Define some constants.
+    const std::string save_path = "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/";
 
     // Define the point cloud with some 3D points
     std::map<unsigned int, Eigen::Vector3f> edge_pool;
@@ -244,31 +292,30 @@ int main(int argc, char** argv) {
         cnt_tmp ++;
     }
 
-    // Visualize detected closed edges
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<u_char> uchar_ran(0,255);
-    for (int i = 0; i < closed_edges.size(); i ++) {
-        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
-        auto vec_i = closed_edges[i];
-        for (int j = 0; j < vec_i.size(); j ++) {
-            // save_edges.push_back(vec_i[j].second);
-            save_edges.push_back(vec_i[j]);
-        }
-        unsigned char color[3];
-        color[0] = uchar_ran(gen);
-        color[1] = uchar_ran(gen);
-        color[2] = uchar_ran(gen);
-        savePoints(i, save_edges, "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/tmp-edges/", color);
-    }
+    // // Visualize all detected closed-edges
+    // for (int i = 0; i < closed_edges.size(); i ++) {
+    //     std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
+    //     auto vec_i = closed_edges[i];
+    //     for (int j = 0; j < vec_i.size(); j ++) {
+    //         // save_edges.push_back(vec_i[j].second);
+    //         save_edges.push_back(vec_i[j]);
+    //     }
+    //     unsigned char color[3];
+    //     color[0] = uchar_ran(gen);
+    //     color[1] = uchar_ran(gen);
+    //     color[2] = uchar_ran(gen);
+    //     savePoints(i, save_edges, "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/tmp-edges/", color);
+    // }
 
     // Plane ransac for all clusters.
     std::vector<uint32_t> outlier_ids;
+    std::vector<geometricSemantics> semantics;
     for (auto it = closed_edges.begin(); it != closed_edges.end(); ++it) {
         // log(1-p)/log(1-w^3) where p=0.99 (successful rate) and w=0.5 (outlier ratio)
         const int num_iter = 35;
         unsigned int vote_best = 0;
         Eigen::Vector3f normal_best = Eigen::Vector3f::Zero();
+        Eigen::Vector3f position_best = Eigen::Vector3f::Zero();
         std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> inliers_best;
         for (int ri = 0; ri < num_iter; ri ++) {
             size_t num_edges =  it->second.size();
@@ -292,8 +339,8 @@ int main(int argc, char** argv) {
                     points_ri.push_back(it->second[ran_i]);
                 }
             }
-            Eigen::Vector3f normal_ri;
-            estimatePlane(points_ri, normal_ri);
+            Eigen::Vector3f normal_ri, position_ri;
+            estimatePlane(points_ri, normal_ri, position_ri);
 
             // Test with other samples
             unsigned int vote_i = 0;
@@ -308,7 +355,7 @@ int main(int argc, char** argv) {
             }
 
             if (vote_i > vote_best) {
-                estimatePlane(inliers_i, normal_best);
+                estimatePlane(inliers_i, normal_best, position_best);
                 vote_best = vote_i;
                 inliers_best = inliers_i;
                 normal_best /= normal_best.norm();
@@ -321,9 +368,17 @@ int main(int argc, char** argv) {
         else {
             std::cout << "edge id[" << it->first 
                 << "], vote_best = " << vote_best 
-                << ", normal_best = " << normal_best << std::endl;
-            // TODO: create struct for semantic structures and save
-            // id, normal, center position, type(manhole, longitudinal)
+                << ", normal_best = [" << normal_best(0) << ", " << normal_best(1) << ", " << normal_best(2)
+                << "], position_best = [" << position_best(0) << ", " << position_best(1) << ", " << position_best(2) 
+                << "]" << std::endl;
+            // Save intermediate semantics.
+            geometricSemantics semantics_i;
+            semantics_i.id = it->first;
+            semantics_i.position = position_best;
+            semantics_i.normal_vector = normal_best;
+            semantics_i.edges = inliers_best;
+            semantics_i.type = -1;
+            semantics.push_back(semantics_i);
         }
     }
 
@@ -332,10 +387,74 @@ int main(int argc, char** argv) {
         closed_edges.erase(outlier_ids[i]);
     }
 
-    // TODO: project to the plane.
+    // tmp
+    std::ofstream outFile("projects.txt"); // Open a file for writing
 
-    // TODO: fit to a ellipse
+    // Project to the plane (z=0) and fit to an ellipse.
+    // TODO: set manhole size as configurable parameter. For now, Manhole size in Gazebo: (0.8m x 0.64m)
+    const Eigen::Vector3f v_z(0.0, 0.0, 1.0);
+    const float major_squared = 0.4*0.4;
+    const float minor_squared = 0.32*0.32;
+    // TODO: think about more reasonable way to give threshold.
+    const float thr_manhole = 0.14;
+    for (size_t i = 0; i < semantics.size(); i ++) {
+        geometricSemantics semantics_i = semantics[i];
+        const Eigen::Vector3f n_i = semantics_i.normal_vector;
+        Eigen::Matrix3f R_zplane;
+        if (solveRotationMatrix(n_i, v_z, R_zplane)) {
+            // Project to the z-plane.
+            Eigen::Vector2f center_i = Eigen::Vector2f::Zero();
+            std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> projects_i;
+            size_t num_i = semantics_i.edges.size();
+            for (size_t ii = 0; ii < num_i; ii ++) {
+                Eigen::Vector2f projects_ii = (R_zplane * semantics_i.edges[ii]).head<2>();
+                center_i += projects_ii;
+                projects_i.push_back(projects_ii);
+                // std::cout << "### " << semantics_i.edges[ii] << "-->" << projects_ii << std::endl;
+            }
+            center_i /= num_i;
 
+            // Test with an ellipse model (0.8m x 0.64m)
+            // TODO: we don't know the orientation of the ellipse. For now, only test with two hypothesis.
+            float error_ellipse0 = 0.0f;
+            float error_ellipse1 = 0.0f;
+            for (size_t ii = 0; ii < num_i; ii ++) {
+                // proejcts_ii is 2D points projected on to the z-plane with offset.
+                Eigen::Vector2f projects_ii = projects_i[ii] - center_i;
+                float error0_ii = (projects_ii(0)*projects_ii(0))/major_squared + (projects_ii(1)*projects_ii(1))/minor_squared - 1.0f;
+                float error1_ii = (projects_ii(1)*projects_ii(1))/major_squared + (projects_ii(0)*projects_ii(0))/minor_squared - 1.0f;
+                error_ellipse0 += error0_ii * error0_ii;
+                error_ellipse1 += error1_ii * error1_ii;
+
+                if (semantics_i.id == 11) {
+                    outFile << projects_ii(0) << " " << projects_ii(1) << std::endl;
+                }
+            }
+            error_ellipse0 /= num_i;
+            error_ellipse1 /= num_i;
+
+            // std::cout << "### " << semantics_i.id << ", " 
+            //     << n_i(0) << ", " << n_i(1) << ", " << n_i(2) << ", "
+            //     << error_ellipse0 << ", " << error_ellipse1 << std::endl;
+            unsigned char color[3];
+            if (error_ellipse0 < thr_manhole || error_ellipse1 < thr_manhole) {
+                // TODO: properly set saving directories.
+                color[0] = uchar_ran(gen);
+                color[1] = uchar_ran(gen);
+                color[2] = uchar_ran(gen);
+                savePoints(semantics_i.id, semantics_i.edges, save_path + "/manholes/", color);
+            }
+            else {
+                color[0] = 55;
+                color[1] = 55;
+                color[2] = 55;
+                savePoints(semantics_i.id, semantics_i.edges, save_path + "/edges3d/", color);
+            }
+        }
+    }
+
+
+    outFile.close();
 
     return 0;
 }
