@@ -1,11 +1,14 @@
 #include <iostream>
 #include <fstream>
+#include <random>
+#include <cmath>
 
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
+
 #include <nanoflann.hpp>
-#include <random>
-#include <cmath>
+
+#include <Eigen/Eigenvalues> 
 
 struct geometricSemantics{
     char type; // type (-1: not determined; 0: manhole; 1: longitudinals; ...)
@@ -388,7 +391,7 @@ int main(int argc, char** argv) {
     }
 
     // tmp
-    std::ofstream outFile("projects.txt"); // Open a file for writing
+    // std::ofstream outFile("projects.txt"); // Open a file for writing
 
     // Project to the plane (z=0) and fit to an ellipse.
     // TODO: set manhole size as configurable parameter. For now, Manhole size in Gazebo: (0.8m x 0.64m)
@@ -414,30 +417,51 @@ int main(int argc, char** argv) {
             }
             center_i /= num_i;
 
-            // Test with an ellipse model (0.8m x 0.64m)
-            // TODO: we don't know the orientation of the ellipse. For now, only test with two hypothesis.
-            float error_ellipse0 = 0.0f;
-            float error_ellipse1 = 0.0f;
+            // Find the eigenvector for the major axis.
+            Eigen::Matrix2f cov = Eigen::Matrix2f::Zero();
             for (size_t ii = 0; ii < num_i; ii ++) {
-                // proejcts_ii is 2D points projected on to the z-plane with offset.
                 Eigen::Vector2f projects_ii = projects_i[ii] - center_i;
-                float error0_ii = (projects_ii(0)*projects_ii(0))/major_squared + (projects_ii(1)*projects_ii(1))/minor_squared - 1.0f;
-                float error1_ii = (projects_ii(1)*projects_ii(1))/major_squared + (projects_ii(0)*projects_ii(0))/minor_squared - 1.0f;
-                error_ellipse0 += error0_ii * error0_ii;
-                error_ellipse1 += error1_ii * error1_ii;
-
-                if (semantics_i.id == 11) {
-                    outFile << projects_ii(0) << " " << projects_ii(1) << std::endl;
-                }
+                cov += projects_ii * projects_ii.transpose();
             }
-            error_ellipse0 /= num_i;
-            error_ellipse1 /= num_i;
+            cov /= (num_i - 1.0f);
 
-            // std::cout << "### " << semantics_i.id << ", " 
-            //     << n_i(0) << ", " << n_i(1) << ", " << n_i(2) << ", "
-            //     << error_ellipse0 << ", " << error_ellipse1 << std::endl;
+            // Note that for a positive definite matrix, always real eigenvectors/values.
+            // The first element is the bigger one (major axis)
+            Eigen::EigenSolver<Eigen::Matrix2f> eigen_solver(cov);
+            Eigen::Vector2f eigen_values = eigen_solver.eigenvalues().real();
+            Eigen::Matrix2f eigen_vectors = eigen_solver.eigenvectors().real();
+            float theta_i = std::acos(eigen_vectors(0,0)); // acos(v.transpose*[1,0])
+            Eigen::Matrix2f Rtheta_i;
+            Rtheta_i << std::cos(theta_i), -std::sin(theta_i),
+                        std::sin(theta_i), std::cos(theta_i);
+
+            // std::cout << "cov:\n" << cov << std::endl;
+            // std::cout << "Eigenvalues:\n" << eigen_values << "\n";
+            // std::cout << "Eigenvectors:\n" << eigen_vectors << "\n";
+            // std::cout << "Rtheta_i:\n" << Rtheta_i << "\n";
+
+            // Test with an ellipse model (0.8m x 0.64m)
+            float error_ellipse = 0.0f;
+            for (size_t ii = 0; ii < num_i; ii ++) {
+                // proejcts_ii is 2D points projected on to the z-plane with offset
+                // where its major axis is aligned with the x-axis.
+                Eigen::Vector2f projects_ii = Rtheta_i*(projects_i[ii] - center_i);
+                float error0_ii = (projects_ii(0)*projects_ii(0))/major_squared + (projects_ii(1)*projects_ii(1))/minor_squared - 1.0f;
+                error_ellipse += error0_ii * error0_ii;
+                // // TMP
+                // if (semantics_i.id == 21) {
+                //     outFile << projects_ii(0) << " " << projects_ii(1) << std::endl;
+                // }
+            }
+            error_ellipse /= num_i;
+            
+            std::cout << "### " << semantics_i.id << ", " 
+                << n_i(0) << ", " << n_i(1) << ", " << n_i(2)
+                << ", error_ellipse: " << error_ellipse
+                << ", major-axis: " << eigen_vectors(0,0) << ", " << eigen_vectors(1,0) << std::endl;
+
             unsigned char color[3];
-            if (error_ellipse0 < thr_manhole || error_ellipse1 < thr_manhole) {
+            if (error_ellipse < thr_manhole) {
                 // TODO: properly set saving directories.
                 color[0] = uchar_ran(gen);
                 color[1] = uchar_ran(gen);
@@ -452,9 +476,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-
-
-    outFile.close();
+    // outFile.close();
 
     return 0;
 }
