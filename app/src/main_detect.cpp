@@ -197,95 +197,7 @@ int main(int argc, char** argv)
                         se::Measurements{se::Measurement{processed_depth_img, sensor, T_WS}});
                 }
             }
-            TOCK("integration")
-
-            TICK("DetectSemantics")
-            std::queue<const NodeType*> nodes;
-            std::queue<const BlockType*> blocks;
-            const NodeType* const root = static_cast<const NodeType*>(map.getOctree().getRoot());
-            nodes.push(root);
-            const int detect_rate = 100;
-            if (frame % detect_rate == 0) {
-                while (!nodes.empty()) {
-                    const NodeType* const node = nodes.front();
-                    nodes.pop();
-                    // Test the data of all children are within the minimum and maximum data of the parent.
-                    for (int child_idx = 0; child_idx < 8; child_idx++) {
-                        const se::OctantBase* const child = node->getChild(child_idx);
-                        if (child) {
-                            // Get the child min/max data and add it to the appropriate traversal queue.
-                            if (child->is_block) {
-                                blocks.push(static_cast<const BlockType*>(child));
-                            }
-                            else {
-                                nodes.push(static_cast<const NodeType*>(child));
-                            }
-                        }
-                    }
-                }
-                std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> threed_edges;
-                std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> threed_fedges;
-                std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> test_points;
-                while (!blocks.empty()) {
-                    const BlockType* block = blocks.front();
-                    blocks.pop();
-                    const int scale = block->getCurrentScale();
-                    if (scale != 0) continue;
-                    const int block_size = block->getSize();
-                    const Eigen::Vector3i& block_coord = block->coord; // the smallest coordinate in the block.
-                    const Eigen::Vector3i block_upper_coord =
-                        block_coord + Eigen::Vector3i::Constant(block_size);
-                    const int size = se::octantops::scale_to_size(scale);
-
-                    // Test each voxel at the current scale.
-                    for (int z = 0; z < block_size; z += size) {
-                        for (int y = 0; y < block_size; y += size) {
-                            for (int x = 0; x < block_size; x += size) {
-                                const Eigen::Vector3i coord = block_coord + Eigen::Vector3i(x,y,z); // global coord.
-                                const DataType block_data = block->getData(coord);
-                                // 3D edge test for all voxels.
-                                if (block_data.field.valid() && !is_free(block_data)) { // observed & occupied
-                                    // TMP: Save all tested voxels.
-                                    Eigen::Vector3f point_W;
-                                    map.voxelToPoint(coord, point_W);
-                                    test_points.push_back(point_W);
-                                    // Test 26 neighbors
-                                    unsigned char num_free = 0;
-                                    for (int i = 0; i < 26; i++) {
-                                        const Eigen::Vector3i neighbour_coord = 
-                                            coord + size*se::fetcher::all_neighbour_offsets.col(i);
-                                        const bool neighbour_in_block =
-                                            (neighbour_coord.array() >= block_coord.array()).all()
-                                            && (neighbour_coord.array() < block_upper_coord.array()).all();
-                                        if (neighbour_in_block) {
-                                            // If free
-                                            if (is_free(block->getData(neighbour_coord))) {
-                                                num_free ++;
-                                            }
-                                        }
-                                    }
-                                    if (num_free > 11) { // 9(surface) + 2
-                                        threed_edges.push_back(coord);
-                                        // TMP: for visualizing 3d edges.
-                                        Eigen::Vector3f edge_W;
-                                        map.voxelToPoint(coord, edge_W);
-                                        threed_fedges.push_back(edge_W);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                // TMP: save intermediate mesh & 3d edges.
-                map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
-                savePoints(frame, threed_fedges, config.app.mesh_path, "edges");
-                savePoints(frame, test_points, config.app.mesh_path, "all");
-                std::cout << "[" << frame << "] " << threed_edges.size() << " edges3D detected in " << test_points.size() << std::endl;
-
-                // TODO: Detect closed edges.
-
-            }
-            TOCK("DetectSemantics")
+            TOCK("integration")      
 
             // Raycast from T_MS
             TICK("raycast")
@@ -375,6 +287,95 @@ int main(int argc, char** argv)
                     map.getOctree().saveStructure(config.app.structure_path + "/struct_"
                                                   + std::to_string(frame) + ".ply");
                 }
+
+                TICK("DetectSemantics")
+                std::queue<const NodeType*> nodes;
+                std::queue<const BlockType*> blocks;
+                const NodeType* const root = static_cast<const NodeType*>(map.getOctree().getRoot());
+                nodes.push(root);
+                while (!nodes.empty()) {
+                    const NodeType* const node = nodes.front();
+                    nodes.pop();
+                    // Test the data of all children are within the minimum and maximum data of the parent.
+                    for (int child_idx = 0; child_idx < 8; child_idx++) {
+                        const se::OctantBase* const child = node->getChild(child_idx);
+                        if (child) {
+                            // Get the child min/max data and add it to the appropriate traversal queue.
+                            if (child->is_block) {
+                                blocks.push(static_cast<const BlockType*>(child));
+                            }
+                            else {
+                                nodes.push(static_cast<const NodeType*>(child));
+                            }
+                        }
+                    }
+                }
+                std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> threed_edges;
+                std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> threed_fedges;
+                std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> test_points;
+                while (!blocks.empty()) {
+                    const BlockType* block = blocks.front();
+                    blocks.pop();
+                    const int scale = block->getCurrentScale();
+                    if (scale != 0) continue;
+                    const int block_size = block->getSize();
+                    const Eigen::Vector3i& block_coord = block->coord; // the smallest coordinate in the block.
+                    const Eigen::Vector3i block_upper_coord =
+                        block_coord + Eigen::Vector3i::Constant(block_size);
+                    const int size = se::octantops::scale_to_size(scale);
+
+                    // Test each voxel at the current scale.
+                    for (int z = 0; z < block_size; z += size) {
+                        for (int y = 0; y < block_size; y += size) {
+                            for (int x = 0; x < block_size; x += size) {
+                                const Eigen::Vector3i coord = block_coord + Eigen::Vector3i(x,y,z); // global coord.
+                                const DataType block_data = block->getData(coord);
+                                // 3D edge test for all voxels.
+                                if (block_data.field.valid() && !is_free(block_data)) { // observed & occupied
+                                    // TMP: Save all tested voxels.
+                                    Eigen::Vector3f point_W;
+                                    map.voxelToPoint(coord, point_W);
+                                    test_points.push_back(point_W);
+                                    // Test 26 neighbors
+                                    unsigned char num_free = 0;
+                                    unsigned char num_occ = 0;
+                                    for (int i = 0; i < 26; i++) {
+                                        const Eigen::Vector3i neighbour_coord = 
+                                            coord + size*se::fetcher::all_neighbour_offsets.col(i);
+                                        const bool neighbour_in_block =
+                                            (neighbour_coord.array() >= block_coord.array()).all()
+                                            && (neighbour_coord.array() < block_upper_coord.array()).all();
+                                        if (neighbour_in_block) {
+                                            // If free
+                                            if (is_free(block->getData(neighbour_coord))) {
+                                                num_free ++;
+                                            }
+                                            else {
+                                                num_occ ++;
+                                            }
+                                        }
+                                    }
+                                    if (num_free > 12 && num_occ > 10) { // 9(surface)+3 && 5+5
+                                        threed_edges.push_back(coord);
+                                        // TMP: for visualizing 3d edges.
+                                        Eigen::Vector3f edge_W;
+                                        map.voxelToPoint(coord, edge_W);
+                                        threed_fedges.push_back(edge_W);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                // TMP: save intermediate mesh & 3d edges.
+                map.saveMesh(config.app.mesh_path + "/mesh_" + std::to_string(frame) + ".ply");
+                savePoints(frame, threed_fedges, config.app.mesh_path, "edges");
+                savePoints(frame, test_points, config.app.mesh_path, "all");
+                std::cout << "[" << frame << "] " << threed_edges.size() << " edges3D detected in " << test_points.size() << std::endl;
+
+                // TODO: Detect closed edges.
+
+                TOCK("DetectSemantics")
             }
 
             se::perfstats.sample("memory usage",

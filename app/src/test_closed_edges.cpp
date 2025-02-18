@@ -10,6 +10,12 @@
 
 #include <Eigen/Eigenvalues> 
 
+constexpr float SEARCH_RADIUS = 0.6;
+// TODO: set manhole size as configurable parameter. For now, Manhole size in Gazebo: (0.8m x 0.64m)
+constexpr float MAJOR_LENGTH = 0.4;
+constexpr float MINOR_LENGTH = 0.32; 
+constexpr float THR_MANHOLE = 0.34;  // TODO: think about more reasonable way to give threshold.
+
 struct geometricSemantics{
     char type; // type (-1: not determined; 0: manhole; 1: longitudinals; ...)
     uint32_t id; // id
@@ -133,7 +139,8 @@ int main(int argc, char** argv) {
     pcl::PointCloud<pcl::PointXYZ>::Ptr in_cloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
 
     // Load the PLY file into the PointCloud object
-    if (pcl::io::loadPLYFile<pcl::PointXYZ>(argv[1], *in_cloud_ptr) == -1)  // Fill in the cloud data
+    std::string input_ply(argv[1]);
+    if (pcl::io::loadPLYFile<pcl::PointXYZ>(input_ply, *in_cloud_ptr) == -1)  // Fill in the cloud data
     {
         PCL_ERROR("Couldn't read the PLY file\n");
         return -1;
@@ -149,7 +156,11 @@ int main(int argc, char** argv) {
     std::uniform_int_distribution<u_char> uchar_ran(0,255);
 
     // Define some constants.
-    const std::string save_path = "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/";
+    size_t pos_dir = input_ply.find_last_of("/");
+    if (pos_dir == std::string::npos) {
+        return -1;
+    }
+    const std::string save_path = input_ply.substr(0, pos_dir);
 
     // Define the point cloud with some 3D points
     std::map<unsigned int, Eigen::Vector3f> edge_pool;
@@ -174,30 +185,10 @@ int main(int argc, char** argv) {
 
     my_kd_tree_t index(3 /*dim*/, kd_cloud, nanoflann::KDTreeSingleIndexAdaptorParams(20 /* max leaf */));
 
-    // // Search radius example
-    // const float query_point[3] = {8.7, -5.3, 3.14};
-    // Eigen::Vector3f query_v3f(query_point[0], query_point[1], query_point[2]);
-    // const float resolution = 0.04;
-    // float search_radius = 1.5*resolution;
-    // search_radius *= search_radius;
-    // std::vector<nanoflann::ResultItem<uint32_t, float>> ret_matches;
-    // const size_t nMatches =
-    //     index.radiusSearch(&query_point[0], search_radius, ret_matches);
-
-    // std::cout << "radiusSearch(): radius=" << search_radius << " -> " << nMatches
-    //         << " matches\n";
-    // for (size_t i = 0; i < nMatches; i++) {
-    //     uint32_t id = ret_matches[i].first;
-    //     float dist = (query_v3f - edge_pool[id]).norm();
-    //     std::cout << id << ": " << std::sqrt(ret_matches[i].second) << ", " << dist << std::endl;
-    // }
-
     // Loop over all edge pool.
     std::map<uint32_t, std::vector<Eigen::Vector3f,
         Eigen::aligned_allocator<Eigen::Vector3f>>> closed_edges;
-    const float resolution = 0.04;
-    float search_radius = 15.0*resolution;
-    search_radius *= search_radius;
+    float search_radius = SEARCH_RADIUS * SEARCH_RADIUS;
     uint32_t id_edges = 0;
     uint32_t cnt_tmp = 0;
     while(!edge_pool.empty()) {
@@ -212,7 +203,6 @@ int main(int argc, char** argv) {
         float* query_point = edge_anchor.second.data();
         float dist_to_anchor = 1.0e+4;
         float max_dist = -1;
-        float min_dist = 1.0e+4;
 
         int cnt_tracking = 0;
         bool is_loop = true;
@@ -265,9 +255,6 @@ int main(int argc, char** argv) {
                 if (dist_to_anchor > max_dist) {
                     max_dist = dist_to_anchor;
                 }
-                if (cnt_tracking > 10 && dist_to_anchor < min_dist) {
-                    min_dist = dist_to_anchor;
-                }
                 if (cnt_tracking > 1e+5 || max_dist > 1.0) {
                     std::cout << "Tracking failed: " << cnt_tracking << ", " << max_dist << std::endl;
                     is_loop = false;
@@ -282,8 +269,8 @@ int main(int argc, char** argv) {
         // This is a set of closed 3d edges
         std::cout << "dist_to_anchor = " << dist_to_anchor << ", " 
             << "candidate_edges.size() = " << candidate_edges.size() 
-            << ", max_dist = " << max_dist  << ", min_dist = " << min_dist << std::endl;
-        if (min_dist < 0.5 && max_dist < 1.0) {
+            << ", max_dist = " << max_dist << std::endl;
+        if (cnt_tracking > 5 && max_dist < 1.0) {
             std::cout << "!!!! Closed edge detected !!!!" << "\n" << std::endl;
             closed_edges[id_edges] = candidate_edges;
             id_edges ++;
@@ -295,20 +282,19 @@ int main(int argc, char** argv) {
         cnt_tmp ++;
     }
 
-    // // Visualize all detected closed-edges
-    // for (int i = 0; i < closed_edges.size(); i ++) {
-    //     std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
-    //     auto vec_i = closed_edges[i];
-    //     for (int j = 0; j < vec_i.size(); j ++) {
-    //         // save_edges.push_back(vec_i[j].second);
-    //         save_edges.push_back(vec_i[j]);
-    //     }
-    //     unsigned char color[3];
-    //     color[0] = uchar_ran(gen);
-    //     color[1] = uchar_ran(gen);
-    //     color[2] = uchar_ran(gen);
-    //     savePoints(i, save_edges, "/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/tmp-edges/", color);
-    // }
+    // Visualize all detected closed-edges
+    for (int i = 0; i < closed_edges.size(); i ++) {
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
+        auto vec_i = closed_edges[i];
+        for (int j = 0; j < vec_i.size(); j ++) {
+            save_edges.push_back(vec_i[j]);
+        }
+        unsigned char color[3];
+        color[0] = uchar_ran(gen);
+        color[1] = uchar_ran(gen);
+        color[2] = uchar_ran(gen);
+        savePoints(i, save_edges, save_path + "/closed_edges/", color);
+    }
 
     // Plane ransac for all clusters.
     std::vector<uint32_t> outlier_ids;
@@ -351,7 +337,7 @@ int main(int argc, char** argv) {
             for (int i = 0; i < num_edges; i ++) {
                 Eigen::Vector3f pt_i = it->second[i];
                 float cost_i = pt_i.transpose() * normal_ri + 1.0f;
-                if (cost_i*cost_i < 1.0e-8) {
+                if (cost_i*cost_i < 1.0e-4) {
                     inliers_i.push_back(pt_i);
                     vote_i ++;
                 }
@@ -365,12 +351,17 @@ int main(int argc, char** argv) {
             }
         }
 
-        if (vote_best < 10) {
+        if (vote_best < 6) {
             outlier_ids.push_back(it->first);
+            std::cout << "[Reject] edge id = " << it->first 
+                << ", vote_best = " << vote_best 
+                << ", normal_best = [" << normal_best(0) << ", " << normal_best(1) << ", " << normal_best(2)
+                << "], position_best = [" << position_best(0) << ", " << position_best(1) << ", " << position_best(2) 
+                << "]" << std::endl;
         }
         else {
-            std::cout << "edge id[" << it->first 
-                << "], vote_best = " << vote_best 
+            std::cout << "edge id = " << it->first 
+                << ", vote_best = " << vote_best 
                 << ", normal_best = [" << normal_best(0) << ", " << normal_best(1) << ", " << normal_best(2)
                 << "], position_best = [" << position_best(0) << ", " << position_best(1) << ", " << position_best(2) 
                 << "]" << std::endl;
@@ -390,16 +381,27 @@ int main(int argc, char** argv) {
         closed_edges.erase(outlier_ids[i]);
     }
 
+    // Visualize after plane ransac
+    for (int i = 0; i < closed_edges.size(); i ++) {
+        std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> save_edges;
+        auto vec_i = closed_edges[i];
+        for (int j = 0; j < vec_i.size(); j ++) {
+            save_edges.push_back(vec_i[j]);
+        }
+        unsigned char color[3];
+        color[0] = uchar_ran(gen);
+        color[1] = uchar_ran(gen);
+        color[2] = uchar_ran(gen);
+        savePoints(i, save_edges, save_path + "/plane_ransac/", color);
+    }
+
     // tmp
     // std::ofstream outFile("projects.txt"); // Open a file for writing
 
     // Project to the plane (z=0) and fit to an ellipse.
-    // TODO: set manhole size as configurable parameter. For now, Manhole size in Gazebo: (0.8m x 0.64m)
     const Eigen::Vector3f v_z(0.0, 0.0, 1.0);
-    const float major_squared = 0.4*0.4;
-    const float minor_squared = 0.32*0.32;
-    // TODO: think about more reasonable way to give threshold.
-    const float thr_manhole = 0.14;
+    const float major_squared = MAJOR_LENGTH*MAJOR_LENGTH;
+    const float minor_squared = MINOR_LENGTH*MINOR_LENGTH;
     for (size_t i = 0; i < semantics.size(); i ++) {
         geometricSemantics semantics_i = semantics[i];
         const Eigen::Vector3f n_i = semantics_i.normal_vector;
@@ -440,6 +442,7 @@ int main(int argc, char** argv) {
             // std::cout << "Eigenvectors:\n" << eigen_vectors << "\n";
             // std::cout << "Rtheta_i:\n" << Rtheta_i << "\n";
 
+            // TODO: need ellipse ransac with offset as variables, not simply test
             // Test with an ellipse model (0.8m x 0.64m)
             float error_ellipse = 0.0f;
             for (size_t ii = 0; ii < num_i; ii ++) {
@@ -455,13 +458,13 @@ int main(int argc, char** argv) {
             }
             error_ellipse /= num_i;
             
-            std::cout << "### " << semantics_i.id << ", " 
-                << n_i(0) << ", " << n_i(1) << ", " << n_i(2)
+            std::cout << "All manhole candidates: "  << semantics_i.id
                 << ", error_ellipse: " << error_ellipse
+                << ", normal: " << n_i(0) << ", " << n_i(1) << ", " << n_i(2)
                 << ", major-axis: " << eigen_vectors(0,0) << ", " << eigen_vectors(1,0) << std::endl;
 
             unsigned char color[3];
-            if (error_ellipse < thr_manhole) {
+            if (error_ellipse < THR_MANHOLE) {
                 // TODO: properly set saving directories.
                 color[0] = uchar_ran(gen);
                 color[1] = uchar_ran(gen);
