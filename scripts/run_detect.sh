@@ -15,5 +15,8 @@ mkdir $base_path/closed_edges
 rm -r $base_path/plane_ransac
 mkdir $base_path/plane_ransac
 
+rm -r $base_path/manhole_center_position
+mkdir $base_path/manhole_center_position
+
 ./build/release/app/test_closed_edges $input_file \
     2>&1 | tee -a $base_path/output.log

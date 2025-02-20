@@ -13,8 +13,11 @@
 constexpr float SEARCH_RADIUS = 0.6;
 // TODO: set manhole size as configurable parameter. For now, Manhole size in Gazebo: (0.8m x 0.64m)
 constexpr float MAJOR_LENGTH = 0.4;
-constexpr float MINOR_LENGTH = 0.32; 
-constexpr float THR_MANHOLE = 0.34;  // TODO: think about more reasonable way to give threshold.
+constexpr float MINOR_LENGTH = 0.32;
+constexpr float MAJOR_LENGTH_SQ = 0.4*0.4;
+constexpr float MINOR_LENGTH_SQ = 0.32*0.32;
+constexpr float THR_MANHOLE = 0.03;  // TODO: think about more reasonable way to give threshold.
+constexpr size_t NUM_SUPPORT = 9;
 
 struct geometricSemantics{
     char type; // type (-1: not determined; 0: manhole; 1: longitudinals; ...)
@@ -44,7 +47,7 @@ bool solveRotationMatrix(const Eigen::Vector3f& a, const Eigen::Vector3f& b, Eig
         + (1-std::cos(phi))*(v*v.transpose())
         - std::sin(phi)*skewMatrix(v);
     R = R_transpose.transpose();
-    if ((b - R * a).norm() > 1e-5) {
+    if ((b - R * a).norm() > 1e-2) {
         // std::cout << "The difference is " << (b - R * a).norm() << std::endl;
         return false;
     }
@@ -72,6 +75,67 @@ bool estimatePlane(const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<E
     position /= points.size();
 
     return true;
+}
+
+bool estimateEllipse(const std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> points,
+    const float u_0, const float v_0, const float theta_0, float& u_est, float& v_est, float& error_ellipse) {
+
+    bool is_success = false;
+    bool is_converge = false;
+    const size_t num_pt = points.size();
+    if (num_pt < NUM_SUPPORT) {
+        return false;
+    }
+
+    Eigen::Vector3f x(u_0, v_0, theta_0);
+    for (size_t iter = 0; iter < 20; iter ++) {
+        float u = x(0);
+        float v = x(1);
+        float theta = x(2);
+        Eigen::Matrix3f JTJ = Eigen::Matrix3f::Zero();
+        Eigen::Vector3f JTb = Eigen::Vector3f::Zero();
+        float residual = 0;
+        
+        for (size_t j = 0; j < num_pt; j ++) {
+            float x_j = points[j](0);
+            float y_j = points[j](1);
+            float const0_j = (x_j-u)*std::cos(theta) - (y_j-v)*std::sin(theta);
+            float const1_j = (x_j-u)*std::sin(theta) + (y_j-v)*std::cos(theta);
+            float dconst0_j = -(x_j-u)*std::sin(theta) - (y_j-v)*std::cos(theta);
+            float dconst1_j = (x_j-u)*std::cos(theta) - (y_j-v)*std::sin(theta);
+
+            float Jj_0 = -2.0*std::cos(theta)*const0_j/MAJOR_LENGTH_SQ - 2.0*std::sin(theta)*const1_j/MINOR_LENGTH_SQ;
+            float Jj_1 = 2.0*std::sin(theta)*const0_j/MAJOR_LENGTH_SQ - 2.0*std::cos(theta)*const1_j/MINOR_LENGTH_SQ;
+            float Jj_2 = 2.0*const0_j*dconst0_j/MAJOR_LENGTH_SQ + 2.0*const1_j*dconst1_j/MINOR_LENGTH_SQ;
+            float residual_j = 1.0 - ((const0_j*const0_j)/MAJOR_LENGTH_SQ + (const1_j*const1_j)/MINOR_LENGTH_SQ);
+
+            Eigen::Matrix<float,1,3> Jj(Jj_0, Jj_1, Jj_2);
+            JTJ += Jj.transpose() * Jj;
+            JTb += Jj.transpose() * residual_j;
+            residual += residual_j*residual_j;
+        }
+        error_ellipse = residual/num_pt;
+        Eigen::Vector3f delta_x = JTJ.llt().solve(JTb);
+        x += delta_x;
+
+        // std::cout << "[" << iter <<  "] residual = " << residual / num_pt
+        //     << ", state = (" << x(0) << ", " << x(1) << ", " << x(2)
+        //     << ", stop criteria = " << delta_x.norm()/x.norm() << std::endl;
+
+        if (delta_x.norm()/x.norm() < 1.0e-4) {
+            is_converge = true;
+            break;
+        }
+    }
+    u_est = x(0);
+    v_est = x(1);
+
+    // TODO: have to have better threhold than absolute one.
+    if (is_converge && error_ellipse < THR_MANHOLE) {
+        is_success = true;
+    }
+
+    return is_success;
 }
 
 void savePoints(size_t id,
@@ -190,7 +254,6 @@ int main(int argc, char** argv) {
         Eigen::aligned_allocator<Eigen::Vector3f>>> closed_edges;
     float search_radius = SEARCH_RADIUS * SEARCH_RADIUS;
     uint32_t id_edges = 0;
-    uint32_t cnt_tmp = 0;
     while(!edge_pool.empty()) {
 
         std::cout << "Number of 3d edges left to test: " << edge_pool.size() << std::endl;
@@ -236,21 +299,17 @@ int main(int argc, char** argv) {
 
             // When there is a valid next edge.
             if (ret_match.size() > 0) {
-                // for (size_t ii = 0; ii < ret_match.size(); ii++) {
-                //     std::cout << "ret_match: " << ret_match[ii].first << ", " << std::sqrt(ret_match[ii].second) << std::endl;
-                // }
-
-                uint32_t tracking_id = ret_match[0].first;
+                uint32_t tracking_id = ret_match[0].first; // The 1st one is the nearest one.
                 Eigen::Vector3f tracking_edge = edge_pool[tracking_id];
                 dist_to_anchor = (edge_anchor.second - tracking_edge).norm();
                 query_point = tracking_edge.data(); // update the query point.
                 candidate_edges.push_back(tracking_edge);
                 edge_pool.erase(tracking_id);
                 removed_ids.push_back(tracking_id);
-                std::cout << "    Anchor-to-tracking edges: " << "[" << edge_anchor.second(0) << ", " << edge_anchor.second(1) << ", " << edge_anchor.second(2) << "] (" << edge_anchor.first 
+                std::cout << "    Anchor-to-tracking edges: " << "[" << edge_anchor.second(0) << ", " << edge_anchor.second(1) << ", " << edge_anchor.second(2) 
+                    << "] (" << edge_anchor.first 
                     << ") - [" << tracking_edge(0) << ", " << tracking_edge(1) << ", " << tracking_edge(2) << "] (" << tracking_id
                     << "), dist_to_anchor = " << dist_to_anchor << std::endl;
-                // std::cout << tracking_edge(1) << ", " << tracking_edge(2) << std::endl;
 
                 if (dist_to_anchor > max_dist) {
                     max_dist = dist_to_anchor;
@@ -277,9 +336,6 @@ int main(int argc, char** argv) {
         }
         std::cout << "========" << std::endl;
         std::cout << "\n";
-        
-        // if (cnt_tmp >100) break;
-        cnt_tmp ++;
     }
 
     // Visualize all detected closed-edges
@@ -411,71 +467,45 @@ int main(int argc, char** argv) {
             Eigen::Vector2f center_i = Eigen::Vector2f::Zero();
             std::vector<Eigen::Vector2f, Eigen::aligned_allocator<Eigen::Vector2f>> projects_i;
             size_t num_i = semantics_i.edges.size();
+            float mean_pz = 0;
             for (size_t ii = 0; ii < num_i; ii ++) {
-                Eigen::Vector2f projects_ii = (R_zplane * semantics_i.edges[ii]).head<2>();
+                Eigen::Vector3f p_ii = R_zplane * semantics_i.edges[ii];
+                Eigen::Vector2f projects_ii = p_ii.head<2>();
                 center_i += projects_ii;
                 projects_i.push_back(projects_ii);
-                // std::cout << "### " << semantics_i.edges[ii] << "-->" << projects_ii << std::endl;
+                mean_pz += p_ii(2);
             }
             center_i /= num_i;
+            mean_pz /= num_i;
 
-            // Find the eigenvector for the major axis.
-            Eigen::Matrix2f cov = Eigen::Matrix2f::Zero();
-            for (size_t ii = 0; ii < num_i; ii ++) {
-                Eigen::Vector2f projects_ii = projects_i[ii] - center_i;
-                cov += projects_ii * projects_ii.transpose();
-            }
-            cov /= (num_i - 1.0f);
-
-            // Note that for a positive definite matrix, always real eigenvectors/values.
-            // The first element is the bigger one (major axis)
-            Eigen::EigenSolver<Eigen::Matrix2f> eigen_solver(cov);
-            Eigen::Vector2f eigen_values = eigen_solver.eigenvalues().real();
-            Eigen::Matrix2f eigen_vectors = eigen_solver.eigenvectors().real();
-            float theta_i = std::acos(eigen_vectors(0,0)); // acos(v.transpose*[1,0])
-            Eigen::Matrix2f Rtheta_i;
-            Rtheta_i << std::cos(theta_i), -std::sin(theta_i),
-                        std::sin(theta_i), std::cos(theta_i);
-
-            // std::cout << "cov:\n" << cov << std::endl;
-            // std::cout << "Eigenvalues:\n" << eigen_values << "\n";
-            // std::cout << "Eigenvectors:\n" << eigen_vectors << "\n";
-            // std::cout << "Rtheta_i:\n" << Rtheta_i << "\n";
-
-            // TODO: need ellipse ransac with offset as variables, not simply test
-            // Test with an ellipse model (0.8m x 0.64m)
-            float error_ellipse = 0.0f;
-            for (size_t ii = 0; ii < num_i; ii ++) {
-                // proejcts_ii is 2D points projected on to the z-plane with offset
-                // where its major axis is aligned with the x-axis.
-                Eigen::Vector2f projects_ii = Rtheta_i*(projects_i[ii] - center_i);
-                float error0_ii = (projects_ii(0)*projects_ii(0))/major_squared + (projects_ii(1)*projects_ii(1))/minor_squared - 1.0f;
-                error_ellipse += error0_ii * error0_ii;
-                // // TMP
-                // if (semantics_i.id == 21) {
-                //     outFile << projects_ii(0) << " " << projects_ii(1) << std::endl;
-                // }
-            }
-            error_ellipse /= num_i;
-            
-            std::cout << "All manhole candidates: "  << semantics_i.id
-                << ", error_ellipse: " << error_ellipse
-                << ", normal: " << n_i(0) << ", " << n_i(1) << ", " << n_i(2)
-                << ", major-axis: " << eigen_vectors(0,0) << ", " << eigen_vectors(1,0) << std::endl;
-
+            // Ellipse fitting with offset as variables
             unsigned char color[3];
-            if (error_ellipse < THR_MANHOLE) {
-                // TODO: properly set saving directories.
+            float u_est ,v_est, error_ellipse;
+            bool is_success = estimateEllipse(projects_i, center_i(0), center_i(1), 0.0, u_est, v_est, error_ellipse);
+            if (is_success) {
+                // Save attributes for manholes
+                semantics[i].type = 1;
+                semantics[i].position = R_zplane.transpose() * Eigen::Vector3f(u_est, v_est, mean_pz);
+                std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>> center_position;
+                center_position.push_back(semantics[i].position);
+
                 color[0] = uchar_ran(gen);
                 color[1] = uchar_ran(gen);
                 color[2] = uchar_ran(gen);
                 savePoints(semantics_i.id, semantics_i.edges, save_path + "/manholes/", color);
+                savePoints(semantics_i.id, center_position, save_path + "/manhole_center_position/", color);
+                std::cout << "[Manhole detected] id:"  << semantics_i.id 
+                    << ", error_ellipse = " << error_ellipse
+                    << ", normal: " << n_i(0) << ", " << n_i(1) << ", " << n_i(2) << std::endl;
             }
             else {
                 color[0] = 55;
                 color[1] = 55;
                 color[2] = 55;
                 savePoints(semantics_i.id, semantics_i.edges, save_path + "/edges3d/", color);
+                std::cout << "[Manhole Rejected] id:"  << semantics_i.id 
+                    << ", error_ellipse = " << error_ellipse
+                    << ", normal: " << n_i(0) << ", " << n_i(1) << ", " << n_i(2) << std::endl;
             }
         }
     }
