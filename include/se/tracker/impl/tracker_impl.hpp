@@ -15,23 +15,23 @@ namespace se {
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img, Eigen::Isometry3f& T_WS)
+bool Tracker<MapT, SensorT>::track(const Image<float>& depth_img, Eigen::Isometry3f& T_WS)
 {
-    se::Image<Eigen::Vector3f> surface_point_cloud_M(
+    Image<Eigen::Vector3f> surface_point_cloud_M(
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
-    se::Image<Eigen::Vector3f> surface_normals_M(
+    Image<Eigen::Vector3f> surface_normals_M(
         depth_img.width(), depth_img.height(), Eigen::Vector3f::Zero());
-    se::raycaster::raycast_volume(map_, sensor_, T_WS, surface_point_cloud_M, surface_normals_M);
+    raycaster::raycast_volume(map_, sensor_, T_WS, surface_point_cloud_M, surface_normals_M);
     return track(depth_img, T_WS, surface_point_cloud_M, surface_normals_M);
 }
 
 
 
 template<typename MapT, typename SensorT>
-bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
+bool Tracker<MapT, SensorT>::track(const Image<float>& depth_img,
                                    Eigen::Isometry3f& T_WS,
-                                   se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                                   se::Image<Eigen::Vector3f>& surface_normals_W)
+                                   Image<Eigen::Vector3f>& surface_point_cloud_W,
+                                   Image<Eigen::Vector3f>& surface_normals_W)
 {
     assert(depth_img.width() == surface_point_cloud_W.width()
            && depth_img.height() == surface_point_cloud_W.height());
@@ -42,10 +42,10 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
 
     Eigen::Vector2i depth_img_res = Eigen::Vector2i(depth_img.width(), depth_img.height());
 
-    std::vector<se::Image<float>> scaled_depth_img;
+    std::vector<Image<float>> scaled_depth_img;
     std::vector<float> reduction_output(8 * 32, 0.0f);
-    std::vector<se::Image<Eigen::Vector3f>> input_point_cloud_S; //< Point cloud in sensor frame
-    std::vector<se::Image<Eigen::Vector3f>> input_normals_S;     //< Normals in sensor frame
+    std::vector<Image<Eigen::Vector3f>> input_point_cloud_S; //< Point cloud in sensor frame
+    std::vector<Image<Eigen::Vector3f>> input_normals_S;     //< Normals in sensor frame
 
     // Initialize the scaled images
     for (unsigned int i = 0; i < config_.iterations.size(); ++i) {
@@ -63,7 +63,7 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
 
     // Half sample the input depth maps into the pyramid levels
     for (unsigned int i = 1; i < config_.iterations.size(); ++i) {
-        se::preprocessor::half_sample_robust_image(
+        preprocessor::half_sample_robust_image(
             scaled_depth_img[i], scaled_depth_img[i - 1], e_delta * 3, 1);
     }
 
@@ -71,15 +71,13 @@ bool Tracker<MapT, SensorT>::track(const se::Image<float>& depth_img,
     for (unsigned int i = 0; i < config_.iterations.size(); ++i) {
         const float scaling_factor = 1 << i;
         const SensorT scaled_sensor(sensor_, scaling_factor);
-        se::preprocessor::depth_to_point_cloud(
+        preprocessor::depth_to_point_cloud(
             input_point_cloud_S[i], scaled_depth_img[i], scaled_sensor);
         if (sensor_.left_hand_frame) {
-            se::preprocessor::point_cloud_to_normal<true>(input_normals_S[i],
-                                                          input_point_cloud_S[i]);
+            preprocessor::point_cloud_to_normal<true>(input_normals_S[i], input_point_cloud_S[i]);
         }
         else {
-            se::preprocessor::point_cloud_to_normal<false>(input_normals_S[i],
-                                                           input_point_cloud_S[i]);
+            preprocessor::point_cloud_to_normal<false>(input_normals_S[i], input_point_cloud_S[i]);
         }
     }
 

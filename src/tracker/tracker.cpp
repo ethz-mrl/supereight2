@@ -37,11 +37,11 @@ void TrackerConfig::readYaml(const std::string& filename)
     }
 
     // Read the config parameters.
-    se::yaml::subnode_as_vector(node, "iterations", iterations);
-    se::yaml::subnode_as_float(node, "dist_threshold", dist_threshold);
-    se::yaml::subnode_as_float(node, "normal_threshold", normal_threshold);
-    se::yaml::subnode_as_float(node, "track_threshold", track_threshold);
-    se::yaml::subnode_as_float(node, "icp_threshold", icp_threshold);
+    yaml::subnode_as_vector(node, "iterations", iterations);
+    yaml::subnode_as_float(node, "dist_threshold", dist_threshold);
+    yaml::subnode_as_float(node, "normal_threshold", normal_threshold);
+    yaml::subnode_as_float(node, "track_threshold", track_threshold);
+    yaml::subnode_as_float(node, "icp_threshold", icp_threshold);
 }
 
 

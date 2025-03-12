@@ -55,7 +55,7 @@ class Tracker {
      *
      * \return The tracking success.
      */
-    bool track(const se::Image<float>& depth_img, Eigen::Isometry3f& T_WS);
+    bool track(const Image<float>& depth_img, Eigen::Isometry3f& T_WS);
 
     /**
      * \brief Track the current pose using ICP.
@@ -67,10 +67,10 @@ class Tracker {
      *
      * \return The tracking success.
      */
-    bool track(const se::Image<float>& depth_img,
+    bool track(const Image<float>& depth_img,
                Eigen::Isometry3f& T_WS,
-               se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-               se::Image<Eigen::Vector3f>& surface_normals_W);
+               Image<Eigen::Vector3f>& surface_point_cloud_W,
+               Image<Eigen::Vector3f>& surface_normals_W);
 
     void renderTrackingResult(RGBA* tracking_img_data);
 

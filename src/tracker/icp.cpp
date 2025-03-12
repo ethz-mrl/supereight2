@@ -212,7 +212,7 @@ bool updatePoseKernel(Eigen::Isometry3f& T_WS,
     bool result = false;
     Eigen::Map<const Eigen::Matrix<float, 8, 32, Eigen::RowMajor>> values(reduction_output_data);
     Eigen::Matrix<float, 6, 1> x = solve(values.row(0).segment(1, 27));
-    const Eigen::Isometry3f delta(se::math::exp(x));
+    const Eigen::Isometry3f delta(math::exp(x));
     T_WS = delta * T_WS;
 
     if (x.norm() < icp_threshold) {

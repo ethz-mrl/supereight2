@@ -15,10 +15,10 @@ namespace icp {
 
 template<typename ProjectF>
 void trackKernel(Data* output_data,
-                 const se::Image<Eigen::Vector3f>& input_point_cloud_S,
-                 const se::Image<Eigen::Vector3f>& input_normals_S,
-                 const se::Image<Eigen::Vector3f>& surface_point_cloud_W_ref,
-                 const se::Image<Eigen::Vector3f>& surface_normals_W_ref,
+                 const Image<Eigen::Vector3f>& input_point_cloud_S,
+                 const Image<Eigen::Vector3f>& input_normals_S,
+                 const Image<Eigen::Vector3f>& surface_point_cloud_W_ref,
+                 const Image<Eigen::Vector3f>& surface_normals_W_ref,
                  const Eigen::Isometry3f& T_WS,
                  const Eigen::Isometry3f& T_WS_ref,
                  const ProjectF project,
@@ -59,7 +59,7 @@ void trackKernel(Data* output_data,
                 continue;
             }
 
-            const Eigen::Vector2i ref_pixel = se::round_pixel(ref_pixel_f);
+            const Eigen::Vector2i ref_pixel = round_pixel(ref_pixel_f);
             // TODO: Properly fix the ICP tracking instead of blindly inverting the reference
             // normal. Due to a bug in raycast_volume(), it used to return the inwards instead of
             // the outwards facing normals. Using the outwards facing normals breaks tracking in the
