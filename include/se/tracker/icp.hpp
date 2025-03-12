@@ -19,13 +19,9 @@ namespace se {
 namespace icp {
 
 struct Data {
-    int result;
-    float error;
-    float J[6];
-
-    Data() : result(0), error(0.0f), J{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f}
-    {
-    }
+    int result = 0;
+    float error = 0.0f;
+    float J[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 };
 
 
