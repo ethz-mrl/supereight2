@@ -84,6 +84,8 @@ se::PinholeCamera::PinholeCamera(const Config& c, const float dsf) :
               _distortion),
         scaled_pixel(1 / (c.fx / dsf))
 {
+    left_hand_frame = (c.fx < 0.0f) ^ (c.fy < 0.0f);
+
     computeFrustumVertices();
     computeFrustumNormals();
 
