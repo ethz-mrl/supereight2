@@ -44,6 +44,7 @@ add_library(${LIB_NAME} STATIC
     "src/sensor/leica_lidar.cpp"
     "src/sensor/ouster_lidar.cpp"
     "src/sensor/pinhole_camera.cpp"
+    "src/tracker/icp.cpp"
     "src/tracker/tracker.cpp"
 )
 configure_file("include/se/supereight_config.hpp.in" "include/se/supereight_config.hpp" @ONLY)
