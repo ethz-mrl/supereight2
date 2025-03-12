@@ -22,6 +22,15 @@ void se::LeicaLidar::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_float(node, "azimuth_resolution_angle", azimuth_resolution_angle_);
 }
 
+se::LeicaLidar::Config se::LeicaLidar::Config::operator/(const float downsampling_factor) const
+{
+    return se::LeicaLidar::Config{
+        se::SensorBase<se::LeicaLidar>::Config::operator/(downsampling_factor),
+        elevation_resolution_angle_,
+        azimuth_resolution_angle_,
+    };
+}
+
 
 
 std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidar::Config& c)

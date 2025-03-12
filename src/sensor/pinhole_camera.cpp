@@ -26,6 +26,18 @@ void se::PinholeCamera::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_float(node, "cy", cy);
 }
 
+se::PinholeCamera::Config
+se::PinholeCamera::Config::operator/(const float downsampling_factor) const
+{
+    return se::PinholeCamera::Config{
+        se::SensorBase<se::PinholeCamera>::Config::operator/(downsampling_factor),
+        fx / downsampling_factor,
+        fy / downsampling_factor,
+        (cx + 0.5f) / downsampling_factor - 0.5f,
+        (cy + 0.5f) / downsampling_factor - 0.5f,
+    };
+}
+
 
 
 std::ostream& se::operator<<(std::ostream& os, const se::PinholeCamera::Config& c)

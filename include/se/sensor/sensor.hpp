@@ -60,6 +60,16 @@ class SensorBase {
          */
         void readYaml(const std::string& filename);
 
+        Config operator/(const float downsampling_factor) const
+        {
+            return Config{static_cast<int>(width / downsampling_factor),
+                          static_cast<int>(height / downsampling_factor),
+                          near_plane,
+                          far_plane,
+                          T_BS,
+                          pixel_voxel_ratio_per_scale};
+        }
+
         // The definition of this function MUST be inside the definition of Config for template
         // argument deduction to work.
         friend std::ostream& operator<<(std::ostream& os, const Config& c)

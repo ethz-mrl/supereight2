@@ -36,6 +36,8 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
          */
         void readYaml(const std::string& filename);
 
+        Config operator/(const float downsampling_factor) const;
+
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 

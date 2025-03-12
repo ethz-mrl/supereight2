@@ -33,6 +33,15 @@ void se::OusterLidar::Config::readYaml(const std::string& filename)
     }
 }
 
+se::OusterLidar::Config se::OusterLidar::Config::operator/(const float downsampling_factor) const
+{
+    return se::OusterLidar::Config{
+        se::SensorBase<se::OusterLidar>::Config::operator/(downsampling_factor),
+        beam_elevation_angles,
+        beam_azimuth_angles,
+    };
+}
+
 
 
 std::ostream& se::operator<<(std::ostream& os, const se::OusterLidar::Config& c)
