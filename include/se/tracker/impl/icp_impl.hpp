@@ -39,7 +39,7 @@ void trackKernel(Data* output_data,
             Data& row = output_data[pixel.x() + pixel.y() * ref_res.x()];
 
             if (input_normals_S[pixel.x() + pixel.y() * w] == math::g_invalid_normal) {
-                row.result = -1;
+                row.result = ResultInvalidInputNormal;
                 continue;
             }
 
@@ -55,7 +55,7 @@ void trackKernel(Data* output_data,
             //if (sensor_.model.project(point_S_ref, &ref_pixel_f)
             //    != srl::projection::ProjectionStatus::Successful) {
             if (!project(point_S_ref, ref_pixel_f)) {
-                row.result = -2;
+                row.result = ResultProjectionOutside;
                 continue;
             }
 
@@ -69,7 +69,7 @@ void trackKernel(Data* output_data,
                 -surface_normals_W_ref[ref_pixel.x() + ref_pixel.y() * ref_res.x()];
 
             if (ref_normal_W == math::g_invalid_normal) {
-                row.result = -3;
+                row.result = ResultInvalidRefNormal;
                 continue;
             }
 
@@ -80,14 +80,14 @@ void trackKernel(Data* output_data,
                 T_WS.linear() * input_normals_S[pixel.x() + pixel.y() * w];
 
             if (diff.norm() > dist_threshold) {
-                row.result = -4;
+                row.result = ResultDistThreshold;
                 continue;
             }
             if (input_normal_W.dot(ref_normal_W) < normal_threshold) {
-                row.result = -5;
+                row.result = ResultNormalThreshold;
                 continue;
             }
-            row.result = 1;
+            row.result = ResultSuccess;
             row.error = ref_normal_W.dot(diff);
             row.J[0] = ref_normal_W.x();
             row.J[1] = ref_normal_W.y();

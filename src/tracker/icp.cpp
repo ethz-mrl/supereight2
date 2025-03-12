@@ -94,11 +94,11 @@ void newReduce(const int block_idx,
     for (int y = block_idx; y < output_res.y(); y += 8) {
         for (int x = 0; x < output_res.x(); x++) {
             const Data& row = J_data[(x + y * J_res.x())]; // ...
-            if (row.result < 1) {
+            if (row.result < ResultSuccess) {
                 // accesses sums[28..31]
-                /*(sums+28)[1]*/ sums29 += row.result == -4 ? 1 : 0;
-                /*(sums+28)[2]*/ sums30 += row.result == -5 ? 1 : 0;
-                /*(sums+28)[3]*/ sums31 += row.result > -4 ? 1 : 0;
+                /*(sums+28)[1]*/ sums29 += row.result == ResultDistThreshold ? 1 : 0;
+                /*(sums+28)[2]*/ sums30 += row.result == ResultNormalThreshold ? 1 : 0;
+                /*(sums+28)[3]*/ sums31 += row.result > ResultDistThreshold ? 1 : 0;
 
                 continue;
             }

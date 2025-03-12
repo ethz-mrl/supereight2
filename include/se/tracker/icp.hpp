@@ -18,8 +18,18 @@
 namespace se {
 namespace icp {
 
+enum TrackingResult {
+    ResultSuccess = 1,
+    ResultUnknown = 0,
+    ResultInvalidInputNormal = -1,
+    ResultProjectionOutside = -2,
+    ResultInvalidRefNormal = -3,
+    ResultDistThreshold = -4,
+    ResultNormalThreshold = -5,
+};
+
 struct Data {
-    int result = 0;
+    TrackingResult result = ResultUnknown;
     float error = 0.0f;
     float J[6] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 };

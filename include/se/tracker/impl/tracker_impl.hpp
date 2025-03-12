@@ -125,27 +125,27 @@ void Tracker<MapT, SensorT>::renderTrackingResult(RGBA* tracking_img_data)
         for (int x = 0; x < sensor_.model.imageWidth(); x++) {
             const int pixel_idx = x + sensor_.model.imageWidth() * y;
             switch (tracking_result[pixel_idx].result) {
-            case 1:
+            case icp::ResultSuccess:
                 // Gray
                 tracking_img_data[pixel_idx] = {0x80, 0x80, 0x80, 0xFF};
                 break;
-            case -1:
+            case icp::ResultInvalidInputNormal:
                 // Black
                 tracking_img_data[pixel_idx] = {0x00, 0x00, 0x00, 0xFF};
                 break;
-            case -2:
+            case icp::ResultProjectionOutside:
                 // Red
                 tracking_img_data[pixel_idx] = {0xFF, 0x00, 0x00, 0xFF};
                 break;
-            case -3:
+            case icp::ResultInvalidRefNormal:
                 // Green
                 tracking_img_data[pixel_idx] = {0x00, 0xFF, 0x00, 0xFF};
                 break;
-            case -4:
+            case icp::ResultDistThreshold:
                 // Blue
                 tracking_img_data[pixel_idx] = {0x00, 0x00, 0xFF, 0xFF};
                 break;
-            case -5:
+            case icp::ResultNormalThreshold:
                 // Yellow
                 tracking_img_data[pixel_idx] = {0xFF, 0xFF, 0x00, 0xFF};
                 break;
