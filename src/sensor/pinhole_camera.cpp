@@ -85,33 +85,9 @@ se::PinholeCamera::PinholeCamera(const Config& c) :
 
 
 
-se::PinholeCamera::PinholeCamera(const Config& c, const float dsf) :
-        se::SensorBase<se::PinholeCamera>(c),
-        model(c.width / dsf,
-              c.height / dsf,
-              c.fx / dsf,
-              c.fy / dsf,
-              (c.cx + 0.5f) / dsf - 0.5f,
-              (c.cy + 0.5f) / dsf - 0.5f,
-              _distortion),
-        scaled_pixel(1 / (c.fx / dsf))
+se::PinholeCamera::PinholeCamera(const Config& c, const float downsampling_factor) :
+        PinholeCamera(c / downsampling_factor)
 {
-    left_hand_frame = (c.fx < 0.0f) ^ (c.fy < 0.0f);
-
-    computeFrustumVertices();
-    computeFrustumNormals();
-
-    assert(c.width > 0);
-    assert(c.height > 0);
-    assert(c.near_plane >= 0.f);
-    assert(c.far_plane > c.near_plane);
-    assert(!std::isnan(c.fx));
-    assert(!std::isnan(c.fy));
-    assert(!std::isnan(c.cx));
-    assert(!std::isnan(c.cy));
-
-    horizontal_fov = 2.0f * atanf(c.width / (2.0f * c.fx));
-    vertical_fov = 2.0f * atanf(c.height / (2.0f * c.fy));
 }
 
 

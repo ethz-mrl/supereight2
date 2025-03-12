@@ -86,32 +86,9 @@ se::OusterLidar::OusterLidar(const Config& c) :
 
 
 
-se::OusterLidar::OusterLidar(const Config& c, const float dsf) :
-        se::SensorBase<se::OusterLidar>(c),
-        model(c.width / dsf, c.height / dsf, c.beam_azimuth_angles, c.beam_elevation_angles)
+se::OusterLidar::OusterLidar(const Config& c, const float downsampling_factor) :
+        se::OusterLidar(c / downsampling_factor)
 {
-    assert(c.width > 0);
-    assert(c.height > 0);
-    assert(c.near_plane >= 0.f);
-    assert(c.far_plane > c.near_plane);
-    assert(c.beam_azimuth_angles.size() > 0);
-    assert(c.beam_elevation_angles.size() > 0);
-    float min_elevation_angle = fabsf(c.beam_elevation_angles[1] - c.beam_elevation_angles[0]);
-    for (int i = 2; i < c.beam_elevation_angles.size(); i++) {
-        const float diff = fabsf(c.beam_elevation_angles[i - 1] - c.beam_elevation_angles[i]);
-        if (diff < min_elevation_angle) {
-            min_elevation_angle = diff;
-        }
-    }
-    const float azimuth_angle = 360.0f / c.width;
-    min_ray_angle = std::min(min_elevation_angle, azimuth_angle);
-    horizontal_fov = 2.0f * M_PI;
-    constexpr float deg_to_rad = M_PI / 180.0f;
-    const float min_elevation = c.beam_elevation_angles.minCoeff();
-    min_elevation_rad = min_elevation * deg_to_rad;
-    const float max_elevation = c.beam_elevation_angles.maxCoeff();
-    max_elevation_rad = max_elevation * deg_to_rad;
-    vertical_fov = deg_to_rad * (max_elevation - min_elevation);
 }
 
 

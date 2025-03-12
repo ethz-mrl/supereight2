@@ -74,30 +74,9 @@ se::LeicaLidar::LeicaLidar(const Config& c) :
 
 
 
-se::LeicaLidar::LeicaLidar(const Config& c, const float dsf) :
-        se::SensorBase<se::LeicaLidar>(c),
-        model(c.width / dsf, c.height / dsf),
-        azimuth_resolution_angle(c.azimuth_resolution_angle_),
-        elevation_resolution_angle(c.elevation_resolution_angle_)
+se::LeicaLidar::LeicaLidar(const Config& c, const float downsampling_factor) :
+        se::LeicaLidar(c / downsampling_factor)
 {
-    assert(c.width > 0);
-    assert(c.height > 0);
-    assert(c.near_plane > 0.f);
-    assert(c.far_plane > c.near_plane);
-
-    min_ray_angle = std::min(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
-    horizontal_fov = 2.0f * M_PI;
-
-    constexpr float deg_to_rad = M_PI / 180.0f;
-
-    const float min_elevation = -90.0f;
-    min_elevation_rad = min_elevation * deg_to_rad;
-    const float max_elevation = 90.0f;
-    max_elevation_rad = max_elevation * deg_to_rad;
-    vertical_fov =
-        deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
-
-    pixel_dim_tan = 2.0f * std::tan(min_ray_angle * 0.5f * deg_to_rad);
 }
 
 
