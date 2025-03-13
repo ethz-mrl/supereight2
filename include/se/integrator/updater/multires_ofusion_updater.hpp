@@ -80,6 +80,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Se
      */
     template<bool UpdateBuffer>
     void updateBlockData(BlockType& block,
+                         const Eigen::Vector3f& block_centre_C,
                          const int scale,
                          const bool low_variance,
                          const bool project_inside);

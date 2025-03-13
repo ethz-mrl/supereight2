@@ -395,7 +395,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
             }
         }
 
-        updateBlockData<true>(*block_ptr, recommended_scale, low_variance, project_inside);
+        updateBlockData<true>(
+            *block_ptr, block_centre_C, recommended_scale, low_variance, project_inside);
 
         if (block_ptr->switchData()) {
             return;
@@ -405,7 +406,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->resetBuffer();
     }
 
-    updateBlockData<false>(*block_ptr, integration_scale, low_variance, project_inside);
+    updateBlockData<false>(
+        *block_ptr, block_centre_C, integration_scale, low_variance, project_inside);
 }
 
 
@@ -414,13 +416,11 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 template<bool UpdateBuffer>
 void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
              SensorT>::updateBlockData(BlockType& block,
+                                       const Eigen::Vector3f& block_centre_C,
                                        const int scale,
                                        const bool low_variance,
                                        const bool project_inside)
 {
-    Eigen::Vector3f block_centre_point_W;
-    map_.voxelToPoint(block.coord, BlockType::size, block_centre_point_W);
-    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
     const int stride = octantops::scale_to_size(scale);
     const int size_at_scale = BlockType::size >> scale;
     const int size_at_scale_sq = math::sq(size_at_scale);
@@ -432,7 +432,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
          * (map_res_ * (Eigen::Matrix3f() << stride, 0, 0, 0, stride, 0, 0, 0, stride).finished()));
 
     // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
-    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_point_C);
+    const float block_point_C_m = sensor_.measurementFromPoint(block_centre_C);
     // Compute the surface thickness value (tau) for the block.
     const float tau =
         compute_tau(block_point_C_m, config_.tau_min, config_.tau_max, map_.getDataConfig());
