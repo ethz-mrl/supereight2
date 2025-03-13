@@ -168,26 +168,18 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     assert(octant_ptr->is_block);
 
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-
     // Compute the point of the block centre in the sensor frame
-    const unsigned int block_size = BlockType::size;
-    const Eigen::Vector3i block_coord = block_ptr->coord;
     Eigen::Vector3f block_centre_point_W;
-
-    map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
+    map_.voxelToPoint(block_ptr->coord, BlockType::size, block_centre_point_W);
+    const Eigen::Vector3f block_centre_C = T_CW_ * block_centre_point_W;
 
     // Compute the integration scale
     // The last integration scale
     const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
     // The recommended integration scale
-    const int computed_integration_scale =
-        sensor_.computeIntegrationScale(block_centre_point_C,
-                                        map_res_,
-                                        last_scale,
-                                        block_ptr->getMinScale(),
-                                        block_ptr->getMaxScale());
+    const int computed_integration_scale = sensor_.computeIntegrationScale(
+        block_centre_C, map_res_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
 
     // The minimum integration scale (change to last if data has already been integrated)
     const int min_integration_scale = ((block_ptr->getMinScale() == -1
@@ -223,7 +215,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
             if (recommended_scale < last_scale) {
                 const int parent_scale = last_scale;
-                const unsigned int size_at_parent_scale_li = block_size >> parent_scale;
+                const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
@@ -317,26 +309,19 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
     assert(octant_ptr);
     assert(octant_ptr->is_block);
 
-    // Compute the point of the block centre in the sensor frame
     BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-    const int block_size = BlockType::size;
-    const Eigen::Vector3i block_coord = block_ptr->coord;
-
+    // Compute the point of the block centre in the sensor frame
     Eigen::Vector3f block_centre_point_W;
-    map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-    const Eigen::Vector3f block_centre_point_C = T_CW_ * block_centre_point_W;
+    map_.voxelToPoint(block_ptr->coord, BlockType::size, block_centre_point_W);
+    const Eigen::Vector3f block_centre_C = T_CW_ * block_centre_point_W;
 
     // Compute the integration scale
     // The last integration scale
     const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
 
     // The recommended integration scale
-    const int computed_integration_scale =
-        sensor_.computeIntegrationScale(block_centre_point_C,
-                                        map_res_,
-                                        last_scale,
-                                        block_ptr->getMinScale(),
-                                        block_ptr->getMaxScale());
+    const int computed_integration_scale = sensor_.computeIntegrationScale(
+        block_centre_C, map_res_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
 
     // The minimum integration scale (change to last if data has already been integrated)
     const int min_integration_scale = (low_variance
