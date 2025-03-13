@@ -458,14 +458,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
                 const int idx = x + y * size_at_scale + z * size_at_scale_sq;
                 auto& data = UpdateBuffer ? block.bufferData(idx) : block.currData(idx);
+                bool newly_observed;
                 if (low_variance) {
-                    const bool newly_observed = updater::free_voxel(data, map_.getDataConfig());
-                    if constexpr (UpdateBuffer) {
-                        block.incrBufferObservedCount(newly_observed);
-                    }
-                    else {
-                        block.incrCurrObservedCount(newly_observed);
-                    }
+                    newly_observed = updater::free_voxel(data, map_.getDataConfig());
                     // We don't update colour or semantics in free space.
                 }
                 else {
@@ -473,14 +468,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                     const float range = sample_point_C.norm();
                     const float range_diff =
                         (sample_point_C_m - depth_value) * (range / sample_point_C_m);
-                    const bool newly_observed = updater::update_voxel(
+                    newly_observed = updater::update_voxel(
                         data, range_diff, tau, three_sigma, map_.getDataConfig());
-                    if constexpr (UpdateBuffer) {
-                        block.incrBufferObservedCount(newly_observed);
-                    }
-                    else {
-                        block.incrCurrObservedCount(newly_observed);
-                    }
                     const bool field_updated = range_diff < tau;
 
                     // Never update colour or semantics beyond the far plane.
@@ -515,6 +504,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                             }
                         }
                     }
+                }
+                if constexpr (UpdateBuffer) {
+                    block.incrBufferObservedCount(newly_observed);
+                }
+                else {
+                    block.incrCurrObservedCount(newly_observed);
                 }
             } // x
         }     // y
