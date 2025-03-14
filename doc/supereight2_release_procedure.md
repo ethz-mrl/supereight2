@@ -1,6 +1,6 @@
 # Supereight release procedure
 
-The process to follow when making a new supereight release. The `master` branch
+The process to follow when making a new supereight release. The `main` branch
 should always point to the latest release.
 
 
@@ -26,12 +26,12 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
    ./scripts/supereight-test.bash /tmp/se2results
    ```
 
-1. Pull the latest commits in the `devel` and `master` branches from the private
+1. Pull the latest commits in the `devel` and `main` branches from the private
    repository remote into your local clone.
 
     ``` sh
-    git checkout master
-    git pull origin master
+    git checkout main
+    git pull origin main
     git checkout devel
     git pull origin devel
     ```
@@ -47,10 +47,10 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
     git push origin devel
     ```
 
-1. Fast-forward merge the `devel` branch into the `master` branch.
+1. Fast-forward merge the `devel` branch into the `main` branch.
 
     ``` sh
-    git checkout master
+    git checkout main
     git merge --ff devel
     ```
 
@@ -58,15 +58,15 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
    the output of `git shortlog` as the extended description.
 
     ``` sh
-    tag_msg=$(printf 'supereight2 %s\n\n%s\n' "$se2_version" "$(git shortlog origin/master..master)")
-    git tag --no-sign -a -m "$tag_msg" "$se2_version" master
+    tag_msg=$(printf 'supereight2 %s\n\n%s\n' "$se2_version" "$(git shortlog origin/main..main)")
+    git tag --no-sign -a -m "$tag_msg" "$se2_version" main
     ```
 
-1. Push the master branch to both the private and public repositories.
+1. Push the main branch to both the private and public repositories.
 
     ``` sh
-    git push origin master:master
-    git push public master:master
+    git push origin main:main
+    git push public main:main
     ```
 
 1. Push the tag to both the private and public repositories.
