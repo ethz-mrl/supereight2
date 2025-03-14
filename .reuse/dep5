@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: supereight
 
-Files: README.md doc/supereight_common_issues.md doc/supereight_release_procedure.md
+Files: README.md doc/supereight2_common_issues.md doc/supereight2_release_procedure.md
 Copyright: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
 License: BSD-3-Clause
 
