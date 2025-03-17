@@ -59,14 +59,6 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, ResT> {
         return (max_data.field.observed && derived()->isLeaf()) ? max_data : default_data;
     }
 
-    /** Set the node's data to \p data. It should only be called on leaf nodes. */
-    void setData(const DataType& data)
-    {
-        assert(derived()->isLeaf());
-        min_data = data;
-        max_data = data;
-    }
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
