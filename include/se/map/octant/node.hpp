@@ -20,12 +20,6 @@ class Node;
  */
 template<typename DataT, Res ResT>
 struct NodeData {
-    protected:
-    NodeData(const DataT&)
-    {
-    }
-
-    public:
     /** Always returns the default data. This method allows simplifying the implementation of
      * certain algorithms.
      */
@@ -33,6 +27,11 @@ struct NodeData {
     {
         static const DataT default_data;
         return default_data;
+    }
+
+    protected:
+    NodeData(const DataT&)
+    {
     }
 };
 
