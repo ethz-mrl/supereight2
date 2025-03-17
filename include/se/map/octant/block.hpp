@@ -38,10 +38,6 @@ class BlockSingleRes {
 
     DataType& getData(const Eigen::Vector3i& voxel_coord);
 
-    void setData(const int voxel_idx, const DataT& data);
-
-    void setData(const Eigen::Vector3i& voxel_coord, const DataT& data);
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
@@ -125,19 +121,11 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    /// Get data
+    /// Get data union
 
     const DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
-
-    /// Set data at current scale
-
-    void setData(const int voxel_idx, const DataType& data);
-
-    void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
-
-    void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
 
     void setDataUnion(const DataUnion& data_union);
 
@@ -278,10 +266,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /// Set data at current scale
-    void setData(const Eigen::Vector3i& voxel_coord, const DataType& data);
-
-    void setData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
-
     void setMinData(const Eigen::Vector3i& voxel_coord, const DataType& data);
 
     void setMinData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);

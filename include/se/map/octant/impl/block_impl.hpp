@@ -66,28 +66,6 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::getData(const Eigen::Vector3i& voxel
 
 
 
-template<typename DataT, int BlockSize, typename DerivedT>
-void BlockSingleRes<DataT, BlockSize, DerivedT>::setData(const Eigen::Vector3i& voxel_coord,
-                                                         const DataType& data)
-{
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
-        + voxel_offset.z() * underlying()->size_sq;
-    setData(voxel_idx, data);
-}
-
-
-
-template<typename DataT, int BlockSize, typename DerivedT>
-void BlockSingleRes<DataT, BlockSize, DerivedT>::setData(const int voxel_idx, const DataType& data)
-{
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
-    block_data_[voxel_idx] = data;
-}
-
-
-
 /// Multi-res Block ///
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
@@ -245,39 +223,6 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     data_union.data_idx = voxel_idx;
     data_union.prop_data_idx = voxel_idx;
     return data_union;
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setData(
-    const int voxel_idx,
-    const DataType& data)
-{
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
-    block_data_[voxel_idx] = data;
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setData(
-    const Eigen::Vector3i& voxel_coord,
-    const DataType& data)
-{
-    setData(getVoxelIdx(voxel_coord, current_scale), data);
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setData(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale,
-    const DataType& data)
-{
-    setData(getVoxelIdx(voxel_coord, scale), data);
 }
 
 
@@ -626,27 +571,6 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
                                                   + voxel_offset.y() * size_at_scale
                                                   + voxel_offset.z() * math::sq(size_at_scale)];
     }
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::setData(
-    const Eigen::Vector3i& voxel_coord,
-    const DataType& data)
-{
-    block_data_[max_scale - current_scale][getVoxelIdx(voxel_coord, current_scale)] = data;
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::setData(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale,
-    const DataType& data)
-{
-    block_data_[max_scale - scale][getVoxelIdx(voxel_coord, scale)] = data;
 }
 
 

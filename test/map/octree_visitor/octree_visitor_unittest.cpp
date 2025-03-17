@@ -67,7 +67,7 @@ TEST(VisitorTSDFSingleRes, Interpolation)
             BlockType0::DataType data;
             data.field.tsdf = i;
             data.field.weight = 1;
-            block_ptr_0->setData(voxel_idx, data);
+            block_ptr_0->getData(voxel_idx) = data;
         }
     }
 
@@ -159,7 +159,7 @@ TEST(VisitorTSDFMultiRes, Interpolation)
             BlockType0::DataType data;
             data.field.tsdf = i;
             data.field.weight = 1;
-            block_ptr_0->setData(voxel_idx, data);
+            block_ptr_0->getData(voxel_idx) = data;
         }
     }
 

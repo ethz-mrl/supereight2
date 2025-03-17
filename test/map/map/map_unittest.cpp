@@ -167,7 +167,7 @@ TEST(Map, Interpolation)
             DataType data;
             data.field.tsdf = i;
             data.field.weight = 1;
-            block_ptr->setData(voxel_idx, data);
+            block_ptr->getData(voxel_idx) = data;
         }
     }
 
