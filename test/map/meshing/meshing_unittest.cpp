@@ -112,7 +112,7 @@ create_octree_scale()
         auto block_ptr = static_cast<typename OctreeType::BlockType*>(*block_ptr_itr);
         Eigen::Vector3i block_coord = block_ptr->coord;
 
-        block_ptr->setCurrentScale(curr_scale);
+        block_ptr->current_scale = curr_scale;
         for (unsigned x = 0; x < block_size; x += curr_stride) {
             for (unsigned y = 0; y < block_size; y += curr_stride) {
                 for (unsigned z = 0; z < block_size; z += curr_stride) {

@@ -69,7 +69,7 @@ static void expect_valid_block(const BlockType& block)
 
     // Test that the data of all children are within the minimum and maximum data of their
     // parent. Skip the finest scale since it has no children.
-    for (int scale = block.getMaxScale(); scale > block.getCurrentScale(); scale--) {
+    for (int scale = block.max_scale; scale > block.current_scale; scale--) {
         const int size_at_scale = se::octantops::scale_to_size(scale);
         // Iterate over all the octants at this scale.
         for (int z = 0; z < BlockType::size; z += size_at_scale) {

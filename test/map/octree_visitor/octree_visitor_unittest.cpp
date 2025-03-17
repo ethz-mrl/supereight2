@@ -152,7 +152,7 @@ TEST(VisitorTSDFMultiRes, Interpolation)
         block_ptr_0 = static_cast<BlockType0*>(
             se::allocator::block(voxel_key, *octree_ptr_0, octree_ptr_0->getRoot()));
         coord_is = block_ptr_0->coord;
-        block_ptr_0->setCurrentScale(1);
+        block_ptr_0->current_scale = 1;
         EXPECT_EQ(coord_ought, coord_is);
         for (size_t voxel_idx = block_ptr_0->size_cu; voxel_idx < block_ptr_0->size_cu + 64;
              voxel_idx++) {

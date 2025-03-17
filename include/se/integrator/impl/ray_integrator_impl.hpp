@@ -186,7 +186,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         // compute integration scale
         BlockType* block_ptr = static_cast<BlockType*>(finest_octant_ptr);
         // The last integration scale
-        const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
+        const int last_scale = (block_ptr->min_scale == -1) ? 0 : block_ptr->current_scale;
 
         // Compute the point of the block centre in the sensor frame ToDo: is this needed? Can't we just use the point in sensor frame?
         const unsigned int block_size = BlockType::size;
@@ -196,19 +196,15 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
         const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
 
         // The recommended integration scale
-        int computed_integration_scale = sensor_.computeIntegrationScale(block_centre_point_C,
-                                                                         map_res_,
-                                                                         last_scale,
-                                                                         block_ptr->getMinScale(),
-                                                                         block_ptr->getMaxScale());
+        int computed_integration_scale = sensor_.computeIntegrationScale(
+            block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
         if (rayState == se::RayState::FreeSpace
             && (computed_integration_scale < free_space_scale_)) {
-            if (block_ptr->getMinScale() == -1) {
+            if (block_ptr->min_scale == -1) {
                 computed_integration_scale = free_space_scale_;
             }
             else {
-                computed_integration_scale =
-                    std::min(free_space_scale_, block_ptr->getCurrentScale());
+                computed_integration_scale = std::min(free_space_scale_, block_ptr->current_scale);
             }
         }
 
@@ -261,13 +257,12 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     // The last integration scale
     // -- Nothing integrated yet (-1) => set to desired_scale
     // -- otherwise current scale of block ptr
-    const int last_scale =
-        (block_ptr->getMinScale() == -1) ? desired_scale : block_ptr->getCurrentScale();
+    const int last_scale = (block_ptr->min_scale == -1) ? desired_scale : block_ptr->current_scale;
     int integration_scale = last_scale;
 
 
     // Case 1: Nothing integrated yet:
-    if (block_ptr->getMinScale() == -1) { // nothing inegrated yet
+    if (block_ptr->min_scale == -1) { // nothing inegrated yet
         // Make sure the block is allocated up to the integration scale
         block_ptr->allocateDownTo(integration_scale);
         block_ptr->setInitData(DataType());
@@ -282,7 +277,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
         se::ray_integrator::propagate_block_to_scale<BlockType>(block_ptr, desired_scale);
         integration_scale = desired_scale;
         block_ptr->deleteUpTo(integration_scale);
-        block_ptr->setCurrentScale(integration_scale);
+        block_ptr->current_scale = integration_scale;
     }
 
     /// Determine voxels to be updated

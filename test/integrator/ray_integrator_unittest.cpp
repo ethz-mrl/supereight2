@@ -123,7 +123,7 @@ TEST(RayIntegrator, SingleRay)
 
         const OctreeType::BlockType* const block_ptr =
             static_cast<const OctreeType::BlockType*>(finest_octant_ptr);
-        const int allocatedScale = block_ptr->getCurrentScale();
+        const int allocatedScale = block_ptr->current_scale;
         EXPECT_NE(allocatedScale, -1);
 
 
@@ -258,7 +258,7 @@ TEST(RayIntegrator, Propagation)
         const BlockType* const block = blocks.front();
         blocks.pop();
         // Test each voxel for all scales except the finest.
-        for (int scale = block->getMaxScale(); scale > block->getCurrentScale(); scale--) {
+        for (int scale = block->max_scale; scale > block->current_scale; scale--) {
             const int stride = se::octantops::scale_to_size(scale);
             for (int z = 0; z < block->size; z += stride) {
                 for (int y = 0; y < block->size; y += stride) {

@@ -138,10 +138,10 @@ void propagate_block_to_coarsest_scale(se::OctantBase* octant_ptr)
     assert(octant_ptr);
     assert(octant_ptr->is_block);
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
-    if (block.getCurrentScale() == block.getMaxScale()) {
+    if (block.current_scale == block.max_scale) {
         return;
     }
-    return propagate_block_to_scale<BlockT>(octant_ptr, BlockT::getMaxScale());
+    return propagate_block_to_scale<BlockT>(octant_ptr, BlockT::max_scale);
 }
 
 template<typename BlockT>
@@ -154,9 +154,9 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
 
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
 
-    assert(desired_scale >= block.getCurrentScale());
+    assert(desired_scale >= block.current_scale);
 
-    int child_scale = block.getCurrentScale();
+    int child_scale = block.current_scale;
     int size_at_child_scale_li = BlockT::size >> child_scale;
     int size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
 
@@ -368,14 +368,14 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
 
     BlockT& block = *static_cast<BlockT*>(octant_ptr);
 
-    const int last_scale = block.getCurrentScale();
+    const int last_scale = block.current_scale;
 
     int current_scale = last_scale;
     while (current_scale > desired_scale) {
         // down propagation
         block.allocateDownTo(current_scale - 1);
-        block.setCurrentScale(current_scale - 1);
-        assert(block.getCurrentScale() == current_scale - 1);
+        block.current_scale = current_scale - 1;
+        assert(block.current_scale == current_scale - 1);
         // Now do the down propagation
         int child_scale = current_scale - 1;
         int size_at_child_scale_li = BlockT::size >> child_scale;

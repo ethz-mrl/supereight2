@@ -25,6 +25,9 @@ class BlockSingleRes {
     public:
     typedef DataT DataType;
 
+    static constexpr int min_scale = 0;
+    static constexpr int current_scale = 0;
+
     BlockSingleRes(const DataType init_data = DataType());
 
     const DataType& getData(const int voxel_idx) const;
@@ -39,23 +42,10 @@ class BlockSingleRes {
 
     void setData(const Eigen::Vector3i& voxel_coord, const DataT& data);
 
-
-    static int getMinScale()
-    {
-        return min_scale_;
-    }
-
-    static int getCurrentScale()
-    {
-        return curr_scale_;
-    }
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
     std::array<DataType, BlockSize * BlockSize * BlockSize> block_data_;
-    static constexpr int min_scale_ = 0;
-    static constexpr int curr_scale_ = 0;
 
     const DerivedT* underlying() const
     {
@@ -99,6 +89,10 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
         int data_idx;
         int prop_data_idx;
     };
+
+    static constexpr int max_scale = math::log2_const(BlockSize);
+    int min_scale;
+    int current_scale;
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
@@ -148,37 +142,9 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     void setDataUnion(const DataUnion& data_union);
 
 
-    /// Get scales
-
-    int getMinScale() const
-    {
-        return min_scale_;
-    }
-
-    void setMinScale(const int min_scale)
-    {
-        min_scale_ = min_scale;
-    }
-
-    static constexpr int getMaxScale()
-    {
-        return max_scale_;
-    }
-
-    int getCurrentScale() const
-    {
-        return curr_scale_;
-    }
-
-    void setCurrentScale(const int curr_scale)
-    {
-        curr_scale_ = curr_scale;
-    }
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    static constexpr int max_scale_ = math::log2_const(BlockSize);
 
     static constexpr int compute_num_voxels()
     {
@@ -234,9 +200,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     std::array<DataType, num_voxels_> block_data_;
     std::array<PastDataType, num_voxels_> block_past_data_;
 
-    int min_scale_;
-    int curr_scale_;
-
     const DerivedT* underlying() const
     {
         return static_cast<const DerivedT*>(this);
@@ -255,6 +218,10 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     public:
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
+
+    static constexpr int max_scale = math::log2_const(BlockSize);
+    int current_scale;
+    int min_scale;
 
     BlockMultiRes(const DataType init_data = DataType());
 
@@ -637,38 +604,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      */
     DataType* blockMaxDataAtScale(const int scale);
 
-    /// Get scales
-
-    int getMinScale() const
-    {
-        return min_scale_;
-    }
-
-    void setMinScale(const int min_scale)
-    {
-        min_scale_ = min_scale;
-    }
-
-    static constexpr int getMaxScale()
-    {
-        return max_scale_;
-    }
-
-    int getCurrentScale() const
-    {
-        return curr_scale_;
-    }
-
-    void setCurrentScale(const int curr_scale)
-    {
-        curr_scale_ = curr_scale;
-    }
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    static constexpr int max_scale_ = math::log2_const(BlockSize);
-
     ///<< Initalise array of data with `init_data_`.
     void initialiseData(DataType* voxel_data, const int num_voxels)
     {
@@ -708,9 +646,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *        the double integration only happens in areas where the recommended integration scale changed and stops
      *        as soon as the criteria for switching to the finer or coarser scale.
      */
-    int curr_scale_;
-    int min_scale_;
-
     DataType* buffer_data_ = nullptr; ///<< Pointer to the buffer data.
     int buffer_scale_;                ///<< The scale of the buffer.
     size_t

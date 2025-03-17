@@ -175,21 +175,21 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     // Compute the integration scale
     // The last integration scale
-    const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
+    const int last_scale = (block_ptr->min_scale == -1) ? 0 : block_ptr->current_scale;
 
     // The recommended integration scale
     const int computed_integration_scale = sensor_.computeIntegrationScale(
-        block_centre_C, map_res_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
+        block_centre_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
 
     // The minimum integration scale (change to last if data has already been integrated)
-    const int min_integration_scale = ((block_ptr->getMinScale() == -1
+    const int min_integration_scale = ((block_ptr->min_scale == -1
                                         || block_ptr->getMaxData().field.occupancy
                                             < 0.95 * map_.getDataConfig().field.log_odd_min))
         ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
-    const int max_integration_scale = (block_ptr->getMinScale() == -1)
-        ? BlockType::getMaxScale()
-        : std::min(BlockType::getMaxScale(), last_scale + 1);
+    const int max_integration_scale = (block_ptr->min_scale == -1)
+        ? BlockType::max_scale
+        : std::min(BlockType::max_scale, last_scale + 1);
 
     // The final integration scale
     const int recommended_scale = std::min(
@@ -197,12 +197,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     int integration_scale = last_scale;
 
-    // If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
-    if (block_ptr->getMinScale() == -1) {
+    // If no data has been integrated in the block before (block_ptr->min_scale == -1), use the computed integration scale.
+    if (block_ptr->min_scale == -1) {
         // Make sure the block is allocated up to the integration scale
         integration_scale = recommended_scale;
         block_ptr->allocateDownTo(integration_scale);
-        block_ptr->setCurrentScale(integration_scale);
+        block_ptr->current_scale = integration_scale;
         block_ptr->initCurrCout();
         block_ptr->setInitData(DataType());
     }
@@ -317,22 +317,22 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     // Compute the integration scale
     // The last integration scale
-    const int last_scale = (block_ptr->getMinScale() == -1) ? 0 : block_ptr->getCurrentScale();
+    const int last_scale = (block_ptr->min_scale == -1) ? 0 : block_ptr->current_scale;
 
     // The recommended integration scale
     const int computed_integration_scale = sensor_.computeIntegrationScale(
-        block_centre_C, map_res_, last_scale, block_ptr->getMinScale(), block_ptr->getMaxScale());
+        block_centre_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
 
     // The minimum integration scale (change to last if data has already been integrated)
     const int min_integration_scale = (low_variance
-                                       && (block_ptr->getMinScale() == -1
+                                       && (block_ptr->min_scale == -1
                                            || block_ptr->getMaxData().field.occupancy
                                                < 0.95 * map_.getDataConfig().field.log_odd_min))
         ? map_.getDataConfig().field.fs_integr_scale
         : std::max(0, last_scale - 1);
-    const int max_integration_scale = (block_ptr->getMinScale() == -1)
-        ? BlockType::getMaxScale()
-        : std::min(BlockType::getMaxScale(), last_scale + 1);
+    const int max_integration_scale = (block_ptr->min_scale == -1)
+        ? BlockType::max_scale
+        : std::min(BlockType::max_scale, last_scale + 1);
 
     // The final integration scale
     const int recommended_scale = std::min(
@@ -340,12 +340,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
     int integration_scale = last_scale;
 
-    // If no data has been integrated in the block before (block_ptr->getMinScale() == -1), use the computed integration scale.
-    if (block_ptr->getMinScale() == -1) {
+    // If no data has been integrated in the block before (block_ptr->min_scale == -1), use the computed integration scale.
+    if (block_ptr->min_scale == -1) {
         // Make sure the block is allocated up to the integration scale
         integration_scale = recommended_scale;
         block_ptr->allocateDownTo(integration_scale);
-        block_ptr->setCurrentScale(integration_scale);
+        block_ptr->current_scale = integration_scale;
         block_ptr->initCurrCout();
         block_ptr->setInitData(DataType());
     }

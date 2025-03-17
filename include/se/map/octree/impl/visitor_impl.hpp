@@ -436,7 +436,7 @@ bool get_neighbours(const OctreeT& octree,
         const OctantBase* leaf_ptr = fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_ptr
             || (leaf_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -453,7 +453,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -461,7 +461,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -479,7 +479,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -487,7 +487,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -507,7 +507,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -515,7 +515,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -523,7 +523,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -531,7 +531,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -550,7 +550,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -558,7 +558,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -578,7 +578,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -586,7 +586,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -594,7 +594,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -602,7 +602,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -624,7 +624,7 @@ bool get_neighbours(const OctreeT& octree,
             fetcher::template leaf<OctreeT>(base_coord, octree.getRoot());
         if (!leaf_1_ptr
             || (leaf_1_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_1_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -632,7 +632,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs2[0]], octree.getRoot());
         if (!leaf_2_ptr
             || (leaf_2_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_2_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -640,7 +640,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs3[0]], octree.getRoot());
         if (!leaf_3_ptr
             || (leaf_3_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_3_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -648,7 +648,7 @@ bool get_neighbours(const OctreeT& octree,
             base_coord + stride * interp_offsets[offs4[0]], octree.getRoot());
         if (!leaf_4_ptr
             || (leaf_4_ptr->is_block
-                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->getCurrentScale()
+                && static_cast<const typename OctreeT::BlockType*>(leaf_4_ptr)->current_scale
                     > scale)) {
             return false;
         }
@@ -676,7 +676,7 @@ bool get_neighbours(const OctreeT& octree,
                 fetcher::template leaf<OctreeT>(voxels_coord[i], octree.getRoot());
             if (!leaf_ptr
                 || (leaf_ptr->is_block
-                    && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->getCurrentScale()
+                    && static_cast<const typename OctreeT::BlockType*>(leaf_ptr)->current_scale
                         > scale)) {
                 return false;
             }
@@ -929,10 +929,10 @@ getInterp(const OctreeT& octree,
 
     // XXX: Setting the scale to 0 for Nodes to reuse the Block code is an ugly hack.
     const int init_scale = octant_ptr->is_block
-        ? std::max(static_cast<const BlockType*>(octant_ptr)->getCurrentScale(), desired_scale)
+        ? std::max(static_cast<const BlockType*>(octant_ptr)->current_scale, desired_scale)
         : 0;
 
-    for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
+    for (int scale = init_scale; scale <= BlockType::max_scale; scale++) {
         // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out
         // of the 8 voxels nearest to the query point.
         const int stride = octantops::scale_to_size(scale);
@@ -1297,9 +1297,9 @@ getFieldGrad(const OctreeT& octree,
 
     int init_scale =
         std::max(scale_desired,
-                 block_ptr->getCurrentScale()); // Get scale to start gradient computation from
+                 block_ptr->current_scale); // Get scale to start gradient computation from
 
-    for (int scale = init_scale; scale <= BlockType::getMaxScale(); scale++) {
+    for (int scale = init_scale; scale <= BlockType::max_scale; scale++) {
         scale_returned = scale; // Update returned scale
         const int stride = octantops::scale_to_size(scale);
         const Eigen::Vector3f scaled_voxel_coord_f =

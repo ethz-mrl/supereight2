@@ -26,7 +26,7 @@ typename OctreeT::StructureMesh octree_structure_mesh(OctreeT& octree, const boo
         int node_scale;
         if (octant_ptr->is_block) {
             node_size = static_cast<typename OctreeT::BlockType*>(octant_ptr)->getSize();
-            node_scale = static_cast<typename OctreeT::BlockType*>(octant_ptr)->getCurrentScale();
+            node_scale = static_cast<typename OctreeT::BlockType*>(octant_ptr)->current_scale;
         }
         else {
             node_size = static_cast<typename OctreeT::NodeType*>(octant_ptr)->size;

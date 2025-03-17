@@ -45,19 +45,18 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         Eigen::Vector3f block_centre_point_W;
         map.voxelToPoint(block_coord, block.getSize(), block_centre_point_W);
         const Eigen::Vector3f block_centre_point_C = T_CW * block_centre_point_W;
-        const int last_curr_scale = block.getCurrentScale();
+        const int last_curr_scale = block.current_scale;
         const int lower_curr_scale_limit = last_curr_scale - 1;
 
         const int curr_scale =
             std::max(measurements.depth.sensor.computeIntegrationScale(block_centre_point_C,
                                                                        map.getRes(),
                                                                        last_curr_scale,
-                                                                       block.getMinScale(),
-                                                                       block.getMaxScale()),
+                                                                       block.min_scale,
+                                                                       block.max_scale),
                      lower_curr_scale_limit);
 
-        block.setMinScale(block.getMinScale() < 0 ? curr_scale
-                                                  : std::min(block.getMinScale(), curr_scale));
+        block.min_scale = block.min_scale < 0 ? curr_scale : std::min(block.min_scale, curr_scale);
 
         // Down-propagate the block data to the new, finer scale.
         if (curr_scale < last_curr_scale) {
@@ -130,7 +129,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                                            parent_down_funct);
         }
 
-        block.setCurrentScale(curr_scale);
+        block.current_scale = curr_scale;
         const int stride = octantops::scale_to_size(curr_scale);
 
         for (int x = 0; x < BlockType::getSize(); x += stride) {
@@ -162,7 +161,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                     const field_t sdf_value = (depth_value - m) / m * point_C.norm();
 
                     typename BlockType::DataUnion data_union =
-                        block.getDataUnion(voxel_coord, block.getCurrentScale());
+                        block.getDataUnion(voxel_coord, block.current_scale);
                     const bool field_updated = data_union.data.field.update(
                         sdf_value, truncation_boundary, map.getDataConfig().field.max_weight);
                     data_union.past_data.field.weight++;
