@@ -29,7 +29,7 @@ typename OctreeT::StructureMesh octree_structure_mesh(OctreeT& octree, const boo
             node_scale = static_cast<typename OctreeT::BlockType*>(octant_ptr)->getCurrentScale();
         }
         else {
-            node_size = static_cast<typename OctreeT::NodeType*>(octant_ptr)->getSize();
+            node_size = static_cast<typename OctreeT::NodeType*>(octant_ptr)->size;
             // Since we don't care about the node scale, just set it to a number that will result in
             // a gray color when saving the mesh.
             node_scale = 7;

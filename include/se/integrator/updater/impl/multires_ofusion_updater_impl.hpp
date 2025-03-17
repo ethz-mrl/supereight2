@@ -55,7 +55,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 #pragma omp parallel for
     for (unsigned int i = 0; i < allocation_list.node_list.size(); ++i) {
         auto node_ptr = static_cast<NodeType*>(allocation_list.node_list[i]);
-        const int depth = octree_.getMaxScale() - std::log2(node_ptr->getSize());
+        const int depth = octree_.getMaxScale() - std::log2(node_ptr->size);
         freeNodeRecurse(allocation_list.node_list[i], depth);
     }
     TOCK("fusion-nodes")

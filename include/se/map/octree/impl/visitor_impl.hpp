@@ -417,7 +417,7 @@ bool get_neighbours(const OctreeT& octree,
     }
     const int base_octant_size = (base_octant_ptr->is_block)
         ? OctreeT::BlockType::getSize()
-        : static_cast<const typename OctreeT::NodeType*>(base_octant_ptr)->getSize();
+        : static_cast<const typename OctreeT::NodeType*>(base_octant_ptr)->size;
 
     int crossmask = (((base_coord.x() & (base_octant_size - 1)) == base_octant_size - stride) << 2)
         | (((base_coord.y() & (base_octant_size - 1)) == base_octant_size - stride) << 1)
@@ -957,7 +957,7 @@ getInterp(const OctreeT& octree,
             // Return the correct scale in the case of Nodes.
             *returned_scale = octant_ptr->is_block
                 ? scale
-                : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->getSize());
+                : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->size);
         }
         // Perform trilinear interpolation.
         // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
@@ -1280,7 +1280,7 @@ getFieldGrad(const OctreeT& octree,
                 // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
                 // boundary of the node where there can be small non-zero gradients. It's a rather
                 // good and simple approximation though.
-                scale_returned = octantops::size_to_scale(node.getSize());
+                scale_returned = octantops::size_to_scale(node.size);
                 return field_vec_t::Zero();
             }
             else {
@@ -1331,7 +1331,7 @@ getFieldGrad(const OctreeT& octree,
             const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
             if (node.isLeaf() && is_valid(node.data())) {
                 // Attempting to compute the gradient at a node, approximate with 0 as before.
-                scale_returned = octantops::size_to_scale(node.getSize());
+                scale_returned = octantops::size_to_scale(node.size);
                 return field_vec_t::Zero();
             }
             else {

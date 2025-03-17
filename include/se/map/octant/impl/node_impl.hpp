@@ -13,7 +13,7 @@ namespace se {
 
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
-        OctantBase(coord, false, nullptr), NodeData<DataT, ResT>(init_data), size_(size)
+        OctantBase(coord, false, nullptr), NodeData<DataT, ResT>(init_data), size(size)
 {
     assert(math::is_power_of_two(size));
     children_ptr_.fill(nullptr);
@@ -25,19 +25,11 @@ template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(Node* const parent_ptr, const int child_idx, const DataT& init_data) :
         OctantBase(parent_ptr->getChildCoord(child_idx), false, parent_ptr),
         NodeData<DataT, ResT>(init_data),
-        size_(parent_ptr->size_ / 2)
+        size(parent_ptr->size / 2)
 {
     assert(child_idx >= 0);
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     children_ptr_.fill(nullptr);
-}
-
-
-
-template<typename DataT, Res ResT>
-int Node<DataT, ResT>::getSize() const
-{
-    return size_;
 }
 
 
@@ -86,7 +78,7 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());
     const Eigen::Vector3i child_offset(
         (child_idx & 1) != 0, (child_idx & 2) != 0, (child_idx & 4) != 0);
-    const int child_size = getSize() / 2;
+    const int child_size = size / 2;
     return coord + child_size * child_offset;
 }
 
@@ -95,11 +87,11 @@ Eigen::Vector3i Node<DataT, ResT>::getChildCoord(const int child_idx) const
 template<typename DataT, Res ResT>
 int Node<DataT, ResT>::getChildIdx(const Eigen::Vector3i& child_coord) const
 {
-    assert(keyops::is_child(keyops::encode_key(coord, math::log2_const(getSize())),
-                            keyops::encode_key(child_coord, math::log2_const(getSize() / 2)))
+    assert(keyops::is_child(keyops::encode_key(coord, math::log2_const(size)),
+                            keyops::encode_key(child_coord, math::log2_const(size / 2)))
            && "child_coord must correspond to a child of the node");
     const Eigen::Vector3i offset = child_coord - coord;
-    const int child_size = getSize() / 2;
+    const int child_size = size / 2;
     return ((offset.x() & child_size) > 0) + 2 * ((offset.y() & child_size) > 0)
         + 4 * ((offset.z() & child_size) > 0);
 }

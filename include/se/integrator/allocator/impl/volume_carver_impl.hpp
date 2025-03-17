@@ -45,7 +45,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
              SensorT>::operator()()
 {
     NodeType* root_ptr = static_cast<NodeType*>(octree_.getRoot());
-    const int child_size = root_ptr->getSize() / 2;
+    const int child_size = root_ptr->size / 2;
     octree_.allocateChildren(root_ptr);
     // Launch on the root node's children.
 #pragma omp parallel for
@@ -57,7 +57,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
     // can't be done on the octree side.
     for (const OctantBase* octant : allocation_list_.node_list) {
         if (octant->isLeaf()) {
-            octree_.aabbExtend(octant->coord, static_cast<const NodeType*>(octant)->getSize());
+            octree_.aabbExtend(octant->coord, static_cast<const NodeType*>(octant)->size);
         }
     }
 
@@ -296,7 +296,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         }
         else {
             NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
-            const int child_size = node_ptr->getSize() / 2;
+            const int child_size = node_ptr->size / 2;
             // Split! Start recursive process
             octree_.allocateChildren(node_ptr);
 #pragma omp parallel for
@@ -502,7 +502,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
         }
         else {
             NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
-            const int child_size = node_ptr->getSize() / 2;
+            const int child_size = node_ptr->size / 2;
             // Split! Start recursive process
             octree_.allocateChildren(node_ptr);
 #pragma omp parallel for

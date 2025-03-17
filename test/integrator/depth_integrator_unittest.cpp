@@ -88,7 +88,7 @@ static void expect_valid_block(const BlockType& block)
 static void expect_valid_leaf_node(const NodeType& node)
 {
     std::stringstream fail_msg;
-    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.getSize();
+    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.size;
 
     EXPECT_TRUE(node.isLeaf()) << fail_msg.str();
 
@@ -111,7 +111,7 @@ static void expect_valid_leaf_node(const NodeType& node)
 static void expect_valid_non_leaf_node(const NodeType& node)
 {
     std::stringstream fail_msg;
-    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.getSize();
+    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.size;
 
     EXPECT_FALSE(node.isLeaf()) << fail_msg.str();
 
@@ -123,8 +123,8 @@ static void expect_valid_non_leaf_node(const NodeType& node)
         if (child_ptr) {
             const int child_size = child_ptr->is_block
                 ? static_cast<const BlockType*>(child_ptr)->getSize()
-                : static_cast<const NodeType*>(child_ptr)->getSize();
-            EXPECT_EQ(child_size, node.getSize() / 2);
+                : static_cast<const NodeType*>(child_ptr)->size;
+            EXPECT_EQ(child_size, node.size / 2);
 
             const DataType& child_min_data = child_ptr->is_block
                 ? static_cast<const BlockType*>(child_ptr)->getMinData()
@@ -152,7 +152,7 @@ static void expect_valid_non_leaf_node(const NodeType& node)
 static void expect_valid_node(const NodeType& node)
 {
     std::stringstream fail_msg;
-    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.getSize();
+    fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.size;
 
     // Minimum and maximum node data must always be consistent with each other.
     EXPECT_EQ(node.min_data.field.valid(), node.max_data.field.valid()) << fail_msg.str();

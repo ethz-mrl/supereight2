@@ -23,8 +23,7 @@ static void expect_valid_node_data(const NodeType& node, const se::OctantBase* c
                                                : static_cast<const NodeType*>(child)->max_data;
 
     std::stringstream failure_message;
-    failure_message << "for node (" << node.coord.transpose() << ") with size "
-                    << node.getSize();
+    failure_message << "for node (" << node.coord.transpose() << ") with size " << node.size;
     if (min_data.field.observed) {
         EXPECT_LE(se::get_field(node.min_data), se::get_field(min_data)) << failure_message.str();
     }

@@ -34,7 +34,7 @@ const OctantBase* octant(const Eigen::Vector3i& octant_coord,
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->getSize() >> 1;
+    int child_size = parent_ptr->size >> 1;
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
@@ -72,7 +72,7 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->getSize() >> 1;
+    int child_size = parent_ptr->size >> 1;
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
@@ -109,7 +109,7 @@ const OctantBase* block(const Eigen::Vector3i& block_coord, const OctantBase* co
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->getSize() >> 1;
+    int child_size = parent_ptr->size >> 1;
     const OctantBase* child_ptr = nullptr;
 
     for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1) {
@@ -153,7 +153,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
     const Eigen::Vector3i& octant_coord = octant_ptr->coord;
     const int octant_size = octant_ptr->is_block
         ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getSize()
-        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getSize();
+        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->size;
     const int octant_scale = octantops::size_to_scale(octant_size);
     const Eigen::Matrix<int, 3, 6> neighbour_coords =
         (octant_size * face_neighbour_offsets).colwise() + octant_coord;

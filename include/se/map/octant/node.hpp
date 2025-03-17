@@ -101,9 +101,6 @@ class Node : public OctantBase, public NodeData<DataT, ResT> {
      */
     Node(Node* const parent_ptr, const int child_idx, const DataT& init_data);
 
-    /** Return the edge length of the node in voxels */
-    int getSize() const;
-
     /** Return a pointer to the node child with index \p child_idx. The value of \p child_idx must
      * be in the interval [0, 7] inclusive. Returns nullptr if the child is not allocated.
      */
@@ -133,8 +130,10 @@ class Node : public OctantBase, public NodeData<DataT, ResT> {
     private:
     // Pointers to the eight node children. Must be nullptr for unallocated children.
     std::array<OctantBase*, 8> children_ptr_;
-    // The edge length of the node in voxels.
-    const int size_;
+
+    public:
+    /** The edge length of the node in voxels. */
+    const int size;
 };
 
 } // namespace se

@@ -1029,7 +1029,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
             BlockSingleRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>,
             BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(init_data)
 {
-    assert(BlockSize == (parent_ptr->getSize() >> 1));
+    assert(BlockSize == (parent_ptr->size >> 1));
 }
 
 

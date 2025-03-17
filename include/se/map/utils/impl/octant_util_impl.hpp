@@ -85,7 +85,7 @@ inline int octant_to_size(const se::OctantBase* octant_ptr)
     else {
         typedef typename OctreeT::NodeType NodeType;
         const NodeType* node_ptr = static_cast<const NodeType*>(octant_ptr);
-        return node_ptr->getSize();
+        return node_ptr->size;
     }
 }
 

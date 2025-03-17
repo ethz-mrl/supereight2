@@ -132,7 +132,7 @@ inline bool allocate_key(const se::key_t key,
         static_cast<typename OctreeT::NodeType*>(base_parent_ptr);
     se::OctantBase* child_ptr = nullptr;
 
-    int child_scale = octantops::size_to_scale(parent_ptr->getSize()) - 1;
+    int child_scale = octantops::size_to_scale(parent_ptr->size) - 1;
     se::code_t code = se::keyops::key_to_code(key);
     int min_scale = std::max(se::keyops::key_to_scale(key), octree.max_block_scale);
 
