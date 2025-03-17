@@ -105,10 +105,10 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         if (child_ptr) {
             child_min_data[child_idx] = child_ptr->is_block
                 ? static_cast<const BlockT*>(child_ptr)->getMinData()
-                : static_cast<const NodeT*>(child_ptr)->getMinData();
+                : static_cast<const NodeT*>(child_ptr)->min_data;
             child_max_data[child_idx] = child_ptr->is_block
                 ? static_cast<const BlockT*>(child_ptr)->getMaxData()
-                : static_cast<const NodeT*>(child_ptr)->getMaxData();
+                : static_cast<const NodeT*>(child_ptr)->max_data;
         }
         else {
             set_invalid(child_min_data[child_idx]);
@@ -116,15 +116,9 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         }
     }
 
-    typename NodeT::DataType node_min_data = node.getMinData();
-    data::up_prop_min(node_min_data, child_min_data);
-    node.setMinData(node_min_data);
-
-    typename NodeT::DataType node_max_data = node.getMaxData();
-    data::up_prop_max(node_max_data, child_max_data);
-    node.setMaxData(node_max_data);
-
-    return node_max_data;
+    data::up_prop_min(node.min_data, child_min_data);
+    data::up_prop_max(node.max_data, child_max_data);
+    return node.max_data;
 }
 
 

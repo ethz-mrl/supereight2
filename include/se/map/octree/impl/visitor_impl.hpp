@@ -832,7 +832,7 @@ getMaxData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int 
             ->getMaxData(voxel_coord, scale_desired, scale_returned);
     }
     else {
-        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getMaxData();
+        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->max_data;
     }
 }
 

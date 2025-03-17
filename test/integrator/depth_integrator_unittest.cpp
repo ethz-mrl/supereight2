@@ -94,11 +94,11 @@ static void expect_valid_leaf_node(const NodeType& node)
 
     // Leaf nodes with at least one integration (.valid()) should fully reflect their contained
     // volume (.observed).
-    if (node.getMinData().field.valid()) {
-        EXPECT_TRUE(node.getMinData().field.observed) << fail_msg.str();
+    if (node.min_data.field.valid()) {
+        EXPECT_TRUE(node.min_data.field.observed) << fail_msg.str();
     }
-    if (node.getMaxData().field.valid()) {
-        EXPECT_TRUE(node.getMaxData().field.observed) << fail_msg.str();
+    if (node.max_data.field.valid()) {
+        EXPECT_TRUE(node.max_data.field.observed) << fail_msg.str();
     }
 
     for (int child_idx = 0; child_idx < 8; child_idx++) {
@@ -115,8 +115,8 @@ static void expect_valid_non_leaf_node(const NodeType& node)
 
     EXPECT_FALSE(node.isLeaf()) << fail_msg.str();
 
-    const DataType& min_data = node.getMinData();
-    const DataType& max_data = node.getMaxData();
+    const DataType& min_data = node.min_data;
+    const DataType& max_data = node.max_data;
     int observed_children = 0;
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         const se::OctantBase* const child_ptr = node.getChild(child_idx);
@@ -128,7 +128,7 @@ static void expect_valid_non_leaf_node(const NodeType& node)
 
             const DataType& child_min_data = child_ptr->is_block
                 ? static_cast<const BlockType*>(child_ptr)->getMinData()
-                : static_cast<const NodeType*>(child_ptr)->getMinData();
+                : static_cast<const NodeType*>(child_ptr)->min_data;
             if (child_min_data.field.observed) {
                 EXPECT_GE(se::get_field(child_min_data), se::get_field(min_data)) << fail_msg.str();
                 observed_children++;
@@ -136,7 +136,7 @@ static void expect_valid_non_leaf_node(const NodeType& node)
 
             const DataType& child_max_data = child_ptr->is_block
                 ? static_cast<const BlockType*>(child_ptr)->getMaxData()
-                : static_cast<const NodeType*>(child_ptr)->getMaxData();
+                : static_cast<const NodeType*>(child_ptr)->max_data;
             if (child_max_data.field.observed) {
                 EXPECT_LE(se::get_field(child_max_data), se::get_field(max_data)) << fail_msg.str();
             }
@@ -155,8 +155,8 @@ static void expect_valid_node(const NodeType& node)
     fail_msg << "for node (" << node.coord.transpose() << ") with size " << node.getSize();
 
     // Minimum and maximum node data must always be consistent with each other.
-    EXPECT_EQ(node.getMinData().field.valid(), node.getMaxData().field.valid()) << fail_msg.str();
-    EXPECT_EQ(node.getMinData().field.observed, node.getMaxData().field.observed) << fail_msg.str();
+    EXPECT_EQ(node.min_data.field.valid(), node.max_data.field.valid()) << fail_msg.str();
+    EXPECT_EQ(node.min_data.field.observed, node.max_data.field.observed) << fail_msg.str();
 
     if (node.isLeaf()) {
         expect_valid_leaf_node(node);

@@ -1,8 +1,8 @@
 /*
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
- * SPDX-FileCopyrightText: 2019-2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2019-2025 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2019-2021 Nils Funk
- * SPDX-FileCopyrightText: 2019-2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2019-2025 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -45,64 +45,39 @@ template<Colour ColB, Semantics SemB, Res ResT>
 struct NodeData<Data<Field::Occupancy, ColB, SemB>, ResT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
-    protected:
-    /** Construct a node with both its minimum and maximum data initialized to \p init_data. */
-    NodeData(const DataType& init_data)
-    {
-        min_data_ = init_data;
-        max_data_ = init_data;
-    }
+    /** The minimum data among the node's children or the node's data if it's a leaf. */
+    DataType min_data;
+    /** The maximum data among the node's children or the node's data if it's a leaf. */
+    DataType max_data;
 
-    public:
     /** Return the node data. If the node is not observed and not a leaf the default data is
      * returned.
      */
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
-        return (max_data_.field.observed && derived()->isLeaf()) ? getMaxData() : default_data;
-    }
-
-    /** Return the minimum data among the node's children. */
-    const DataType& getMinData() const
-    {
-        return min_data_;
-    }
-
-    /** Return the maximum data among the node's children. */
-    const DataType& getMaxData() const
-    {
-        return max_data_;
+        return (max_data.field.observed && derived()->isLeaf()) ? max_data : default_data;
     }
 
     /** Set the node's data to \p data. It should only be called on leaf nodes. */
     void setData(const DataType& data)
     {
         assert(derived()->isLeaf());
-        setMinData(data);
-        setMaxData(data);
-    }
-
-    /** Set the minimum data among the node's children to \p data. */
-    void setMinData(const DataType& data)
-    {
-        min_data_ = data;
-    }
-
-    /** Set the maximum data among the node's children to \p data. */
-    void setMaxData(const DataType& data)
-    {
-        max_data_ = data;
+        min_data = data;
+        max_data = data;
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-    private:
-    /** The minimum data among the node's children or the node's data if it's a leaf. */
-    DataType min_data_;
-    /** The maximum data among the node's children or the node's data if it's a leaf. */
-    DataType max_data_;
+    protected:
+    /** Construct a node with both its minimum and maximum data initialized to \p init_data. */
+    NodeData(const DataType& init_data)
+    {
+        min_data = init_data;
+        max_data = init_data;
+    }
 
+    private:
     /** Cast to the derived class se::Node to allow accessing its members. */
     const Node<DataType, ResT>* derived() const
     {

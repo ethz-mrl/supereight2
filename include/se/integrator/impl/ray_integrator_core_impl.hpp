@@ -85,7 +85,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
 
         const auto& child_min_data = (child_ptr->is_block)
             ? static_cast<const BlockT*>(child_ptr)->getMinData()
-            : static_cast<const NodeT*>(child_ptr)->getMinData();
+            : static_cast<const NodeT*>(child_ptr)->min_data;
         // Only consider children with at least 1 integration.
         if (child_min_data.field.weight > 0) {
             const field_t occupancy = get_field(child_min_data);
@@ -99,7 +99,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
 
         const auto& child_max_data = child_ptr->is_block
             ? static_cast<const BlockT*>(child_ptr)->getMaxData()
-            : static_cast<const NodeT*>(child_ptr)->getMaxData();
+            : static_cast<const NodeT*>(child_ptr)->max_data;
         // Only consider children with at least 1 integration.
         if (child_max_data.field.weight > 0) {
             const field_t occupancy = get_field(child_max_data);
@@ -116,26 +116,20 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         }
     }
     if (min_data_count > 0) {
-        typename NodeT::DataType node_min_data = node.getMinData();
-        node_min_data.field.occupancy = min_mean_occupancy; // TODO: Need to check update?
-        node_min_data.field.weight = min_weight;
+        node.min_data.field.occupancy = min_mean_occupancy; // TODO: Need to check update?
+        node.min_data.field.weight = min_weight;
         if (observed_count == 8) {
-            node_min_data.field.observed = true;
+            node.min_data.field.observed = true;
         }
-        node.setMinData(node_min_data);
     }
-
-    typename NodeT::DataType node_max_data = node.getMaxData();
-
     if (max_data_count > 0) {
-        node_max_data.field.occupancy = max_mean_occupancy; // TODO: Need to check update?
-        node_max_data.field.weight = max_weight;
+        node.max_data.field.occupancy = max_mean_occupancy; // TODO: Need to check update?
+        node.max_data.field.weight = max_weight;
         if (observed_count == 8) {
-            node_max_data.field.observed = true;
+            node.max_data.field.observed = true;
         }
-        node.setMaxData(node_max_data);
     }
-    return node_max_data;
+    return node.max_data;
 }
 
 template<typename BlockT>

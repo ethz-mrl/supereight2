@@ -17,21 +17,19 @@ typedef se::Octree<DataType, se::Res::Multi, 8> OctreeType;
 static void expect_valid_node_data(const NodeType& node, const se::OctantBase* const child)
 {
     const DataType& min_data = child->is_block ? static_cast<const BlockType*>(child)->getMinData()
-                                                : static_cast<const NodeType*>(child)->getMinData();
+                                               : static_cast<const NodeType*>(child)->min_data;
 
     const DataType& max_data = child->is_block ? static_cast<const BlockType*>(child)->getMaxData()
-                                                : static_cast<const NodeType*>(child)->getMaxData();
+                                               : static_cast<const NodeType*>(child)->max_data;
 
     std::stringstream failure_message;
     failure_message << "for node (" << node.coord.transpose() << ") with size "
                     << node.getSize();
     if (min_data.field.observed) {
-        EXPECT_LE(se::get_field(node.getMinData()), se::get_field(min_data))
-            << failure_message.str();
+        EXPECT_LE(se::get_field(node.min_data), se::get_field(min_data)) << failure_message.str();
     }
     if (max_data.field.observed) {
-        EXPECT_GE(se::get_field(node.getMaxData()), se::get_field(max_data))
-            << failure_message.str();
+        EXPECT_GE(se::get_field(node.max_data), se::get_field(max_data)) << failure_message.str();
     }
 }
 
