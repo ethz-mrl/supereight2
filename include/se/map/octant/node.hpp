@@ -29,7 +29,7 @@ struct NodeData {
     /** Always returns the default data. This method allows simplifying the implementation of
      * certain algorithms.
      */
-    const DataT& getData() const
+    const DataT& data() const
     {
         static const DataT default_data;
         return default_data;
@@ -50,10 +50,8 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, ResT> {
     /** The maximum data among the node's children or the node's data if it's a leaf. */
     DataType max_data;
 
-    /** Return the node data. If the node is not observed and not a leaf the default data is
-     * returned.
-     */
-    const DataType& getData() const
+    /** Return NodeData::max_data if the node is observed and a leaf, the default data otherwise. */
+    const DataType& data() const
     {
         static const DataType default_data = DataType();
         return (max_data.field.observed && derived()->isLeaf()) ? max_data : default_data;

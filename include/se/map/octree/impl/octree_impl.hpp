@@ -180,7 +180,7 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
         return false;
     }
 
-    const DataT& init_data = parent_ptr->getData();
+    const DataT& init_data = parent_ptr->data();
     if (parent_ptr->getSize() == 2 * BlockSize) {
 #pragma omp critical
         {
@@ -205,7 +205,7 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* const parent_ptr
 {
     assert(parent_ptr);
 
-    const DataT& init_data = parent_ptr->getData();
+    const DataT& init_data = parent_ptr->data();
     const bool children_are_blocks = parent_ptr->getSize() == 2 * BlockSize;
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         OctantBase* child_ptr = parent_ptr->getChild(child_idx);

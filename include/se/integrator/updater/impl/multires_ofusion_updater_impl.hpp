@@ -536,7 +536,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
     NodeType* node_ptr = static_cast<NodeType*>(octant_ptr);
 
     if (node_ptr->isLeaf()) {
-        typename NodeType::DataType node_data = node_ptr->getData();
+        typename NodeType::DataType node_data = node_ptr->data();
         // Update the node data to free since we don't need to update at a finer level.
         node_data.field.update(map_.getDataConfig().field.log_odd_min,
                                map_.getDataConfig().field.max_weight);

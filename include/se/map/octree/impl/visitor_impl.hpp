@@ -328,7 +328,7 @@ void gather_local(const OctantBase* leaf_ptr,
     else {
         const typename OctreeT::NodeType* node_ptr =
             static_cast<const typename OctreeT::NodeType*>(leaf_ptr);
-        const typename OctreeT::DataType node_data = node_ptr->getData();
+        const typename OctreeT::DataType node_data = node_ptr->data();
         std::fill_n(neighbour_data, 8, node_data);
     }
     return;
@@ -358,7 +358,7 @@ void gather_4(const OctantBase* leaf_ptr,
     }
     else {
         const typename OctreeT::DataType node_data =
-            static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->getData();
+            static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->data();
         neighbour_data[offsets[0]] = node_data;
         neighbour_data[offsets[1]] = node_data;
         neighbour_data[offsets[2]] = node_data;
@@ -387,7 +387,7 @@ void gather_2(const OctantBase* leaf_ptr,
     }
     else {
         const typename OctreeT::DataType node_data =
-            static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->getData();
+            static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->data();
         neighbour_data[offsets[0]] = node_data;
         neighbour_data[offsets[1]] = node_data;
     }
@@ -688,7 +688,7 @@ bool get_neighbours(const OctreeT& octree,
             }
             else {
                 neighbour_data[i] =
-                    static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->getData();
+                    static_cast<const typename OctreeT::NodeType*>(leaf_ptr)->data();
             }
         }
     } break;
@@ -713,7 +713,7 @@ typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i&
 
     return (octant_ptr->is_block)
         ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord)
-        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getData();
+        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->data();
 }
 
 
@@ -762,7 +762,7 @@ getData(const OctreeT& octree,
     else {
         scale_returned =
             scale_desired; // TODO: Verify if it should be the node scale or the desired scale.
-        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getData();
+        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->data();
     }
 }
 
@@ -1275,7 +1275,7 @@ getFieldGrad(const OctreeT& octree,
         if constexpr (OctreeT::DataType::fld_ == Field::Occupancy) {
             // Test the Node data.
             const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant);
-            if (is_valid(node.getData())) {
+            if (is_valid(node.data())) {
                 // The Node has valid data which should be free space. This part of the map has
                 // uniform occupancy, meaning a gradient of 0. This isn't strictly true near the
                 // boundary of the node where there can be small non-zero gradients. It's a rather
@@ -1329,7 +1329,7 @@ getFieldGrad(const OctreeT& octree,
         // there some bug in the algorithm?
         if (!octant_ptr->is_block) {
             const auto& node = *static_cast<const typename OctreeT::NodeType*>(octant_ptr);
-            if (node.isLeaf() && is_valid(node.getData())) {
+            if (node.isLeaf() && is_valid(node.data())) {
                 // Attempting to compute the gradient at a node, approximate with 0 as before.
                 scale_returned = octantops::size_to_scale(node.getSize());
                 return field_vec_t::Zero();
