@@ -186,7 +186,7 @@ uint8_t compute_index(const OctreeT& octree,
                       const int z,
                       DataToIndexF data_to_index)
 {
-    unsigned int block_size = block_ptr->getSize();
+    unsigned int block_size = block_ptr->size;
     unsigned int local = ((x % block_size == block_size - 1) << 2)
         | ((y % block_size == block_size - 1) << 1) | ((z % block_size) == block_size - 1);
 
@@ -696,7 +696,7 @@ void gather_dual_data(const OctreeT& octree,
     BoundedVector<int, 8> lower_priority_neighbours, higher_priority_neighbours;
     BoundedVector<BoundedVector<int, 8>, 8> neighbours;
     norm_dual_corner_idxs(primal_corner_coord_rel,
-                          block_ptr->getSize(),
+                          block_ptr->size,
                           lower_priority_neighbours,
                           higher_priority_neighbours,
                           neighbours);
@@ -773,7 +773,7 @@ void compute_dual_index(const OctreeT& octree,
                         std::array<Eigen::Vector3i, 8>& dual_corner_coords_i,
                         DataToIndexF data_to_index)
 {
-    const unsigned int block_size = block_ptr->getSize();
+    const unsigned int block_size = block_ptr->size;
     // The local case is independent of the scale.
     // lower or upper x boundary (block_coord.x() +0 or +block size) -> (binary) 100 -> local += 4
     // lower or upper y boundary (block_coord.y() +0 or +block size) -> (binary) 010 -> local += 2
@@ -843,7 +843,7 @@ marching_cube_kernel(const OctreeT& octree,
 
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
         for (int x = start_coord.x(); x < last_coord.x(); x++) {
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
@@ -907,7 +907,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
         const int voxel_stride = octantops::scale_to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
         for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
             for (int y = start_coord.y(); y <= last_coord.y(); y += voxel_stride) {
@@ -1023,7 +1023,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
         const int voxel_stride = octantops::scale_to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
-            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::getSize()))
+            (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree_size - 1));
 
         Eigen::Vector3f vertex_0, vertex_1, vertex_2;

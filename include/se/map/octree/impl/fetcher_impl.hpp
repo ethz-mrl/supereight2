@@ -38,7 +38,7 @@ const OctantBase* octant(const Eigen::Vector3i& octant_coord,
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
-                                OctreeT::BlockType::getSize()); // Not smaller than block size
+                                OctreeT::BlockType::size); // Not smaller than block size
     for (; child_size >= size_desired; child_size = child_size >> 1) {
         idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
@@ -76,7 +76,7 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
-                                OctreeT::BlockType::getSize()); // Not smaller than block size
+                                OctreeT::BlockType::size); // Not smaller than block size
     for (; child_size >= size_desired; child_size = child_size >> 1) {
         idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
@@ -112,7 +112,7 @@ const OctantBase* block(const Eigen::Vector3i& block_coord, const OctantBase* co
     int child_size = parent_ptr->size >> 1;
     const OctantBase* child_ptr = nullptr;
 
-    for (; child_size >= OctreeT::BlockType::getSize(); child_size = child_size >> 1) {
+    for (; child_size >= OctreeT::BlockType::size; child_size = child_size >> 1) {
         idx_t child_idx = ((block_coord.x() & child_size) > 0)
             + 2 * ((block_coord.y() & child_size) > 0) + 4 * ((block_coord.z() & child_size) > 0);
         child_ptr = parent_ptr->getChild(child_idx);
@@ -152,7 +152,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
     assert(octant_ptr);
     const Eigen::Vector3i& octant_coord = octant_ptr->coord;
     const int octant_size = octant_ptr->is_block
-        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getSize()
+        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->size
         : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->size;
     const int octant_scale = octantops::size_to_scale(octant_size);
     const Eigen::Matrix<int, 3, 6> neighbour_coords =

@@ -41,9 +41,9 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
         block.timestamp = timestamp;
         const Eigen::Vector3i block_coord = block.coord;
 
-        for (int x = 0; x < BlockType::getSize(); ++x) {
-            for (int y = 0; y < BlockType::getSize(); ++y) {
-                for (int z = 0; z < BlockType::getSize(); ++z) {
+        for (int x = 0; x < BlockType::size; ++x) {
+            for (int y = 0; y < BlockType::size; ++y) {
+                for (int z = 0; z < BlockType::size; ++z) {
                     const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
                     // Compute the coordinates of the voxel sample position in the sensor frame.
                     const Eigen::Vector3f point_C = T_CV * voxel_coord.cast<float>();

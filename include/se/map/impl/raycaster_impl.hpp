@@ -466,7 +466,7 @@ raycast(MapT& map,
     ray.next();
 
     float step = map.getRes();
-    float largestep = MapT::OctreeType::BlockType::getSize() * step;
+    float largestep = MapT::OctreeType::BlockType::size * step;
 
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
     if (t_min <= 0.f) {

@@ -43,7 +43,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         block.timestamp = timestamp;
         const Eigen::Vector3i block_coord = block.coord;
         Eigen::Vector3f block_centre_point_W;
-        map.voxelToPoint(block_coord, block.getSize(), block_centre_point_W);
+        map.voxelToPoint(block_coord, block.size, block_centre_point_W);
         const Eigen::Vector3f block_centre_point_C = T_CW * block_centre_point_W;
         const int last_curr_scale = block.current_scale;
         const int lower_curr_scale_limit = last_curr_scale - 1;
@@ -132,9 +132,9 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
         block.current_scale = curr_scale;
         const int stride = octantops::scale_to_size(curr_scale);
 
-        for (int x = 0; x < BlockType::getSize(); x += stride) {
-            for (int y = 0; y < BlockType::getSize(); y += stride) {
-                for (int z = 0; z < BlockType::getSize(); z += stride) {
+        for (int x = 0; x < BlockType::size; x += stride) {
+            for (int y = 0; y < BlockType::size; y += stride) {
+                for (int z = 0; z < BlockType::size; z += stride) {
                     const Eigen::Vector3i voxel_coord = block_coord + Eigen::Vector3i(x, y, z);
                     // Compute the coordinates of the voxel sample position in the sensor frame.
                     const Eigen::Vector3f point_C = T_CV * voxel_coord.cast<float>();

@@ -678,8 +678,12 @@ class Block : public OctantBase,
 {
     public:
     typedef DataT DataType;
+
+    /** The edge length of the block in voxels. */
     static constexpr int size = BlockSize;
+    /** The face area of the block in voxels. */
     static constexpr int size_sq = BlockSize * BlockSize;
+    /** The volume of the block in voxels. */
     static constexpr int size_cu = BlockSize * BlockSize * BlockSize;
 
     /** Construct the child block of \p parent_ptr with index \p child_idx and initialize its data
@@ -687,12 +691,6 @@ class Block : public OctantBase,
      * [0, 7] inclusive.
      */
     Block(Node<DataT, ResT>* parent_ptr, const int child_idx, const DataT init_data);
-
-    /** Return the edge length of the block in voxels */
-    static constexpr int getSize()
-    {
-        return BlockSize;
-    }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

@@ -15,7 +15,7 @@ std::shared_ptr<OctreeType>
 create_octree()
 {
     const int blocks_per_side = 2;
-    const int block_size = OctreeType::BlockType::getSize();
+    const int block_size = OctreeType::BlockType::size;
     const int octree_size = blocks_per_side * block_size;
     auto octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
 
@@ -82,7 +82,7 @@ std::shared_ptr<OctreeType>
 create_octree_scale()
 {
     const int blocks_per_side = 2;
-    const int block_size = OctreeType::BlockType::getSize();
+    const int block_size = OctreeType::BlockType::size;
     const int octree_size = blocks_per_side * block_size;
     auto octree_ptr = std::shared_ptr<OctreeType>(new OctreeType(octree_size));
 

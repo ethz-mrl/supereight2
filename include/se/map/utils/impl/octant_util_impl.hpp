@@ -24,11 +24,11 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
         se::keyops::encode_key(block_ptr_lhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->size),
                                key_lhs);
         se::key_t key_rhs;
         se::keyops::encode_key(block_ptr_rhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->size),
                                key_rhs);
         return key_lhs < key_rhs;
     };
@@ -45,11 +45,11 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
         se::keyops::encode_key(block_ptr_lhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->getSize()),
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->size),
                                key_lhs);
         se::key_t key_rhs;
         se::keyops::encode_key(block_ptr_rhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->getSize()),
+                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->size),
                                key_rhs);
         return key_lhs < key_rhs;
     };
@@ -80,7 +80,7 @@ inline int octant_to_size(const se::OctantBase* octant_ptr)
     if (octant_ptr->is_block) {
         typedef typename OctreeT::BlockType BlockType;
         const BlockType* block_ptr = static_cast<const BlockType*>(octant_ptr);
-        return block_ptr->getSize();
+        return block_ptr->size;
     }
     else {
         typedef typename OctreeT::NodeType NodeType;
