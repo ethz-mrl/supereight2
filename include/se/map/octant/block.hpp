@@ -265,15 +265,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    /// Set data at current scale
-    void setMinData(const Eigen::Vector3i& voxel_coord, const DataType& data);
-
-    void setMinData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
-
-    void setMaxData(const Eigen::Vector3i& voxel_coord, const DataType& data);
-
-    void setMaxData(const Eigen::Vector3i& voxel_coord, const int scale, const DataType& data);
-
     /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
      */
