@@ -90,7 +90,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     BlockMultiRes(const DataType init_data = DataType());
 
     struct DataUnion {
-        DataUnion(){};
         Eigen::Vector3i coord;
         int scale;
 
