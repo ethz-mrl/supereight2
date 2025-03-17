@@ -11,11 +11,14 @@
 
 namespace se {
 
+template<typename DataT, Res ResT>
+class Node;
+
 /** Contains se::Data stored in se::Node and appropriate methods. Partial template specilization is
  * used so that se::Node doesn't contain unnecessary data. This non-specialized version contains no
  * data.
  */
-template<typename DataT, typename DerivedT>
+template<typename DataT, Res ResT>
 struct NodeData {
     protected:
     NodeData(const DataT&)
@@ -38,8 +41,8 @@ struct NodeData {
 /** Specialization of se::NodeData for se::Field::Occupancy. It contains minimum and maximum
  * up-propagated data.
  */
-template<Colour ColB, Semantics SemB, typename DerivedT>
-struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
+template<Colour ColB, Semantics SemB, Res ResT>
+struct NodeData<Data<Field::Occupancy, ColB, SemB>, ResT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
     protected:
@@ -57,7 +60,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     const DataType& getData() const
     {
         static const DataType default_data = DataType();
-        return (max_data_.field.observed && underlying()->isLeaf()) ? getMaxData() : default_data;
+        return (max_data_.field.observed && derived()->isLeaf()) ? getMaxData() : default_data;
     }
 
     /** Return the minimum data among the node's children. */
@@ -75,7 +78,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     /** Set the node's data to \p data. It should only be called on leaf nodes. */
     void setData(const DataType& data)
     {
-        assert(underlying()->isLeaf());
+        assert(derived()->isLeaf());
         setMinData(data);
         setMaxData(data);
     }
@@ -100,9 +103,10 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     /** The maximum data among the node's children or the node's data if it's a leaf. */
     DataType max_data_;
 
-    const DerivedT* underlying() const
+    /** Cast to the derived class se::Node to allow accessing its members. */
+    const Node<DataType, ResT>* derived() const
     {
-        return static_cast<const DerivedT*>(this);
+        return static_cast<const Node<DataType, ResT>*>(this);
     }
 };
 
@@ -116,7 +120,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
  * \tparam ResT  The value of se::Res for the octree.
  */
 template<typename DataT, Res ResT>
-class Node : public OctantBase, public NodeData<DataT, Node<DataT, ResT>> {
+class Node : public OctantBase, public NodeData<DataT, ResT> {
     public:
     typedef DataT DataType;
 
