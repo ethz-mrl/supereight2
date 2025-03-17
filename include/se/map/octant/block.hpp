@@ -145,57 +145,38 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-
     static constexpr int compute_num_voxels()
     {
         size_t voxel_count = 0;
-        unsigned int size_at_scale = BlockSize;
-        while (size_at_scale >= 1) {
-            voxel_count += size_at_scale * size_at_scale * size_at_scale;
-
-            size_at_scale = size_at_scale >> 1;
+        for (int size_at_scale = BlockSize; size_at_scale > 0; size_at_scale /= 2) {
+            voxel_count += math::cu(size_at_scale);
         }
         return voxel_count;
     }
 
-    static constexpr std::array<int, math::log2_const(BlockSize) + 1> compute_size_at_scales()
+    static constexpr std::array<int, max_scale + 1> compute_size_at_scales()
     {
-        std::array<int, math::log2_const(BlockSize) + 1> size_at_scales{};
-
-        int size_at_scale = BlockSize;
-        int scale = 0;
-        while (size_at_scale >= 1) {
+        std::array<int, max_scale + 1> size_at_scales{};
+        for (int size_at_scale = BlockSize, scale = 0; size_at_scale > 0;
+             size_at_scale /= 2, scale++) {
             size_at_scales[scale] = size_at_scale;
-            size_at_scale = size_at_scale >> 1;
-            scale++;
         }
         return size_at_scales;
     }
 
-    static constexpr std::array<int, math::log2_const(BlockSize) + 1> compute_scale_offsets()
+    static constexpr std::array<int, max_scale + 1> compute_scale_offsets()
     {
-        std::array<int, math::log2_const(BlockSize) + 1> scale_offsets{};
-
-        unsigned int size_at_scale = BlockSize;
-        scale_offsets[0] = 0;
-        int scale = 1;
-        while (size_at_scale > 1) {
-            scale_offsets[scale] =
-                scale_offsets[scale - 1] + size_at_scale * size_at_scale * size_at_scale;
-            size_at_scale = size_at_scale >> 1;
-            scale++;
+        std::array<int, max_scale + 1> scale_offsets{0};
+        for (int size_at_scale = BlockSize, scale = 1; size_at_scale > 1;
+             size_at_scale /= 2, scale++) {
+            scale_offsets[scale] = scale_offsets[scale - 1] + math::cu(size_at_scale);
         }
         return scale_offsets;
     }
 
     static constexpr int num_voxels_ = compute_num_voxels();
-
-    static constexpr std::array<int, math::log2_const(BlockSize) + 1> size_at_scales_ =
-        compute_size_at_scales();
-
-    static constexpr std::array<int, math::log2_const(BlockSize) + 1> scale_offsets_ =
-        compute_scale_offsets();
-
+    static constexpr std::array<int, max_scale + 1> size_at_scales_ = compute_size_at_scales();
+    static constexpr std::array<int, max_scale + 1> scale_offsets_ = compute_scale_offsets();
 
     std::array<DataType, num_voxels_> block_data_;
     std::array<PastDataType, num_voxels_> block_past_data_;
@@ -682,9 +663,9 @@ class Block : public OctantBase,
     /** The edge length of the block in voxels. */
     static constexpr int size = BlockSize;
     /** The face area of the block in voxels. */
-    static constexpr int size_sq = BlockSize * BlockSize;
+    static constexpr int size_sq = math::sq(BlockSize);
     /** The volume of the block in voxels. */
-    static constexpr int size_cu = BlockSize * BlockSize * BlockSize;
+    static constexpr int size_cu = math::cu(BlockSize);
 
     /** Construct the child block of \p parent_ptr with index \p child_idx and initialize its data
      * at the coarsest scale with \p init_data. The value of \p child_idx must be in the interval
