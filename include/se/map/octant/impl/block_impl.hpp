@@ -92,8 +92,7 @@ void BlockSingleRes<DataT, BlockSize, DerivedT>::setData(const int voxel_idx, co
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(
-    const DataType init_data) :
-        min_scale(-1), current_scale(-1)
+    const DataType init_data)
 {
     block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
@@ -301,7 +300,7 @@ void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setDataU
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(
     const DataType init_data) :
-        current_scale(max_scale), min_scale(-1), buffer_scale_(-1), init_data_(init_data)
+        init_data_(init_data)
 {
     const int num_voxels_at_scale = 1;
     DataType* data_at_scale = new DataType[num_voxels_at_scale];

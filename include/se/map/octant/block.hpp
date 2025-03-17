@@ -91,8 +91,8 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     };
 
     static constexpr int max_scale = math::log2_const(BlockSize);
-    int min_scale;
-    int current_scale;
+    int min_scale = -1;
+    int current_scale = -1;
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
@@ -201,8 +201,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     typedef Data<Field::Occupancy, ColB, SemB> DataType;
 
     static constexpr int max_scale = math::log2_const(BlockSize);
-    int current_scale;
-    int min_scale;
+    int min_scale = -1;
+    int current_scale = max_scale;
 
     BlockMultiRes(const DataType init_data = DataType());
 
@@ -628,7 +628,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *        as soon as the criteria for switching to the finer or coarser scale.
      */
     DataType* buffer_data_ = nullptr; ///<< Pointer to the buffer data.
-    int buffer_scale_;                ///<< The scale of the buffer.
+    int buffer_scale_ = -1;           ///<< The scale of the buffer.
     size_t
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
