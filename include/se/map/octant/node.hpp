@@ -75,6 +75,7 @@ struct NodeData<Data<Field::Occupancy, ColB, SemB>, DerivedT> {
     /** Set the node's data to \p data. It should only be called on leaf nodes. */
     void setData(const DataType& data)
     {
+        assert(underlying()->isLeaf());
         setMinData(data);
         setMaxData(data);
     }
