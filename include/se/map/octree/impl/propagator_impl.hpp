@@ -50,8 +50,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
                             for (int i = 0; i < parent_stride; i += child_stride) {
                                 const Eigen::Vector3i child_coord =
                                     parent_coord + Eigen::Vector3i(i, j, k);
-                                child_data[child_idx++] =
-                                    block_ptr->getData(child_coord, child_scale);
+                                child_data[child_idx++] = block_ptr->data(child_coord, child_scale);
                             } // i
                         }     // j
                     }         // k

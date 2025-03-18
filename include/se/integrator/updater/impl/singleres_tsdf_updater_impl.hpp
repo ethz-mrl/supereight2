@@ -69,7 +69,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
                     const float m = measurements.depth.sensor.measurementFromPoint(point_C);
                     const field_t sdf_value = (depth_value - m) / m * point_C.norm();
 
-                    DataType& data = block.getData(voxel_coord);
+                    DataType& data = block.data(voxel_coord);
                     const bool field_updated = data.field.update(
                         sdf_value, truncation_boundary, map.getDataConfig().field.max_weight);
 

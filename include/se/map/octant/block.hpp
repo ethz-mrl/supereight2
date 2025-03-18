@@ -30,13 +30,13 @@ class BlockSingleRes {
 
     BlockSingleRes(const DataType init_data = DataType());
 
-    const DataType& getData(const int voxel_idx) const;
+    const DataType& data(const int voxel_idx) const;
 
-    DataType& getData(const int voxel_idx);
+    DataType& data(const int voxel_idx);
 
-    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& data(const Eigen::Vector3i& voxel_coord);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -94,32 +94,32 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
     /// Get coarsest block data
 
-    const DataType& getData() const;
+    const DataType& data() const;
 
-    DataType& getData();
+    DataType& data();
 
     /// Get data at current scale
 
-    const DataType& getData(const int voxel_idx) const;
+    const DataType& data(const int voxel_idx) const;
 
-    DataType& getData(const int voxel_idx);
+    DataType& data(const int voxel_idx);
 
-    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& data(const Eigen::Vector3i& voxel_coord);
 
     /// Get data at current scale or coarser
 
     const DataType&
-    getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
     /// Get data at scale
 
-    const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /// Get data union
 
@@ -222,22 +222,22 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     /// Get data at current scale
 
-    const DataType& getData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord);
+    DataType& data(const Eigen::Vector3i& voxel_coord);
 
     /// Get data at current scale or coarser
 
     const DataType&
-    getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
     /// Get data at scale
 
-    const DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& getData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
 
     const DataType& getMinData(const Eigen::Vector3i& voxel_coord) const;
 
@@ -282,7 +282,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return The block's data at the coarsest scale
      */
-    const DataType& getData() const
+    const DataType& data() const
     {
         assert(!block_data_.empty());
         assert(block_data_.front());

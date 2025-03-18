@@ -147,14 +147,14 @@ void gather_data(const BlockT* block_ptr,
                  const int y,
                  const int z)
 {
-    data_arr[0] = block_ptr->getData(Eigen::Vector3i(x, y, z));
-    data_arr[1] = block_ptr->getData(Eigen::Vector3i(x + 1, y, z));
-    data_arr[2] = block_ptr->getData(Eigen::Vector3i(x + 1, y, z + 1));
-    data_arr[3] = block_ptr->getData(Eigen::Vector3i(x, y, z + 1));
-    data_arr[4] = block_ptr->getData(Eigen::Vector3i(x, y + 1, z));
-    data_arr[5] = block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z));
-    data_arr[6] = block_ptr->getData(Eigen::Vector3i(x + 1, y + 1, z + 1));
-    data_arr[7] = block_ptr->getData(Eigen::Vector3i(x, y + 1, z + 1));
+    data_arr[0] = block_ptr->data(Eigen::Vector3i(x, y, z));
+    data_arr[1] = block_ptr->data(Eigen::Vector3i(x + 1, y, z));
+    data_arr[2] = block_ptr->data(Eigen::Vector3i(x + 1, y, z + 1));
+    data_arr[3] = block_ptr->data(Eigen::Vector3i(x, y, z + 1));
+    data_arr[4] = block_ptr->data(Eigen::Vector3i(x, y + 1, z));
+    data_arr[5] = block_ptr->data(Eigen::Vector3i(x + 1, y + 1, z));
+    data_arr[6] = block_ptr->data(Eigen::Vector3i(x + 1, y + 1, z + 1));
+    data_arr[7] = block_ptr->data(Eigen::Vector3i(x, y + 1, z + 1));
 }
 
 
@@ -283,8 +283,7 @@ void gather_dual_data(const BlockT* block_ptr,
         dual_corner_coords_i[corner_idx] = primal_corner_coord + logical_dual_offset[corner_idx];
         dual_corner_coords_f[corner_idx] =
             primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f[corner_idx];
-        data_arr[corner_idx] =
-            block_ptr->getData(dual_corner_coords_f[corner_idx].cast<int>(), scale);
+        data_arr[corner_idx] = block_ptr->data(dual_corner_coords_f[corner_idx].cast<int>(), scale);
     }
 }
 
@@ -736,8 +735,7 @@ void gather_dual_data(const OctreeT& octree,
         dual_corner_coords_f[offset_idx] =
             ((dual_corner_coords_i[offset_idx] / stride) * stride).cast<float>()
             + stride * se::sample_offset_frac; // TODO:  OctreeT<FieldType>::sample_offset_frac_
-        data_arr[offset_idx] =
-            block_ptr->getData(dual_corner_coords_f[offset_idx].cast<int>(), scale);
+        data_arr[offset_idx] = block_ptr->data(dual_corner_coords_f[offset_idx].cast<int>(), scale);
     }
     for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
         Eigen::Vector3i logical_dual_corner_coord =
@@ -754,7 +752,7 @@ void gather_dual_data(const OctreeT& octree,
                     .cast<float>()
                 + neighbour_stride
                     * se::sample_offset_frac; // TODO: OctreeT<FieldType>::sample_offset_frac_
-            data_arr[offset_idx] = block_neighbour_ptr->getData(
+            data_arr[offset_idx] = block_neighbour_ptr->data(
                 dual_corner_coords_f[offset_idx].cast<int>(), neighbour_scale);
         }
     }

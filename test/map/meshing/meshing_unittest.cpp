@@ -48,12 +48,12 @@ create_octree()
                     if (x < block_size / 2) {
                         data.field.tsdf = 1;
                         data.field.weight = 1;
-                        block_ptr->getData(voxel_coord) = data;
+                        block_ptr->data(voxel_coord) = data;
                     }
                     else {
                         data.field.tsdf = -1;
                         data.field.weight = 1;
-                        block_ptr->getData(voxel_coord) = data;
+                        block_ptr->data(voxel_coord) = data;
                     }
                 }
             }
@@ -121,12 +121,12 @@ create_octree_scale()
                     if (x < block_size / 2) {
                         data.field.tsdf = 1;
                         data.field.weight = 1;
-                        block_ptr->getData(voxel_coord) = data;
+                        block_ptr->data(voxel_coord) = data;
                     }
                     else {
                         data.field.tsdf = -1;
                         data.field.weight = 1;
-                        block_ptr->getData(voxel_coord) = data;
+                        block_ptr->data(voxel_coord) = data;
                     }
                 }
             }

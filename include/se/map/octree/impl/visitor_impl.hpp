@@ -27,14 +27,14 @@ void gather_local(const BlockT* block_ptr,
                   const Eigen::Vector3i& base_coord,
                   DataT neighbour_data[8])
 {
-    neighbour_data[0] = block_ptr->getData(base_coord + interp_offsets[0]);
-    neighbour_data[1] = block_ptr->getData(base_coord + interp_offsets[1]);
-    neighbour_data[2] = block_ptr->getData(base_coord + interp_offsets[2]);
-    neighbour_data[3] = block_ptr->getData(base_coord + interp_offsets[3]);
-    neighbour_data[4] = block_ptr->getData(base_coord + interp_offsets[4]);
-    neighbour_data[5] = block_ptr->getData(base_coord + interp_offsets[5]);
-    neighbour_data[6] = block_ptr->getData(base_coord + interp_offsets[6]);
-    neighbour_data[7] = block_ptr->getData(base_coord + interp_offsets[7]);
+    neighbour_data[0] = block_ptr->data(base_coord + interp_offsets[0]);
+    neighbour_data[1] = block_ptr->data(base_coord + interp_offsets[1]);
+    neighbour_data[2] = block_ptr->data(base_coord + interp_offsets[2]);
+    neighbour_data[3] = block_ptr->data(base_coord + interp_offsets[3]);
+    neighbour_data[4] = block_ptr->data(base_coord + interp_offsets[4]);
+    neighbour_data[5] = block_ptr->data(base_coord + interp_offsets[5]);
+    neighbour_data[6] = block_ptr->data(base_coord + interp_offsets[6]);
+    neighbour_data[7] = block_ptr->data(base_coord + interp_offsets[7]);
 }
 
 
@@ -44,10 +44,10 @@ void gather_4(const BlockT* block_ptr,
               const unsigned int offsets[4],
               DataT neighbour_data[8])
 {
-    neighbour_data[offsets[0]] = block_ptr->getData(base_coord + interp_offsets[offsets[0]]);
-    neighbour_data[offsets[1]] = block_ptr->getData(base_coord + interp_offsets[offsets[1]]);
-    neighbour_data[offsets[2]] = block_ptr->getData(base_coord + interp_offsets[offsets[2]]);
-    neighbour_data[offsets[3]] = block_ptr->getData(base_coord + interp_offsets[offsets[3]]);
+    neighbour_data[offsets[0]] = block_ptr->data(base_coord + interp_offsets[offsets[0]]);
+    neighbour_data[offsets[1]] = block_ptr->data(base_coord + interp_offsets[offsets[1]]);
+    neighbour_data[offsets[2]] = block_ptr->data(base_coord + interp_offsets[offsets[2]]);
+    neighbour_data[offsets[3]] = block_ptr->data(base_coord + interp_offsets[offsets[3]]);
 }
 
 
@@ -58,8 +58,8 @@ void gather_2(const BlockT* block_ptr,
               const unsigned int offsets[2],
               DataT neighbour_data[8])
 {
-    neighbour_data[offsets[0]] = block_ptr->getData(base_coord + interp_offsets[offsets[0]]);
-    neighbour_data[offsets[1]] = block_ptr->getData(base_coord + interp_offsets[offsets[1]]);
+    neighbour_data[offsets[0]] = block_ptr->data(base_coord + interp_offsets[offsets[0]]);
+    neighbour_data[offsets[1]] = block_ptr->data(base_coord + interp_offsets[offsets[1]]);
 }
 
 
@@ -294,7 +294,7 @@ bool get_neighbours(const OctreeT& octree,
                 return false;
             }
 
-            neighbour_data[i] = block_ptr->getData(voxels_coord[i]);
+            neighbour_data[i] = block_ptr->data(voxels_coord[i]);
         }
     } break;
     }
@@ -316,14 +316,14 @@ void gather_local(const OctantBase* leaf_ptr,
         const int stride = octantops::scale_to_size(scale);
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
-        neighbour_data[0] = block_ptr->getData(base_coord + stride * interp_offsets[0], scale);
-        neighbour_data[1] = block_ptr->getData(base_coord + stride * interp_offsets[1], scale);
-        neighbour_data[2] = block_ptr->getData(base_coord + stride * interp_offsets[2], scale);
-        neighbour_data[3] = block_ptr->getData(base_coord + stride * interp_offsets[3], scale);
-        neighbour_data[4] = block_ptr->getData(base_coord + stride * interp_offsets[4], scale);
-        neighbour_data[5] = block_ptr->getData(base_coord + stride * interp_offsets[5], scale);
-        neighbour_data[6] = block_ptr->getData(base_coord + stride * interp_offsets[6], scale);
-        neighbour_data[7] = block_ptr->getData(base_coord + stride * interp_offsets[7], scale);
+        neighbour_data[0] = block_ptr->data(base_coord + stride * interp_offsets[0], scale);
+        neighbour_data[1] = block_ptr->data(base_coord + stride * interp_offsets[1], scale);
+        neighbour_data[2] = block_ptr->data(base_coord + stride * interp_offsets[2], scale);
+        neighbour_data[3] = block_ptr->data(base_coord + stride * interp_offsets[3], scale);
+        neighbour_data[4] = block_ptr->data(base_coord + stride * interp_offsets[4], scale);
+        neighbour_data[5] = block_ptr->data(base_coord + stride * interp_offsets[5], scale);
+        neighbour_data[6] = block_ptr->data(base_coord + stride * interp_offsets[6], scale);
+        neighbour_data[7] = block_ptr->data(base_coord + stride * interp_offsets[7], scale);
     }
     else {
         const typename OctreeT::NodeType* node_ptr =
@@ -348,13 +348,13 @@ void gather_4(const OctantBase* leaf_ptr,
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
         neighbour_data[offsets[0]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[0]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[0]], scale);
         neighbour_data[offsets[1]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[1]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[1]], scale);
         neighbour_data[offsets[2]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[2]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[2]], scale);
         neighbour_data[offsets[3]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[3]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[3]], scale);
     }
     else {
         const typename OctreeT::DataType node_data =
@@ -381,9 +381,9 @@ void gather_2(const OctantBase* leaf_ptr,
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
         neighbour_data[offsets[0]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[0]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[0]], scale);
         neighbour_data[offsets[1]] =
-            block_ptr->getData(base_coord + stride * interp_offsets[offsets[1]], scale);
+            block_ptr->data(base_coord + stride * interp_offsets[offsets[1]], scale);
     }
     else {
         const typename OctreeT::DataType node_data =
@@ -684,7 +684,7 @@ bool get_neighbours(const OctreeT& octree,
             if (leaf_ptr->is_block) {
                 const typename OctreeT::BlockType* block_ptr =
                     static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
-                neighbour_data[i] = block_ptr->getData(voxels_coord[i], scale);
+                neighbour_data[i] = block_ptr->data(voxels_coord[i], scale);
             }
             else {
                 neighbour_data[i] =
@@ -712,7 +712,7 @@ typename OctreeT::DataType getData(const OctreeT& octree, const Eigen::Vector3i&
     }
 
     return (octant_ptr->is_block)
-        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->getData(voxel_coord)
+        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->data(voxel_coord)
         : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->data();
 }
 
@@ -730,7 +730,7 @@ getData(const OctreeT& octree, BlockT* block_ptr, const Eigen::Vector3i& voxel_c
                                && (voxel_coord.array() <= upper_coord.array()))
                                   .all();
     if (is_contained) {
-        return block_ptr->getData(voxel_coord);
+        return block_ptr->data(voxel_coord);
     }
 
     return visitor::getData(octree, voxel_coord);
@@ -756,7 +756,7 @@ getData(const OctreeT& octree,
 
     if (octant_ptr->is_block) {
         return static_cast<const typename OctreeT::BlockType*>(octant_ptr)
-            ->getData(voxel_coord, scale_desired, scale_returned);
+            ->data(voxel_coord, scale_desired, scale_returned);
     }
     else {
         scale_returned =
@@ -783,7 +783,7 @@ getData(const OctreeT& octree,
                                && (voxel_coord.array() <= upper_coord.array()))
                                   .all();
     if (is_contained) {
-        return block_ptr->getData(voxel_coord, scale_desired, scale_returned);
+        return block_ptr->data(voxel_coord, scale_desired, scale_returned);
     }
 
     return visitor::getData(octree, voxel_coord, scale_desired, scale_returned);
