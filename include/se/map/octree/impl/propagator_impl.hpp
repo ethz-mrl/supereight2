@@ -56,11 +56,9 @@ void propagateBlockUp(const OctreeT& /* octree */,
                     }         // k
 
                     DataUnionType parent_data_union =
-                        block_ptr->getDataUnion(parent_coord, child_scale + 1);
+                        block_ptr->dataUnion(parent_coord, child_scale + 1);
 
                     aggregate_children_funct(parent_data_union, child_data);
-
-                    block_ptr->setDataUnion(parent_data_union);
                 } // x
             }     // y
         }         // z
@@ -94,7 +92,7 @@ void propagateBlockDown(const OctreeT& octree,
                 for (int x = 0; x < block_size; x += parent_stride) {
                     const Eigen::Vector3i parent_coord = block_coord + Eigen::Vector3i(x, y, z);
                     DataUnionType parent_data_union =
-                        block_ptr->getDataUnion(parent_coord, parent_scale);
+                        block_ptr->dataUnion(parent_coord, parent_scale);
                     const int child_stride = parent_stride / 2;
                     const int child_scale = parent_scale - 1;
 
@@ -104,16 +102,14 @@ void propagateBlockDown(const OctreeT& octree,
                                 const Eigen::Vector3i child_coord =
                                     parent_coord + Eigen::Vector3i(i, j, k);
                                 DataUnionType child_data_union =
-                                    block_ptr->getDataUnion(child_coord, child_scale);
+                                    block_ptr->dataUnion(child_coord, child_scale);
 
                                 child_funct(octree, block_ptr, child_data_union, parent_data_union);
-                                block_ptr->setDataUnion(child_data_union);
                             } // i
                         }     // j
                     }         // k
 
                     parent_funct(octree, block_ptr, parent_data_union);
-                    block_ptr->setDataUnion(parent_data_union);
                 } // x
             }     // y
         }         // z

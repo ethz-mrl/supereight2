@@ -161,7 +161,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                     const field_t sdf_value = (depth_value - m) / m * point_C.norm();
 
                     typename BlockType::DataUnion data_union =
-                        block.getDataUnion(voxel_coord, block.current_scale);
+                        block.dataUnion(voxel_coord, block.current_scale);
                     const bool field_updated = data_union.data.field.update(
                         sdf_value, truncation_boundary, map.getDataConfig().field.max_weight);
                     data_union.past_data.field.weight++;
@@ -193,8 +193,6 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Upd
                             }
                         }
                     }
-
-                    block.setDataUnion(data_union);
                 }
             }
         }

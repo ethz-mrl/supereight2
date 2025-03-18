@@ -184,7 +184,7 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::data(
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataUnion
-BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
+BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::dataUnion(
     const Eigen::Vector3i& voxel_coord,
     const int scale)
 {
@@ -201,18 +201,6 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     };
 }
 
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setDataUnion(
-    const DataUnion& data_union)
-{
-    assert(data_union.data_idx >= 0);
-    assert(static_cast<size_t>(data_union.data_idx) < block_data_.size());
-    assert(static_cast<size_t>(data_union.data_idx) < block_past_data_.size());
-    block_data_[data_union.data_idx] = data_union.data;
-    block_past_data_[data_union.data_idx] = data_union.past_data;
-}
 
 
 /// Multi-res occupancy

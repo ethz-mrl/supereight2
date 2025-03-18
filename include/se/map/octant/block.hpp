@@ -78,8 +78,8 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     struct DataUnion {
         const Eigen::Vector3i coord;
         const int scale;
-        DataType data;
-        PastDataType past_data;
+        DataType& data;
+        PastDataType& past_data;
         const int data_idx;
     };
 
@@ -118,12 +118,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    /// Get data union
-
-    DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
-
-    void setDataUnion(const DataUnion& data_union);
-
+    DataUnion dataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
