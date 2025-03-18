@@ -202,18 +202,14 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     /// Get init block data
 
-    const DataType& getInitData() const
-    {
-        return init_data_;
-    };
-    DataType& getInitData()
+    const DataType& initData() const
     {
         return init_data_;
     };
 
-    void setInitData(const DataType& init_data)
+    DataType& initData()
     {
-        init_data_ = init_data;
+        return init_data_;
     };
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;

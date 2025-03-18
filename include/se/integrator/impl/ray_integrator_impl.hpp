@@ -265,7 +265,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     if (block_ptr->min_scale == -1) { // nothing inegrated yet
         // Make sure the block is allocated up to the integration scale
         block_ptr->allocateDownTo(integration_scale);
-        block_ptr->setInitData(DataType());
+        block_ptr->initData() = DataType();
     }
     else if (desired_scale < last_scale) {
         se::ray_integrator::propagate_block_down_to_scale<BlockType>(block_ptr, desired_scale);
