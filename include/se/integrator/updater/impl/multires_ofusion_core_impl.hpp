@@ -104,7 +104,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         const OctantBase* const child_ptr = node.getChild(child_idx);
         if (child_ptr) {
             child_min_data[child_idx] = child_ptr->is_block
-                ? static_cast<const BlockT*>(child_ptr)->getMinData()
+                ? static_cast<const BlockT*>(child_ptr)->minData()
                 : static_cast<const NodeT*>(child_ptr)->min_data;
             child_max_data[child_idx] = child_ptr->is_block
                 ? static_cast<const BlockT*>(child_ptr)->getMaxData()

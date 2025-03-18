@@ -27,7 +27,7 @@ static void expect_valid_block_at_scale(const BlockType& block,
 
     const int parent_size = se::octantops::scale_to_size(parent_scale);
     const int child_scale = parent_scale - 1;
-    const auto& parent_min_data = block.getMinData(parent_coord, parent_scale);
+    const auto& parent_min_data = block.minData(parent_coord, parent_scale);
     const auto& parent_max_data = block.getMaxData(parent_coord, parent_scale);
     // Iterate over the 8 children.
     int observed_children = 0;
@@ -36,7 +36,7 @@ static void expect_valid_block_at_scale(const BlockType& block,
             for (int x = 0; x < parent_size; x += parent_size / 2) {
                 const Eigen::Vector3i child_coord = parent_coord + Eigen::Vector3i(x, y, z);
 
-                const auto& child_min_data = block.getMinData(child_coord, child_scale);
+                const auto& child_min_data = block.minData(child_coord, child_scale);
                 if (child_min_data.field.observed) {
                     EXPECT_GE(se::get_field(child_min_data), se::get_field(parent_min_data))
                         << fail_msg.str();
@@ -127,7 +127,7 @@ static void expect_valid_non_leaf_node(const NodeType& node)
             EXPECT_EQ(child_size, node.size / 2);
 
             const DataType& child_min_data = child_ptr->is_block
-                ? static_cast<const BlockType*>(child_ptr)->getMinData()
+                ? static_cast<const BlockType*>(child_ptr)->minData()
                 : static_cast<const NodeType*>(child_ptr)->min_data;
             if (child_min_data.field.observed) {
                 EXPECT_GE(se::get_field(child_min_data), se::get_field(min_data)) << fail_msg.str();

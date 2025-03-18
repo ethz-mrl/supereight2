@@ -84,7 +84,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         }
 
         const auto& child_min_data = (child_ptr->is_block)
-            ? static_cast<const BlockT*>(child_ptr)->getMinData()
+            ? static_cast<const BlockT*>(child_ptr)->minData()
             : static_cast<const NodeT*>(child_ptr)->min_data;
         // Only consider children with at least 1 integration.
         if (child_min_data.field.weight > 0) {
