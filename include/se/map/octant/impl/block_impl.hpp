@@ -192,13 +192,13 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     assert(static_cast<size_t>(voxel_idx) < block_past_data_.size());
-    DataUnion data_union;
-    data_union.coord = voxel_coord;
-    data_union.scale = scale;
-    data_union.data = block_data_[voxel_idx];
-    data_union.past_data = block_past_data_[voxel_idx];
-    data_union.data_idx = voxel_idx;
-    return data_union;
+    return DataUnion{
+        voxel_coord,
+        scale,
+        block_data_[voxel_idx],
+        block_past_data_[voxel_idx],
+        voxel_idx,
+    };
 }
 
 
@@ -213,13 +213,13 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < block_data_.size());
     assert(static_cast<size_t>(voxel_idx) < block_past_data_.size());
-    DataUnion data_union;
-    data_union.coord = voxel_coord;
-    data_union.scale = scale;
-    data_union.data = block_data_[voxel_idx];
-    data_union.past_data = block_past_data_[voxel_idx];
-    data_union.data_idx = voxel_idx;
-    return data_union;
+    return DataUnion{
+        voxel_coord,
+        scale,
+        block_data_[voxel_idx],
+        block_past_data_[voxel_idx],
+        voxel_idx,
+    };
 }
 
 
