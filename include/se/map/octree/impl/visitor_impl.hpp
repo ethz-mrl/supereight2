@@ -808,7 +808,7 @@ getMinData(const OctreeT& octree, const Eigen::Vector3i& voxel_coord, const int 
             ->getMinData(voxel_coord, scale_desired, _);
     }
     else {
-        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->getMinData();
+        return static_cast<const typename OctreeT::NodeType*>(octant_ptr)->min_data;
     }
 }
 
