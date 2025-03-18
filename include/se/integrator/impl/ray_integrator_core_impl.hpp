@@ -98,7 +98,7 @@ typename NodeT::DataType propagate_to_parent_node(OctantBase* octant_ptr,
         }
 
         const auto& child_max_data = child_ptr->is_block
-            ? static_cast<const BlockT*>(child_ptr)->getMaxData()
+            ? static_cast<const BlockT*>(child_ptr)->maxData()
             : static_cast<const NodeT*>(child_ptr)->max_data;
         // Only consider children with at least 1 integration.
         if (child_max_data.field.weight > 0) {

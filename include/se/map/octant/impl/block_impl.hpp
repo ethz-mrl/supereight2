@@ -488,7 +488,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::minData(
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord) const
 {
     return block_max_data_[max_scale - current_scale][getVoxelIdx(voxel_coord, current_scale)];
@@ -498,7 +498,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord)
 {
     return block_max_data_[max_scale - current_scale][getVoxelIdx(voxel_coord, current_scale)];
@@ -508,7 +508,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale_in,
     int& scale_out) const
@@ -521,7 +521,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale_in,
     int& scale_out)
@@ -534,7 +534,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
@@ -555,7 +555,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxDa
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::getMaxData(
+BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale)
 {

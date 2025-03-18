@@ -254,7 +254,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             ///                          The node to be evaluated is free (2) and fully observed (3),
             if (variance_state != se::VarianceState::Gradient) {
                 typename OctreeType::DataType child_data = (octant_ptr->is_block)
-                    ? static_cast<BlockType*>(octant_ptr)->getMaxData()
+                    ? static_cast<BlockType*>(octant_ptr)->maxData()
                     : static_cast<NodeType*>(octant_ptr)->data();
 
                 // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy
@@ -455,7 +455,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             ///                          The node to be evaluated is free (2) and fully observed (3)
             if (variance_state != se::VarianceState::Gradient) {
                 typename OctreeType::DataType child_data = (octant_ptr->is_block)
-                    ? static_cast<BlockType*>(octant_ptr)->getMaxData()
+                    ? static_cast<BlockType*>(octant_ptr)->maxData()
                     : static_cast<NodeType*>(octant_ptr)->data();
 
                 // Check if the child is fully observed (i.e. all children are observed) // TODO: incooperate MAX occupancy

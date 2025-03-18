@@ -19,7 +19,7 @@ static void expect_valid_node_data(const NodeType& node, const se::OctantBase* c
     const DataType& min_data = child->is_block ? static_cast<const BlockType*>(child)->minData()
                                                : static_cast<const NodeType*>(child)->min_data;
 
-    const DataType& max_data = child->is_block ? static_cast<const BlockType*>(child)->getMaxData()
+    const DataType& max_data = child->is_block ? static_cast<const BlockType*>(child)->maxData()
                                                : static_cast<const NodeType*>(child)->max_data;
 
     std::stringstream failure_message;
@@ -39,14 +39,14 @@ static void expect_valid_scale_data(const BlockType& block,
     const int stride = se::octantops::scale_to_size(scale);
 
     const auto& parent_min_data = block.minData(parent_coord, scale);
-    const auto& parent_max_data = block.getMaxData(parent_coord, scale);
+    const auto& parent_max_data = block.maxData(parent_coord, scale);
     for (int z = 0; z < stride; z += stride / 2) {
         for (int y = 0; y < stride; y += stride / 2) {
             for (int x = 0; x < stride; x += stride / 2) {
                 const Eigen::Vector3i child_coord = parent_coord + Eigen::Vector3i(x, y, z);
 
                 const auto& child_min_data = block.minData(child_coord, scale);
-                const auto& child_max_data = block.getMaxData(child_coord, scale);
+                const auto& child_max_data = block.maxData(child_coord, scale);
                 std::stringstream failure_message;
                 failure_message << "for block (" << parent_coord.transpose() << ") at scale "
                                 << scale;

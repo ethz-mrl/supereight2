@@ -252,18 +252,18 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
 
-    const DataType& getMaxData(const Eigen::Vector3i& voxel_coord) const;
+    const DataType& maxData(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& getMaxData(const Eigen::Vector3i& voxel_coord);
+    DataType& maxData(const Eigen::Vector3i& voxel_coord);
 
     const DataType&
-    getMaxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
 
-    const DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& getMaxData(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
@@ -308,7 +308,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
      *
      * \return The block's max data at the coarsest scale
      */
-    const DataType& getMaxData() const
+    const DataType& maxData() const
     {
         assert(!block_max_data_.empty());
         assert(block_max_data_.front());
