@@ -120,8 +120,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
 
     /// Get data union
 
-    const DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale) const;
-
     DataUnion getDataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 
     void setDataUnion(const DataUnion& data_union);

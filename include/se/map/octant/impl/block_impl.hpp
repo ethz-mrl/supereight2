@@ -183,27 +183,6 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::data(
 
 
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataUnion
-BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale) const
-{
-    const int voxel_idx = getVoxelIdx(voxel_coord, scale);
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < block_data_.size());
-    assert(static_cast<size_t>(voxel_idx) < block_past_data_.size());
-    return DataUnion{
-        voxel_coord,
-        scale,
-        block_data_[voxel_idx],
-        block_past_data_[voxel_idx],
-        voxel_idx,
-    };
-}
-
-
-
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::DataUnion
 BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     const Eigen::Vector3i& voxel_coord,
