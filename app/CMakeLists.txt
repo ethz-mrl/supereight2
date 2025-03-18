@@ -114,3 +114,7 @@ target_include_directories(supereight_occupancy_multi_leicalidar_ray BEFORE PRIV
 target_link_libraries(supereight_occupancy_multi_leicalidar_ray PRIVATE SRL::Supereight2 ${LIB_NAME})
 # Allow handling large files in 32-bit systems
 target_compile_definitions(supereight_occupancy_multi_leicalidar_ray PRIVATE _FILE_OFFSET_BITS=64)
+
+add_executable(supereight2_sizes src/supereight2_sizes.cpp)
+target_compile_options(supereight2_sizes PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+target_link_libraries(supereight2_sizes PRIVATE SRL::Supereight2 ${LIB_NAME})
