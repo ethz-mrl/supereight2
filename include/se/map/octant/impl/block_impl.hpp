@@ -198,7 +198,6 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     data_union.data = block_data_[voxel_idx];
     data_union.past_data = block_past_data_[voxel_idx];
     data_union.data_idx = voxel_idx;
-    data_union.prop_data_idx = voxel_idx;
     return data_union;
 }
 
@@ -220,7 +219,6 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::getDataUnion(
     data_union.data = block_data_[voxel_idx];
     data_union.past_data = block_past_data_[voxel_idx];
     data_union.data_idx = voxel_idx;
-    data_union.prop_data_idx = voxel_idx;
     return data_union;
 }
 
@@ -232,10 +230,9 @@ void BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::setDataU
 {
     assert(data_union.data_idx >= 0);
     assert(static_cast<size_t>(data_union.data_idx) < block_data_.size());
-    assert(data_union.prop_data_idx >= 0);
-    assert(static_cast<size_t>(data_union.prop_data_idx) < block_past_data_.size());
+    assert(static_cast<size_t>(data_union.data_idx) < block_past_data_.size());
     block_data_[data_union.data_idx] = data_union.data;
-    block_past_data_[data_union.prop_data_idx] = data_union.past_data;
+    block_past_data_[data_union.data_idx] = data_union.past_data;
 }
 
 

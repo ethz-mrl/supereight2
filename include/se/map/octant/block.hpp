@@ -78,12 +78,9 @@ class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
     struct DataUnion {
         Eigen::Vector3i coord;
         int scale;
-
         DataType data;
         PastDataType past_data;
-
         int data_idx;
-        int prop_data_idx;
     };
 
     static constexpr int max_scale = math::log2_const(BlockSize);
