@@ -220,6 +220,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
             }
         }
         else {
+            // Clamp to avoid overflow/underflow when casting to int.
+            proj_node_corner_pixels_f = (proj_node_corner_pixels_f.array() > 1e7f)
+                                            .select(1e7f, proj_node_corner_pixels_f.array());
+            proj_node_corner_pixels_f = (proj_node_corner_pixels_f.array() < -1e7f)
+                                            .select(-1e7f, proj_node_corner_pixels_f.array());
+
             // Compute the minimum and maximum pixel values to generate the bounding box
             const Eigen::Vector2i img_bb_min =
                 proj_node_corner_pixels_f.rowwise().minCoeff().cast<int>();
