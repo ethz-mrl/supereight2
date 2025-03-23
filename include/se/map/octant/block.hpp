@@ -496,7 +496,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     {
         assert(curr_data_);
         assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> curr_scale_));
+        assert(voxel_idx < math::cu(BlockSize >> current_scale));
         return curr_data_[voxel_idx];
     }
 
@@ -513,7 +513,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     {
         assert(curr_data_);
         assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> curr_scale_));
+        assert(voxel_idx < math::cu(BlockSize >> current_scale));
         return curr_data_[voxel_idx];
     }
 
