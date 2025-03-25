@@ -1,13 +1,16 @@
-# supereight 2
+# supereight2
 
-Welcome to supereight 2: a high performance template octree library and a dense volumetric SLAM pipeline implementation.
+Welcome to supereight2: a high performance template octree library and a dense
+volumetric SLAM pipeline implementation.
 
-supereight 2 is a complete rewrite of the
+supereight2 is a complete rewrite of the
 [original supereight](https://github.com/emanuelev/supereight). It adds
 [state-of-the-art mapping features](https://arxiv.org/abs/2010.07929) while also
 making the library more flexible and easier to use.
 
-supereight 2 follows [semantic versioning](https://semver.org/).
+supereight2 follows [semantic versioning](https://semver.org/). The `main`
+branch always points to the latest release, which is more thoroughly tested,
+while the `devel` branch contains the latest changes and fixes.
 
 ![MultiresTSDF - ICL NUIM Traj 2 - mesh](./doc/images/tsdf-multi-icl-nuim-traj-2-mesh.jpeg)
 
@@ -15,8 +18,8 @@ supereight 2 follows [semantic versioning](https://semver.org/).
 
 Install the dependencies
 
-* GCC 7+ or clang 6+ (for C++ 17 features)
-* CMake 3.8+
+* GCC 7+ or clang 6+
+* CMake 3.10+
 * Eigen 3
 * OpenCV 3+
 * Threading Building Blocks (TBB) (optional, for some C++ 17 features)
@@ -59,7 +62,7 @@ make install
 cmake --install build/release
 ```
 
-You can then use supereight 2 in your CMake project by adding
+You can then use supereight2 in your CMake project by adding
 `find_package(Supereight2 REQUIRED)` and linking against `SRL::Supereight2`.
 
 To uninstall the library delete the files listed in the `install_manifest.txt`
@@ -89,7 +92,7 @@ Download the ICL-NUIM datasets:
 make download-icl-nuim
 ```
 
-Copy the configuration file into the dataset folder and run supereight:
+Copy the configuration file into the dataset folder and run supereight2:
 
 ``` sh
 ./build/release/app/supereight_tsdfcol_single_pinholecamera PATH/TO/dataset/living_room_traj0_frei_png/config.yaml
@@ -97,8 +100,8 @@ Copy the configuration file into the dataset folder and run supereight:
 
 ### 1. Setting up a map
 
-The map is templated based on field type, colour, semantics, map resolution and block size.
-The following map types are currently supported:
+The map is templated based on field type, colour, semantics, map resolution and
+block size. The following map types are currently supported:
 
 | Field Type | Colour | Semantics | Resolution |
 |------------|--------|-----------|------------|
@@ -124,6 +127,7 @@ The following sensor types are currently supported:
 |---------------|
 | PinholeCamera |
 | OusterLidar   |
+| LeicaLidar    |
 
 Example snippet
 
@@ -172,7 +176,7 @@ to match the `TUM` format.
 
 We recommend to delete `depth/0.png` and `rgb/0.png` from the dataset and remove
 them from the `rgb.txt`, `depth.txt` and `association.txt` files, as no matching
-ground truth is available (additionally delete frame 1 for the `kt0` dataset).
+ground truth is available (additionally delete frame 1 from the `kt0` dataset).
 
 ```text
 dataset/
@@ -277,7 +281,8 @@ dataset/
 
 ##### From TUM
 
-To convert TUM datasets clone [dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
+To convert TUM datasets clone
+[dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
 
 ``` sh
 cd dataset-tools/TUM/tum2raw
@@ -285,12 +290,14 @@ make
 ./bin/tum2raw /path/to/dataset
 ```
 
-Use the `./scripts/icl-nuim-download.sh` script to download the ICL NUIM datasets in `TUM` format.
-Read (Section TUM, Subsection ICL NUIM dataset) when downloading the dataset manually.
+Use the `./scripts/icl-nuim-download.sh` script to download the ICL NUIM
+datasets in `TUM` format. Read (Section TUM, Subsection ICL NUIM dataset) when
+downloading the dataset manually.
 
 ##### From Newer College
 
-To convert Newer College datasets clone [dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
+To convert Newer College datasets clone
+[dataset-tools](https://github.com/smartroboticslab/dataset-tools) and run
 
 ``` sh
 cd dataset-tools/NewerCollege
@@ -332,9 +339,11 @@ current camera pose will be shown.
 
 #### Mesh
 
-The mesh can be extracted from the map using its `se::Map::saveMesh()` function. Internally the function runs a marching cube algorithm on the
-primal grid (single-res implementation) or dual grid (multi-res implementation). The mesh can be saved
-as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
+The mesh can be extracted from the map using its `se::Map::saveMesh()` function.
+Internally the function runs a marching cube algorithm on the primal grid
+(single-res implementation) or dual grid (multi-res implementation). The mesh
+can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename
+the according type will be saved.
 
 ![MultiresOccupancy - Cow and Lady - mesh](./doc/images/occupancy-multi-cow-and-lady-mesh.jpeg)
 
@@ -344,8 +353,10 @@ map.saveMesh("./mesh.ply");
 
 #### Structure
 
-The map's underlying octree structure up to block level can saved using `se::Map::saveStructure()` function.
-The structure can be saved as a `.ply`, `.obj` or `.vtk` file. Based on the provided filename the according type will be saved.
+The map's underlying octree structure up to block level can saved using
+`se::Map::saveStructure()` function. The structure can be saved as a `.ply`,
+`.obj` or `.vtk` file. Based on the provided filename the according type will be
+saved.
 
 ```cpp
 map.getOctree().saveStructure("./octree_structure.ply");
@@ -353,9 +364,11 @@ map.getOctree().saveStructure("./octree_structure.ply");
 
 #### Slice
 
-Slices through the TSDF/occupancy field of the map can be saved using the `se::Map::saveFieldSlice()` function. The field can only be saved as a `.vtk` file.
-Given a position `t_WS` three axis aligned slices located at the `t_WS.x()` (y-z plane), `t_WS.y()` (x-z plane) and `t_WS.z()` (x-y plane)
-will be saved.
+Slices through the TSDF/occupancy field of the map can be saved using the
+`se::Map::saveFieldSlice()` function. The field can only be saved as a `.vtk`
+file. Given a position `t_WS` three axis aligned slices located at the
+`t_WS.x()` (y-z plane), `t_WS.y()` (x-z plane) and `t_WS.z()` (x-y plane) will
+be saved.
 
 ```cpp
 map.saveFieldSlice("./octree_slice", t_WS);
@@ -417,19 +430,20 @@ resolution with a 320x240 input image resolution.
 
 ## References
 
-If you use supereight 2 in your work, please cite
+If you use supereight2 in your work, please cite
 
 ``` bibtex
 @Article{Vespa_RAL2018,
-  author  = {Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan},
-  title   = {Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping},
-  journal = {IEEE Robotics and Automation Letters},
-  year    = {2018},
-  volume  = {3},
-  number  = {2},
-  pages   = {1144--1151},
-  month   = apr,
-  issn    = {2377-3766},
+  author  = "Vespa, Emanuele and Nikolov, Nikolay and Grimm, Marius and Nardi, Luigi and Kelly, Paul H. J. and Leutenegger, Stefan",
+  title   = "Efficient Octree-Based Volumetric {SLAM} Supporting Signed-Distance and Occupancy Mapping",
+  journal = "IEEE Robotics and Automation Letters",
+  year    = "2018",
+  month   = "April",
+  volume  = "3",
+  number  = "2",
+  pages   = "1144--1151",
+  issn    = "2377-3766",
+  doi     = "10.1109/LRA.2018.2792537",
 }
 ```
 
@@ -437,25 +451,30 @@ Additionally, if you are using MultiresOccupancy or MultiresTSDF, please cite
 
 ``` bibtex
 @Article{Funk_RAL2021,
-  author  = {Nils Funk and Juan Tarrio and Sotiris Papatheodorou and Marija Popovi\'{c} and Pablo F. Alcantarilla and Stefan Leutenegger},
-  title   = {Multi-Resolution {3D} Mapping With Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning},
-  journal = {IEEE Robotics and Automation Letters},
-  year    = {2021},
-  volume  = {6},
-  number  = {2},
-  pages   = {3553--3560},
-  month   = apr,
-  issn    = {2377-3766},
+  author   = "Funk, Nils and Tarrio, Juan and Papatheodorou, Sotiris and Popovi\'{c}, Marija and Alcantarilla, Pablo F. and Leutenegger, Stefan",
+  title    = "Multi-Resolution {3D} Mapping with Explicit Free Space Representation for Fast and Accurate Mobile Robot Motion Planning",
+  journal  = "IEEE Robotics and Automation Letters",
+  year     = "2021",
+  month    = "April",
+  volume   = "6",
+  number   = "2",
+  pages    = "3553--3560",
+  issn     = "2377-3766",
+  doi      = "10.1109/LRA.2021.3061989",
+
 }
 ```
 or
 ``` bibtex
 @InProceedings{Vespa_3DV2019,
-  author    = {Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan},
-  title     = {Adaptive-Resolution Octree-Based Volumetric {SLAM}},
-  booktitle = {International Conference on 3D Vision (3DV)},
-  year      = {2019},
-  pages     = {654--662},
+  author    = "Vespa, Emanuele and Funk, Nils and Kelly, Paul H. J. and Leutenegger, Stefan",
+  title     = "Adaptive-Resolution Octree-Based Volumetric {SLAM}",
+  booktitle = "International Conference on 3D Vision (3DV)",
+  year      = "2019",
+  month     = "September",
+  address   = "Qu\'{e}bec City, QC, Canada",
+  pages     = "654--662",
+  doi       = "10.1109/3DV.2019.00077",
 }
 ```
 respectively.
@@ -463,10 +482,13 @@ respectively.
 ## License
 
 Copyright 2018-2019 Emanuele Vespa<br>
-Copyright 2019-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich<br>
+Copyright 2019-2025 Smart Robotics Lab, Imperial College London, Technical University of Munich<br>
 Copyright 2019-2022 Nils Funk<br>
-Copyright 2019-2022 Sotiris Papatheodorou<br>
+Copyright 2019-2025 Sotiris Papatheodorou<br>
+Copyright 2023-2025 Simon Boche<br>
+Copyright 2023-2025 Simon Boche<br>
+Copyright 2024-2025 Sebastián Barbas Laina<br>
+Copyright 2024 Thomas Mörwald<br>
 
-supereight 2 is distributed under the
+supereight2 is distributed under the
 [BSD 3-clause license](LICENSES/BSD-3-Clause.txt).
-
