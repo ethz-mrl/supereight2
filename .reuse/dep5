@@ -13,7 +13,7 @@ Files: test/system/multires_ofusion/dataset/depth/* test/system/multires_ofusion
 Copyright: 2014 Imperial College London, National University of Ireland, Maynooth
 License: CC-BY-3.0
 
-Files: .gitmodules doc/custom.css doc/sphinx/conf.py
+Files: .gitmodules doc/custom.css
 Copyright: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
 License: CC0-1.0
 
