@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: 2021-2025 Smart Robotics Lab, Imperial College London, Technical University of Munich -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+
 # Supereight release procedure
 
 The process to follow when making a new supereight release. The `main` branch

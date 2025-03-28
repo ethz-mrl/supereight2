@@ -1,3 +1,6 @@
+<!-- SPDX-FileCopyrightText: 2021-2025 Smart Robotics Lab, Imperial College London, Technical University of Munich -->
+<!-- SPDX-License-Identifier: BSD-3-Clause -->
+
 # supereight2
 
 Welcome to supereight2: a high performance template octree library and a dense
