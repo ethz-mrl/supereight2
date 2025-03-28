@@ -77,7 +77,7 @@ xargs rm < install_manifest.txt
 ## API documentation
 
 Online API documentation can be found
-[here](https://supereight2.readthedocs.io).
+[here](https://smartroboticslab.github.io/supereight2/).
 
 If you have Doxygen installed you can build a local copy of the documentation in
 `doc/html` by running `make doc`.
