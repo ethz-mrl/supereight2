@@ -200,6 +200,9 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
             block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
         if (rayState == se::RayState::FreeSpace
             && (computed_integration_scale < free_space_scale_)) {
+            // Avoid updating block data as free at a scale coarser than the block's current scale.
+            // Doing so could overwrite previous updates from the same batch, resulting in missing
+            // surfaces, especially at coarser resolutions like 20 cm.
             if (block_ptr->min_scale == -1) {
                 computed_integration_scale = free_space_scale_;
             }
