@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
 # SPDX-License-Identifier: CC0-1.0
 
-PROJECT_NAME           = "supereight"
+PROJECT_NAME           = "supereight2"
 OUTPUT_DIRECTORY       = doc
 JAVADOC_AUTOBRIEF      = YES
 QT_AUTOBRIEF           = YES
@@ -9,7 +9,7 @@ EXTRACT_ALL            = YES
 EXTRACT_STATIC         = YES
 SORT_MEMBER_DOCS       = NO
 CITE_BIB_FILES         = "./references.bib"
-INPUT                  = include app/include README.md
+INPUT                  = include app/include README.md README-DEVELOPERS.md doc/supereight2_release_procedure.md
 RECURSIVE              = YES
 EXCLUDE_PATTERNS       = */impl/*, *_impl.hpp
 IMAGE_PATH             = doc/images
