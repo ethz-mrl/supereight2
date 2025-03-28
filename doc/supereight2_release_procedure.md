@@ -1,9 +1,9 @@
 <!-- SPDX-FileCopyrightText: 2021-2025 Smart Robotics Lab, Imperial College London, Technical University of Munich -->
 <!-- SPDX-License-Identifier: BSD-3-Clause -->
 
-# Supereight release procedure
+# supereight2 release procedure
 
-The process to follow when making a new supereight release. The `main` branch
+The process to follow when making a new supereight2 release. The `main` branch
 should always point to the latest release.
 
 
@@ -28,8 +28,7 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
    ``` sh
    ./scripts/supereight-test.bash /tmp/se2results
    ```
-
-1. Pull the latest commits in the `devel` and `main` branches from the private
+2. Pull the latest commits in the `devel` and `main` branches from the private
    repository remote into your local clone.
 
     ``` sh
@@ -38,8 +37,7 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
     git checkout devel
     git pull origin devel
     ```
-
-1. Increase the version number in `CMakeLists.txt` in a separate commit. Keep
+3. Increase the version number in `CMakeLists.txt` in a separate commit. Keep
    [semantic versioning](https://semver.org/) in mind when doing this.
 
     ``` sh
@@ -49,30 +47,26 @@ git remote add public git@github.com:smartroboticslab/supereight2.git
     git commit -m "Increment version to $se2_version"
     git push origin devel
     ```
-
-1. Fast-forward merge the `devel` branch into the `main` branch.
+4. Fast-forward merge the `devel` branch into the `main` branch.
 
     ``` sh
     git checkout main
     git merge --ff devel
     ```
-
-1. Create a git tag with the version number with name `supereight2 vX.Y.Z` and
+5. Create a git tag with the version number with name `supereight2 vX.Y.Z` and
    the output of `git shortlog` as the extended description.
 
     ``` sh
     tag_msg=$(printf 'supereight2 %s\n\n%s\n' "$se2_version" "$(git shortlog origin/main..main)")
     git tag --no-sign -a -m "$tag_msg" "$se2_version" main
     ```
-
-1. Push the main branch to both the private and public repositories.
+6. Push the main branch to both the private and public repositories.
 
     ``` sh
     git push origin main:main
     git push public main:main
     ```
-
-1. Push the tag to both the private and public repositories.
+7. Push the tag to both the private and public repositories.
 
     ``` sh
     git push origin "$se2_version"
