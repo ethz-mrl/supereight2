@@ -105,7 +105,7 @@ inline std::vector<se::OctantBase*> blocks(std::vector<se::key_t>& unique_voxel_
 
         // Don't push back if only the newly allocated Octants are returned and no allocation happened.
         if (!(only_allocated && !did_allocation)) {
-#pragma omp critical
+#pragma omp critical(block_allocator)
             {
                 block_ptrs.push_back(child_ptr);
             }
