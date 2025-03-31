@@ -870,7 +870,7 @@ marching_cube_kernel(const OctreeT& octree,
                                 }
                             }
                         }
-#pragma omp critical
+#pragma omp critical(marching_cubes)
                         {
                             mesh.push_back(face);
                         }
@@ -956,7 +956,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                 }
                             }
                         }
-#pragma omp critical
+#pragma omp critical(dual_marching_cubes)
                         {
                             mesh.push_back(face);
                         }
@@ -1132,7 +1132,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
                 }
             }
         }
-#pragma omp critical
+#pragma omp critical(new_marching_cubes)
         {
             block_meshes.emplace_back(block_mesh);
         }
