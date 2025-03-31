@@ -182,14 +182,14 @@ bool Octree<DataT, ResT, BlockSize>::allocate(NodeType* const parent_ptr,
 
     const DataT& init_data = parent_ptr->data();
     if (parent_ptr->size == 2 * BlockSize) {
-#pragma omp critical
+#pragma omp critical(octree_allocator)
         {
             child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
         }
         aabbExtend(child_ptr->coord, parent_ptr->size / 2);
     }
     else {
-#pragma omp critical
+#pragma omp critical(octree_allocator)
         {
             child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
         }
@@ -213,13 +213,13 @@ void Octree<DataT, ResT, BlockSize>::allocateChildren(NodeType* const parent_ptr
             continue;
         }
         if (children_are_blocks) {
-#pragma omp critical
+#pragma omp critical(octree_allocator)
             {
                 child_ptr = memory_pool_.allocateBlock(parent_ptr, child_idx, init_data);
             }
         }
         else {
-#pragma omp critical
+#pragma omp critical(octree_allocator)
             {
                 child_ptr = memory_pool_.allocateNode(parent_ptr, child_idx, init_data);
             }
