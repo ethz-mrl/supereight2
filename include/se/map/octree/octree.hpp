@@ -38,6 +38,7 @@ class Octree {
     public:
     typedef std::shared_ptr<Octree<DataT, ResT, BlockSize>> Ptr;
     typedef DataT DataType;
+    typedef typename DataT::Config DataConfigType;
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
     typedef TriangleMesh<DataT::col_, DataT::sem_> SurfaceMesh;
