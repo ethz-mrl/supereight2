@@ -35,8 +35,8 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, 
     typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
-    typedef typename MapType::OctreeType::NodeType NodeType;
-    typedef typename MapType::OctreeType::BlockType BlockType;
+    typedef typename MapType::NodeType NodeType;
+    typedef typename MapType::BlockType BlockType;
 
     /**
     * \brief The config file of the single ray carver

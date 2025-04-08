@@ -20,8 +20,8 @@ namespace se {
 
 template<typename MapT>
 class VoxelBlockRayIterator {
-    typedef typename MapT::OctreeType::NodeType NodeType;
-    typedef typename MapT::OctreeType::BlockType BlockType;
+    typedef typename MapT::NodeType NodeType;
+    typedef typename MapT::BlockType BlockType;
 
     public:
     VoxelBlockRayIterator(const MapT& map,

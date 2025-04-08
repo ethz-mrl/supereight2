@@ -18,7 +18,7 @@ template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
 struct Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT> {
     typedef Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
-    typedef typename MapType::OctreeType::BlockType BlockType;
+    typedef typename MapType::BlockType BlockType;
 
     Updater(MapType& map,
             std::vector<OctantBase*>& block_ptrs,

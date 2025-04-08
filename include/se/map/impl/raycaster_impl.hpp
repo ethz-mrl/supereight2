@@ -39,7 +39,7 @@ inline std::optional<se::field_t> find_valid_point(const MapT& map,
                                                    Eigen::Vector3f& point_W)
 {
     std::optional<se::field_t> value = {};
-    typename MapT::OctreeType::DataType peek_data;
+    typename MapT::DataType peek_data;
 
     Eigen::Vector3f ray_pos_W = ray_origin_W + t * ray_dir_W;
     if (map.contains(ray_pos_W)) {
@@ -249,7 +249,7 @@ inline void advance_ray(const MapT& map,
     v_far = std::min(std::min(std::min(v_map.x(), v_map.y()), v_map.z()) + v, v_far); // [voxel]
     t_far = voxel_dim * v_far;                                                        // [m]
 
-    typename MapT::OctreeType::DataType data =
+    typename MapT::DataType data =
         se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
 
     while (get_field(data) > -0.2f && scale > 2) { // TODO Verify
@@ -355,7 +355,7 @@ raycast(MapT& map,
         float /* t_near */,
         float t_far)
 {
-    typedef typename MapT::OctreeType::DataType DataType;
+    typedef typename MapT::DataType DataType;
 
     // Check if the ray origin is outside the map.
     // If so, compute the first point of contact with the map.
@@ -466,7 +466,7 @@ raycast(MapT& map,
     ray.next();
 
     float step = map.getRes();
-    float largestep = MapT::OctreeType::BlockType::size * step;
+    float largestep = MapT::BlockType::size * step;
 
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
     if (t_min <= 0.f) {

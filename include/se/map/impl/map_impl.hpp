@@ -414,13 +414,11 @@ Map<Data<FldT, ColB, SemB>, ResT, BlockSize>::saveScaleSlices(const std::string&
             return max_scale;
         }
         else if (leaf_ptr->is_block) {
-            const typename OctreeType::BlockType* block_ptr =
-                static_cast<const typename OctreeType::BlockType*>(leaf_ptr);
+            const BlockType* block_ptr = static_cast<const BlockType*>(leaf_ptr);
             return block_ptr->current_scale;
         }
         else {
-            const typename OctreeType::NodeType* node_ptr =
-                static_cast<const typename OctreeType::NodeType*>(leaf_ptr);
+            const NodeType* node_ptr = static_cast<const NodeType*>(leaf_ptr);
             return (node_ptr->isLeaf()) ? se::octantops::size_to_scale(node_ptr->size) : -1;
         }
     };

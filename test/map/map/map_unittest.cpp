@@ -136,7 +136,7 @@ TEST(Map, Interpolation)
 
     typedef typename se::TSDFMap<se::Res::Single>::DataType DataType;
     typedef typename se::TSDFMap<se::Res::Single>::OctreeType OctreeType;
-    typedef typename se::TSDFMap<se::Res::Single>::OctreeType::BlockType BlockType;
+    typedef typename se::TSDFMap<se::Res::Single>::BlockType BlockType;
 
     int block_size = BlockType::size;
 

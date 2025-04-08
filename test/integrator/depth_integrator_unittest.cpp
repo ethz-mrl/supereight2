@@ -11,9 +11,9 @@
 
 typedef se::OccupancyMap<> MapType;
 typedef MapType::OctreeType OctreeType;
-typedef MapType::OctreeType::NodeType NodeType;
-typedef MapType::OctreeType::BlockType BlockType;
-typedef MapType::OctreeType::DataType DataType;
+typedef MapType::NodeType NodeType;
+typedef MapType::BlockType BlockType;
+typedef MapType::DataType DataType;
 
 
 

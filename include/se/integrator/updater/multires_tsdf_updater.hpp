@@ -20,7 +20,7 @@ struct Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, Sensor
     typedef Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
-    typedef typename MapType::OctreeType::BlockType BlockType;
+    typedef typename MapType::BlockType BlockType;
 
     Updater(MapType& map,
             std::vector<OctantBase*>& block_ptrs,

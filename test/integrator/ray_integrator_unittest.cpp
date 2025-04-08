@@ -9,9 +9,9 @@
 #include <se/common/filesystem.hpp>
 #include <se/integrator/map_integrator.hpp>
 
-typedef se::OccupancyMap<se::Res::Multi, 8>::OctreeType::NodeType NodeType;
-typedef se::OccupancyMap<se::Res::Multi, 8>::OctreeType::BlockType BlockType;
-typedef se::OccupancyMap<se::Res::Multi, 8>::OctreeType::DataType DataType;
+typedef se::OccupancyMap<se::Res::Multi, 8>::NodeType NodeType;
+typedef se::OccupancyMap<se::Res::Multi, 8>::BlockType BlockType;
+typedef se::OccupancyMap<se::Res::Multi, 8>::DataType DataType;
 typedef se::Octree<DataType, se::Res::Multi, 8> OctreeType;
 
 static void expect_valid_node_data(const NodeType& node, const se::OctantBase* const child)
