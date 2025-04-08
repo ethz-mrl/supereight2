@@ -104,10 +104,10 @@ class Node : public OctantBase, public NodeData<DataT, ResT> {
     /** Return a pointer to the node child with index \p child_idx. The value of \p child_idx must
      * be in the interval [0, 7] inclusive. Returns nullptr if the child is not allocated.
      */
-    const OctantBase* getChild(const int child_idx) const;
-
-    /** A non-const overload of the previous member function. */
     OctantBase* getChild(const int child_idx);
+
+    /** \constoverload */
+    const OctantBase* getChild(const int child_idx) const;
 
     /** Set the node child with index \p child_idx to \p child_ptr. The value of \p child_idx must
      * be in the interval [0, 7] inclusive.
