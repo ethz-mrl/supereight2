@@ -18,3 +18,5 @@ HTML_EXTRA_STYLESHEET  = doc/custom.css
 GENERATE_LATEX         = NO
 PREDEFINED             = SE_OCTOMAP=1
 GENERATE_TAGFILE       = doc/supereight2.tag
+
+ALIASES += constoverload="This is the const-qualified overload of the above member function."
