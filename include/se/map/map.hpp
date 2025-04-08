@@ -31,9 +31,11 @@ class Map;
 template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
 class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
     public:
-    typedef Data<FldT, ColB, SemB> DataType;
-    typedef typename Data<FldT, ColB, SemB>::Config DataConfigType;
-    typedef se::Octree<DataType, ResT, BlockSize> OctreeType;
+    typedef Octree<Data<FldT, ColB, SemB>, ResT, BlockSize> OctreeType;
+    typedef typename OctreeType::DataType DataType;
+    typedef typename OctreeType::DataConfigType DataConfigType;
+    typedef typename OctreeType::BlockType BlockType;
+    typedef typename OctreeType::NodeType NodeType;
     typedef typename OctreeType::SurfaceMesh SurfaceMesh;
     typedef typename OctreeType::StructureMesh StructureMesh;
 
