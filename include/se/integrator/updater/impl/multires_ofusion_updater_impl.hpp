@@ -204,7 +204,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->allocateDownTo(integration_scale);
         block_ptr->current_scale = integration_scale;
         block_ptr->initCurrCout();
-        block_ptr->initData() = DataType();
+        block_ptr->init_data = DataType();
     }
     else if (recommended_scale != last_scale) // Potential double integration
     {
@@ -347,7 +347,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
         block_ptr->allocateDownTo(integration_scale);
         block_ptr->current_scale = integration_scale;
         block_ptr->initCurrCout();
-        block_ptr->initData() = DataType();
+        block_ptr->init_data = DataType();
     }
     else if (recommended_scale != last_scale) // Potential double integration
     {

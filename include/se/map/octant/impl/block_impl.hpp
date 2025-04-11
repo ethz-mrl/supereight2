@@ -208,7 +208,7 @@ BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT>::dataUnion(
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMultiRes(
     const DataType init_data) :
-        init_data_(init_data)
+        init_data(init_data)
 {
     const int num_voxels_at_scale = 1;
     DataType* data_at_scale = new DataType[num_voxels_at_scale];
@@ -329,7 +329,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::data(
     const int scale) const
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -349,7 +349,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::data(
     const int scale)
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -415,7 +415,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::minData(
     const int scale) const
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -436,7 +436,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::minData(
     const int scale)
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -503,7 +503,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const int scale) const
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -524,7 +524,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::maxData(
     const int scale)
 {
     if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(scale)) {
-        return init_data_;
+        return init_data;
     }
     else {
         Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
@@ -672,10 +672,10 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::res
 template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
 void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::initCurrCout()
 {
-    if (init_data_.field.observed) {
+    if (init_data.field.observed) {
         int size_at_scale = BlockSize >> current_scale;
         int num_voxels_at_scale = math::cu(size_at_scale);
-        curr_integr_count_ = init_data_.field.weight;
+        curr_integr_count_ = init_data.field.weight;
         curr_observed_count_ = num_voxels_at_scale;
     }
     else {

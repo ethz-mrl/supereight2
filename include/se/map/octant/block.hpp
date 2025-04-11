@@ -181,6 +181,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     static constexpr int max_scale = math::log2_const(BlockSize);
     int min_scale = -1;
     int current_scale = max_scale;
+    DataType init_data;
 
     BlockMultiRes(const DataType init_data = DataType());
 
@@ -189,18 +190,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     void operator=(const Block<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>& block);
 
     ~BlockMultiRes();
-
-    /// Get init block data
-
-    const DataType& initData() const
-    {
-        return init_data_;
-    };
-
-    DataType& initData()
-    {
-        return init_data_;
-    };
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
@@ -368,7 +357,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     void resetCurrCount();
 
     /**
-     * \brief When a block is initialised from an observed block (i.e. init_data_.observed == true), set the current
+     * \brief When a block is initialised from an observed block (i.e. init_data.observed == true), set the current
      *        observed count to all voxels observed and the integration count to the nodes value. Otherwise reset the current
      *        count.
      */
@@ -549,12 +538,12 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    ///<< Initalise array of data with `init_data_`.
+    ///<< Initalise array of data with `init_data`.
     void initialiseData(DataType* voxel_data, const int num_voxels)
     {
         assert(voxel_data);
         assert(num_voxels >= 0);
-        std::fill(voxel_data, voxel_data + num_voxels, init_data_);
+        std::fill(voxel_data, voxel_data + num_voxels, init_data);
     }
 
     std::vector<DataType*> block_data_;
@@ -593,8 +582,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     size_t
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
-
-    DataType init_data_;
 
     const DerivedT* underlying() const
     {
