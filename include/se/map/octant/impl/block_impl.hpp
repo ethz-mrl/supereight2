@@ -544,57 +544,49 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::all
 {
     assert(new_min_scale >= 0);
     assert(new_min_scale <= max_scale);
-    if (max_scale - (block_data_.size() - 1) > static_cast<size_t>(new_min_scale)) {
-        block_min_data_.pop_back();
-        block_max_data_.pop_back();
-        int size_at_scale = BlockSize >> (max_scale - (block_data_.size() - 1));
-        int num_voxels_at_scale = math::cu(size_at_scale);
-        DataType* min_data_at_scale = new DataType[num_voxels_at_scale];
-        DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
-        DataType* data_at_scale = block_data_[block_data_.size() - 1];
-        std::copy(data_at_scale,
-                  data_at_scale + num_voxels_at_scale,
-                  min_data_at_scale); ///<< Copy init content.
-        std::copy(data_at_scale,
-                  data_at_scale + num_voxels_at_scale,
-                  max_data_at_scale); ///<< Copy init content.
-        block_min_data_.push_back(min_data_at_scale);
-        block_max_data_.push_back(max_data_at_scale);
-
-        for (int scale = max_scale - block_data_.size(); scale >= new_min_scale; scale--) {
-            int size_at_scale = BlockSize >> scale;
-            int num_voxels_at_scale = math::cu(size_at_scale);
-
-            if (scale == new_min_scale) {
-                DataType* data_at_scale = new DataType[num_voxels_at_scale];
-                std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
-                block_data_.push_back(data_at_scale);
-                block_min_data_.push_back(
-                    data_at_scale); ///<< Mean and min data are the same at the min scale.
-                block_max_data_.push_back(
-                    data_at_scale); ///<< Mean and max data are the same at the min scale.
-            }
-            else {
-                DataType* data_at_scale = new DataType[num_voxels_at_scale];
-                DataType* min_data_at_scale = new DataType[num_voxels_at_scale];
-                DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
-                std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
-                block_data_.push_back(data_at_scale);
-                std::copy(data_at_scale,
-                          data_at_scale + num_voxels_at_scale,
-                          min_data_at_scale); ///<< Copy init content.
-                std::copy(data_at_scale,
-                          data_at_scale + num_voxels_at_scale,
-                          max_data_at_scale); ///<< Copy init content.
-                block_min_data_.push_back(min_data_at_scale);
-                block_max_data_.push_back(max_data_at_scale);
-            }
-        }
-
-        current_scale = new_min_scale;
-        min_scale = new_min_scale;
-        curr_data_ = block_data_[max_scale - new_min_scale];
+    if (new_min_scale >= current_scale) {
+        return;
     }
+
+    // The min/max data at the current minimum scale point to the mean data. Remove them to
+    // create copies later.
+    block_min_data_.pop_back();
+    block_max_data_.pop_back();
+    for (int scale = current_scale; scale >= new_min_scale; scale--) {
+        const int size_at_scale = BlockSize >> scale;
+        const int num_voxels_at_scale = math::cu(size_at_scale);
+        // Set the mean data.
+        DataType* data_at_scale;
+        if (scale == current_scale) {
+            // The mean data is already allocated at the current scale.
+            data_at_scale = block_data_.back();
+        }
+        else {
+            // Allocate new mean data for scales finer than the current.
+            data_at_scale = new DataType[num_voxels_at_scale];
+            // XXX: Should finer scales be initialized with the data of the current scale
+            // instead of init_data?
+            std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
+            block_data_.push_back(data_at_scale);
+        }
+        // Set the min/max data.
+        if (scale == new_min_scale) {
+            // Set min/max data to the mean data at the minimum scale.
+            block_min_data_.push_back(data_at_scale);
+            block_max_data_.push_back(data_at_scale);
+        }
+        else {
+            block_min_data_.push_back(new DataType[num_voxels_at_scale]);
+            block_max_data_.push_back(new DataType[num_voxels_at_scale]);
+            // Initialize min/max data at intermediate scales with the mean data.
+            std::copy(data_at_scale, data_at_scale + num_voxels_at_scale, block_min_data_.back());
+            std::copy(data_at_scale, data_at_scale + num_voxels_at_scale, block_max_data_.back());
+        }
+    }
+
+    current_scale = new_min_scale;
+    min_scale = new_min_scale;
+    curr_data_ = block_data_[max_scale - new_min_scale];
 }
 
 
