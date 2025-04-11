@@ -295,31 +295,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
         return block_data_;
     }
 
-    std::vector<DataType*>& blockData()
-    {
-        return block_data_;
-    }
-
-    const std::vector<DataType*>& blockMinData() const
-    {
-        return block_min_data_;
-    }
-
-    std::vector<DataType*>& blockMinData()
-    {
-        return block_min_data_;
-    }
-
-    const std::vector<DataType*>& blockMaxData() const
-    {
-        return block_max_data_;
-    }
-
-    std::vector<DataType*>& blockMaxData()
-    {
-        return block_max_data_;
-    }
-
     /**
      * \brief Get the number of integrations at the current scale.
      */
