@@ -597,46 +597,32 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::del
 {
     assert(new_min_scale >= 0);
     assert(new_min_scale <= max_scale);
-    if (min_scale == -1 || min_scale >= new_min_scale)
+    if (new_min_scale <= min_scale || min_scale == -1) {
         return;
+    }
 
-    auto& data_at_scale = block_data_[max_scale - min_scale];
-    delete[] data_at_scale;
-    block_data_.pop_back();
-    block_min_data_
-        .pop_back(); ///<< Avoid double free as the min scale data points to the same data.
-    block_max_data_
-        .pop_back(); ///<< Avoid double free as the min scale data points to the same data.
-
-    for (int scale = min_scale + 1; scale < new_min_scale; scale++) {
-        // Delete mean data
-        data_at_scale = block_data_[max_scale - scale];
-        delete[] data_at_scale;
+    for (int scale = min_scale; scale < new_min_scale; scale++) {
+        delete[] block_data_.back();
         block_data_.pop_back();
-
-        // Delete min data
-        auto& min_data_at_scale = block_min_data_[max_scale - scale];
-        delete[] min_data_at_scale;
+        // Don't delete the min/max data at the minimum scale to avoid a double-free, since it is
+        // the same as the mean data.
+        if (scale > min_scale) {
+            delete[] block_min_data_.back();
+            delete[] block_max_data_.back();
+        }
         block_min_data_.pop_back();
-
-        // Delete max data
-        auto& max_data_at_scale = block_max_data_[max_scale - scale];
-        delete[] max_data_at_scale;
         block_max_data_.pop_back();
     }
 
-    // Replace min data at min scale with same as mean data.
-    auto& min_data_at_scale = block_min_data_[max_scale - new_min_scale];
-    delete[] min_data_at_scale;
+    // Set the min/max data at the new minimum scale to be the same as the mean data.
+    delete[] block_min_data_.back();
+    delete[] block_max_data_.back();
     block_min_data_.pop_back();
-    block_min_data_.push_back(block_data_[max_scale - new_min_scale]);
-
-    // Replace max data at min scale with same as mean data.
-    auto& max_data_at_scale = block_max_data_[max_scale - new_min_scale];
-    delete[] max_data_at_scale;
     block_max_data_.pop_back();
-    block_max_data_.push_back(block_data_[max_scale - new_min_scale]);
+    block_min_data_.push_back(block_data_.back());
+    block_max_data_.push_back(block_data_.back());
 
+    // XXX: This should probably set current_scale and curr_data_ as well.
     min_scale = new_min_scale;
 }
 
