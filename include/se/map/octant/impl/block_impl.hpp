@@ -212,7 +212,7 @@ BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::BlockMul
 {
     const int num_voxels_at_scale = 1;
     DataType* data_at_scale = new DataType[num_voxels_at_scale];
-    initialiseData(data_at_scale, num_voxels_at_scale);
+    std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
     block_data_.push_back(data_at_scale);
     block_min_data_.push_back(data_at_scale);
     block_max_data_.push_back(data_at_scale);
@@ -567,7 +567,7 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::all
 
             if (scale == new_min_scale) {
                 DataType* data_at_scale = new DataType[num_voxels_at_scale];
-                initialiseData(data_at_scale, num_voxels_at_scale);
+                std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
                 block_data_.push_back(data_at_scale);
                 block_min_data_.push_back(
                     data_at_scale); ///<< Mean and min data are the same at the min scale.
@@ -578,7 +578,7 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT>::all
                 DataType* data_at_scale = new DataType[num_voxels_at_scale];
                 DataType* min_data_at_scale = new DataType[num_voxels_at_scale];
                 DataType* max_data_at_scale = new DataType[num_voxels_at_scale];
-                initialiseData(data_at_scale, num_voxels_at_scale);
+                std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
                 block_data_.push_back(data_at_scale);
                 std::copy(data_at_scale,
                           data_at_scale + num_voxels_at_scale,

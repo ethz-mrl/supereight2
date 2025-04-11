@@ -513,14 +513,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     private:
-    ///<< Initalise array of data with `init_data`.
-    void initialiseData(DataType* voxel_data, const int num_voxels)
-    {
-        assert(voxel_data);
-        assert(num_voxels >= 0);
-        std::fill(voxel_data, voxel_data + num_voxels, init_data);
-    }
-
     std::vector<DataType*> block_data_;
     std::vector<DataType*> block_min_data_;
     std::vector<DataType*> block_max_data_;
