@@ -14,8 +14,8 @@ namespace se {
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
              SensorT>::VolumeCarver(MapType& map,
                                     const SensorT& sensor,
                                     const se::Image<float>& depth_img,
@@ -39,9 +39,9 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 VolumeCarverAllocation
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()()
 {
     NodeType* root_ptr = static_cast<NodeType*>(octree_.getRoot());
@@ -66,8 +66,8 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>, SensorT>::
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>, SensorT>::
     crossesFrustum(std::vector<srl::projection::ProjectionStatus>& proj_corner_stati)
 {
     for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
@@ -80,8 +80,8 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                   SensorT>::cameraInNode(const Eigen::Vector3i& node_coord,
                                          const int node_size,
                                          const Eigen::Isometry3f& T_WS)
@@ -99,9 +99,9 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, Bl
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 se::VarianceState
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
              SensorT>::computeVariance(const float depth_value_min,
                                        const float depth_value_max,
                                        const float node_dist_min_m,
@@ -131,10 +131,10 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 template<class SensorTDummy>
 typename std::enable_if_t<std::is_same<SensorTDummy, PinholeCamera>::value, void>
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()(const Eigen::Vector3i& octant_coord,
                                   const int octant_size,
                                   const int octant_depth,
@@ -336,10 +336,10 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSi
 
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 template<class SensorTDummy>
 typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
-VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
              SensorT>::operator()(const Eigen::Vector3i& octant_coord,
                                   const int octant_size,
                                   const int octant_depth,

@@ -14,9 +14,9 @@
 namespace se {
 
 /** Specialization of se::Updater for single-resolution TSDF mapping. */
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-struct Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT> {
-    typedef Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize> MapType;
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+struct Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT> {
+    typedef Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::BlockType BlockType;
 

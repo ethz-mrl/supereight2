@@ -143,19 +143,19 @@ std::ostream& operator<<(std::ostream& os, const ColourData<se::Colour::On>::Con
 
 
 
-void SemanticData<se::Semantics::On>::Config::readYaml(const std::string& /* yaml_file */)
+void IdData<se::Id::On>::Config::readYaml(const std::string& /* yaml_file */)
 {
-    // TODO Implement when semantics fusion is added.
+    // TODO Implement when Id fusion is added.
 }
 
 
 
-std::ostream& operator<<(std::ostream& os, const SemanticData<se::Semantics::Off>::Config& /* c */)
+std::ostream& operator<<(std::ostream& os, const IdData<se::Id::Off>::Config& /* c */)
 {
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const SemanticData<se::Semantics::On>::Config& /* c */)
+std::ostream& operator<<(std::ostream& os, const IdData<se::Id::On>::Config& /* c */)
 {
     return os;
 }

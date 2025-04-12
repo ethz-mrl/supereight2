@@ -103,20 +103,20 @@ Copy the configuration file into the dataset folder and run supereight2:
 
 ### 1. Setting up a map
 
-The map is templated based on field type, colour, semantics, map resolution and
+The map is templated based on field type, colour, IDs, map resolution and
 block size. The following map types are currently supported:
 
-| Field Type | Colour | Semantics | Resolution |
-|------------|--------|-----------|------------|
-| TSDF       | OFF    | OFF       | Single     |
-| TSDF       | OFF    | OFF       | Multi      |
-| Occupancy  | OFF    | OFF       | Multi      |
+| Field Type | Colour | IDs | Resolution |
+|------------|--------|-----|------------|
+| TSDF       | OFF    | OFF | Single     |
+| TSDF       | OFF    | OFF | Multi      |
+| Occupancy  | OFF    | OFF | Multi      |
 
 Example snippet
 
 ``` cpp
 // Setup a map
-se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off>, se::Res::Single, 8> map_custom(config.map, config.data);
+se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Id::Off>, se::Res::Single, 8> map_custom(config.map, config.data);
 se::TSDFMap<se::Res::Single> map(config.map, config.data)     tsdf_single_map(config.map, config.data);
 se::TSDFMap<se::Res::Multi> map(config.map, config.data)      tsdf_multi_map(config.map, config.data);
 se::OccupancyMap<se::Res::Multi> map(config.map, config.data) occupacny_multi_map(config.map, config.data);

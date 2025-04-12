@@ -554,7 +554,7 @@ void raycast_volume(const MapT& map,
             assert(surface_point_cloud_W.height() == surface_colour->height());
         }
     }
-    if constexpr (MapT::sem_ == Semantics::On) {
+    if constexpr (MapT::id_ == Id::On) {
         if (surface_segment_id) {
             assert(surface_point_cloud_W.width() == surface_segment_id->width());
             assert(surface_point_cloud_W.height() == surface_segment_id->height());
@@ -602,10 +602,10 @@ void raycast_volume(const MapT& map,
                         (*surface_colour)[idx] = result ? *result : colour_t();
                     }
                 }
-                if constexpr (MapT::sem_ == Semantics::On) {
+                if constexpr (MapT::id_ == Id::On) {
                     if (surface_segment_id) {
                         (*surface_segment_id)[idx] =
-                            map.getData(surface_intersection_W->head<3>()).semantic.segment_id;
+                            map.getData(surface_intersection_W->head<3>()).id.segment_id;
                     }
                 }
             }
@@ -617,14 +617,14 @@ void raycast_volume(const MapT& map,
                         (*surface_colour)[idx] = colour_t();
                     }
                 }
-                if constexpr (MapT::sem_ == Semantics::On) {
+                if constexpr (MapT::id_ == Id::On) {
                     if (surface_segment_id) {
                         (*surface_segment_id)[idx] = g_not_mapped;
                     }
                 }
             }
         } // x
-    }     // y
+    } // y
 }
 
 
@@ -680,7 +680,7 @@ Image<segment_id_t> lookup_segment_ids(const MapT& map,
         const Eigen::Vector3f point_W = T_WC * point_cloud_C[i];
         if (valid_depth && map.contains(point_W)) {
             const auto& data = map.getData(point_W);
-            segment_id[i] = is_valid(data) ? data.semantic.segment_id : g_not_mapped;
+            segment_id[i] = is_valid(data) ? data.id.segment_id : g_not_mapped;
         }
         else {
             segment_id[i] = g_not_mapped;

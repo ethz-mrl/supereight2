@@ -23,16 +23,16 @@ class RayIntegrator {
                   const Eigen::Vector3f& /*ray*/,
                   const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
                   const timestamp_t /* timestamp */,
-                  std::set<const OctantBase*>* const /*updated_octants = nullptr*/){};
+                  std::set<const OctantBase*>* const /*updated_octants = nullptr*/) {};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                     SensorT> {
     public:
-    typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize> MapType;
+    typedef Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
     typedef typename MapType::NodeType NodeType;

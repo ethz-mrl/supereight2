@@ -34,26 +34,26 @@ struct MeshFaceColourData<NumVertexes, Colour::On> {
 
 
 
-template<size_t NumVertexes, Semantics SemB>
-struct MeshFaceSemanticData {};
+template<size_t NumVertexes, Id IdB>
+struct MeshFaceIdData {};
 
 template<size_t NumVertexes>
-struct MeshFaceSemanticData<NumVertexes, Semantics::On> {
+struct MeshFaceIdData<NumVertexes, Id::On> {
     segment_id_t segment_id = segment_id_t(0);
 };
 
 
 
-template<size_t NumVertexes, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+template<size_t NumVertexes, Colour ColB = Colour::Off, Id IdB = Id::Off>
 struct MeshFace {
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
     MeshFaceColourData<NumVertexes, ColB> colour;
-    MeshFaceSemanticData<NumVertexes, SemB> semantic;
+    MeshFaceIdData<NumVertexes, IdB> id;
     std::int8_t scale = 0;
 
     static constexpr size_t num_vertexes = NumVertexes;
-    static constexpr Colour col = ColB;
-    static constexpr Semantics sem = SemB;
+    static constexpr Colour col_ = ColB;
+    static constexpr Id id_ = IdB;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -69,23 +69,23 @@ struct MeshFace {
 template<typename FaceT>
 using Mesh = std::vector<FaceT>;
 
-template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-using Triangle = MeshFace<3, ColB, SemB>;
+template<Colour ColB = Colour::Off, Id IdB = Id::Off>
+using Triangle = MeshFace<3, ColB, IdB>;
 
-template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-using TriangleMesh = Mesh<Triangle<ColB, SemB>>;
+template<Colour ColB = Colour::Off, Id IdB = Id::Off>
+using TriangleMesh = Mesh<Triangle<ColB, IdB>>;
 
-template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-using Quad = MeshFace<4, ColB, SemB>;
+template<Colour ColB = Colour::Off, Id IdB = Id::Off>
+using Quad = MeshFace<4, ColB, IdB>;
 
-template<Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
-using QuadMesh = Mesh<Quad<ColB, SemB>>;
+template<Colour ColB = Colour::Off, Id IdB = Id::Off>
+using QuadMesh = Mesh<Quad<ColB, IdB>>;
 
 
 
 /** Return a triangle mesh containig two triangles for each face of \p quad_mesh. */
-template<Colour ColB, Semantics SemB>
-TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_mesh);
+template<Colour ColB, Id IdB>
+TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_mesh);
 
 
 
@@ -101,11 +101,11 @@ struct SegmentInfo {
 /** Return information about all segments in \p mesh. The spatial information is in the same
  * coordinate frame as \p mesh.
  */
-template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
 std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh);
 
 /** Extract per-segment meshes for all segments in \p mesh. */
-template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
 std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh);
 
 /** Extract per-segment meshes for all segments in \p mesh for whose IDs \p extract_segment returns
@@ -116,12 +116,12 @@ std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& me
  */
 template<typename FaceT,
          typename ExtractSegmentF,
-         typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+         typename = std::enable_if_t<FaceT::id_ == Id::On>>
 std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh,
                                                            ExtractSegmentF extract_segment);
 
 /** Colour the faces of \p mesh by their segment ID. */
-template<typename FaceT, typename = std::enable_if_t<FaceT::sem == Semantics::On>>
+template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
 void colour_mesh_by_segment(Mesh<FaceT>& mesh,
                             const bool enable_shading = true,
                             const Eigen::Vector3f& light_dir_W = Eigen::Vector3f(-1, 0, -1),

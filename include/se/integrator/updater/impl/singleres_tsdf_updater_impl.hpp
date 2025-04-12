@@ -11,8 +11,8 @@
 
 namespace se {
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Updater(
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT>::Updater(
     MapType& map,
     std::vector<OctantBase*>& block_ptrs,
     const timestamp_t timestamp,
@@ -26,9 +26,9 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
         }
     }
 
-    const bool has_segments = SemB == Semantics::On && measurements.segments;
+    const bool has_segments = IdB == Id::On && measurements.segments;
     Eigen::Isometry3f T_CsC;
-    if constexpr (SemB == Semantics::On) {
+    if constexpr (IdB == Id::On) {
         if (has_segments) {
             T_CsC = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
         }
@@ -84,7 +84,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
                     // Compute the coordinates of the depth hit in the depth sensor frame C if data
                     // other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
-                    if constexpr (ColB == Colour::On || SemB == Semantics::On) {
+                    if constexpr (ColB == Colour::On || IdB == Id::On) {
                         if ((has_colour || has_segments) && field_updated) {
                             measurements.depth.sensor.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
@@ -111,7 +111,7 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
 
                     // Update the segment data if possible and only if the field was updated, that
                     // is if we have corresponding depth information.
-                    if constexpr (SemB == Semantics::On) {
+                    if constexpr (IdB == Id::On) {
                         if (has_segments && field_updated) {
                             // Project the depth hit onto the segment image.
                             const Eigen::Vector3f hit_Cs = T_CsC * hit_C;
@@ -121,8 +121,8 @@ Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Single, BlockSize>, SensorT>::Up
                                 == srl::projection::ProjectionStatus::Successful) {
                                 const Eigen::Vector2i segment_pixel =
                                     se::round_pixel(segment_pixel_f);
-                                data.semantic.update(measurements.segments->image(
-                                    segment_pixel.x(), segment_pixel.y()));
+                                data.id.update(measurements.segments->image(segment_pixel.x(),
+                                                                            segment_pixel.y()));
                             }
                         }
                     }

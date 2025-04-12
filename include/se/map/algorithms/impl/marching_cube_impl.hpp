@@ -858,7 +858,7 @@ marching_cube_kernel(const OctreeT& octree,
                                 goto skip_face;
                             }
                         }
-                        if constexpr (Face::col == Colour::On) {
+                        if constexpr (Face::col_ == Colour::On) {
                             // Using a separate loop than the vertex computation to avoid the
                             // expensive colour interpolation if one of the vertices is invalid and
                             // the whole face is skipped.
@@ -870,10 +870,10 @@ marching_cube_kernel(const OctreeT& octree,
                                 }
                             }
                         }
-                        if constexpr (Face::sem == Semantics::On) {
-                            face.semantic.segment_id =
+                        if constexpr (Face::id_ == Id::On) {
+                            face.id.segment_id =
                                 visitor::getData(octree, block_ptr, Eigen::Vector3i(x, y, z))
-                                    .semantic.segment_id;
+                                    .id.segment_id;
                         }
 #pragma omp critical(marching_cubes)
                         {
@@ -949,7 +949,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                             }
                         }
                         face.scale = voxel_scale;
-                        if constexpr (Face::col == Colour::On) {
+                        if constexpr (Face::col_ == Colour::On) {
                             // Using a separate loop than the vertex computation to avoid the
                             // expensive colour interpolation if one of the vertices is invalid and
                             // the whole face is skipped.
@@ -961,12 +961,12 @@ dual_marching_cube_kernel(const OctreeT& octree,
                                 }
                             }
                         }
-                        if constexpr (Face::sem == Semantics::On) {
+                        if constexpr (Face::id_ == Id::On) {
                             int _;
-                            face.semantic.segment_id =
+                            face.id.segment_id =
                                 visitor::getData(
                                     octree, block_ptr, Eigen::Vector3i(x, y, z), voxel_scale, _)
-                                    .semantic.segment_id;
+                                    .id.segment_id;
                         }
 #pragma omp critical(dual_marching_cubes)
                         {

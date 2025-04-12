@@ -21,17 +21,17 @@
 namespace se {
 
 // Forward Declaration
-template<typename DataT = se::Data<Field::TSDF, Colour::Off, Semantics::Off>,
+template<typename DataT = se::Data<Field::TSDF, Colour::Off, Id::Off>,
          Res ResT = Res::Single,
          int BlockSize = 8>
 class Map;
 
 
 
-template<Field FldT, Colour ColB, Semantics SemB, Res ResT, int BlockSize>
-class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
+template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
+class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
     public:
-    typedef Octree<Data<FldT, ColB, SemB>, ResT, BlockSize> OctreeType;
+    typedef Octree<Data<FldT, ColB, IdB>, ResT, BlockSize> OctreeType;
     typedef typename OctreeType::DataType DataType;
     typedef typename OctreeType::DataConfigType DataConfigType;
     typedef typename OctreeType::BlockType BlockType;
@@ -81,8 +81,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      */
     Map(const Eigen::Vector3f& dim,
         const float res,
-        const typename Data<FldT, ColB, SemB>::Config& data_config =
-            typename Data<FldT, ColB, SemB>::Config());
+        const typename Data<FldT, ColB, IdB>::Config& data_config =
+            typename Data<FldT, ColB, IdB>::Config());
 
     /**
      * \brief The map constructor.
@@ -91,8 +91,8 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
      * \param data_config         The configuration file for the data
      */
     Map(const Config& map_config,
-        const typename Data<FldT, ColB, SemB>::Config& data_config =
-            typename Data<FldT, ColB, SemB>::Config());
+        const typename Data<FldT, ColB, IdB>::Config& data_config =
+            typename Data<FldT, ColB, IdB>::Config());
 
     /** The copy constructor is explicitly deleted.
      */
@@ -569,7 +569,7 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
-    static constexpr Semantics sem_ = SemB;
+    static constexpr Id id_ = IdB;
 
     static constexpr Res res_ = ResT;
 
@@ -597,10 +597,10 @@ class Map<se::Data<FldT, ColB, SemB>, ResT, BlockSize> {
 //// Full alias template for alternative setup
 template<se::Field FldT = se::Field::TSDF,
          se::Colour ColB = se::Colour::Off,
-         se::Semantics SemB = se::Semantics::Off,
+         se::Id IdB = se::Id::Off,
          se::Res ResT = se::Res::Single,
          int BlockSize = 8>
-using MapD = Map<Data<FldT, ColB, SemB>, ResT, BlockSize>;
+using MapD = Map<Data<FldT, ColB, IdB>, ResT, BlockSize>;
 
 
 // Occupancy map setups
@@ -611,10 +611,10 @@ template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
 using OccupancyColMap = Map<OccupancyColData, ResT, BlockSize>;
 
 template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
-using OccupancySemMap = Map<OccupancySemData, ResT, BlockSize>;
+using OccupancyIdMap = Map<OccupancyIdData, ResT, BlockSize>;
 
 template<se::Res ResT = se::Res::Multi, int BlockSize = 8>
-using OccupancyColSemMap = Map<OccupancyColSemData, ResT, BlockSize>;
+using OccupancyColIdMap = Map<OccupancyColIdData, ResT, BlockSize>;
 
 
 // TSDF map setups
@@ -625,10 +625,10 @@ template<se::Res ResT = se::Res::Single, int BlockSize = 8>
 using TSDFColMap = Map<TSDFColData, ResT, BlockSize>;
 
 template<se::Res ResT = se::Res::Single, int BlockSize = 8>
-using TSDFSemMap = Map<TSDFSemData, ResT, BlockSize>;
+using TSDFIdMap = Map<TSDFIdData, ResT, BlockSize>;
 
 template<se::Res ResT = se::Res::Single, int BlockSize = 8>
-using TSDFColSemMap = Map<TSDFColSemData, ResT, BlockSize>;
+using TSDFColIdMap = Map<TSDFColIdData, ResT, BlockSize>;
 
 } // namespace se
 

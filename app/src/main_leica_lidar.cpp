@@ -42,7 +42,7 @@ int main(int argc, char** argv)
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
         // Custom way of setting up the same map:
-        // se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Semantics::Off>, se::Res::Single, 8>
+        // se::Map<se::Data<se::Field::TSDF, se::Colour::Off, se::Id::Off>, se::Res::Single, 8>
         // See end of map.hpp and data.hpp for more details
         MapType map(config.map, config.data);
 

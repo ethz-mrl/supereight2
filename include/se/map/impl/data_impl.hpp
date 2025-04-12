@@ -10,9 +10,9 @@
 namespace se {
 namespace data {
 
-template<Colour ColB, Semantics SemB>
-int up_prop_mean(Data<Field::TSDF, ColB, SemB>& parent_data,
-                 const std::array<Data<Field::TSDF, ColB, SemB>, 8>& child_data)
+template<Colour ColB, Id IdB>
+int up_prop_mean(Data<Field::TSDF, ColB, IdB>& parent_data,
+                 const std::array<Data<Field::TSDF, ColB, IdB>, 8>& child_data)
 {
     static_assert(std::is_floating_point_v<field_t> && std::is_floating_point_v<weight_t>,
                   "The code must be modified to avoid overflows for non-floating-point types.");
@@ -42,8 +42,8 @@ int up_prop_mean(Data<Field::TSDF, ColB, SemB>& parent_data,
             parent_data.colour.setToMean(valid_child_colour_data);
         }
 
-        if constexpr (SemB == Semantics::On) {
-            // TODO: aggregate the semantics of the valid children (mean?).
+        if constexpr (IdB == Id::On) {
+            // TODO: aggregate the Id of the valid children (mean?).
         }
     }
     return valid_child_indices.size();
@@ -51,9 +51,9 @@ int up_prop_mean(Data<Field::TSDF, ColB, SemB>& parent_data,
 
 
 
-template<Colour ColB, Semantics SemB>
-int up_prop_mean(Data<Field::Occupancy, ColB, SemB>& parent_data,
-                 const std::array<Data<Field::Occupancy, ColB, SemB>, 8>& child_data)
+template<Colour ColB, Id IdB>
+int up_prop_mean(Data<Field::Occupancy, ColB, IdB>& parent_data,
+                 const std::array<Data<Field::Occupancy, ColB, IdB>, 8>& child_data)
 {
     static_assert(std::is_floating_point_v<field_t> && std::is_floating_point_v<weight_t>,
                   "The code must be modified to avoid overflows for non-floating-point types.");
@@ -84,8 +84,8 @@ int up_prop_mean(Data<Field::Occupancy, ColB, SemB>& parent_data,
             parent_data.colour.setToMean(valid_child_colour_data);
         }
 
-        if constexpr (SemB == Semantics::On) {
-            // TODO: aggregate the semantics of the valid children (mean?).
+        if constexpr (IdB == Id::On) {
+            // TODO: aggregate the Id of the valid children (mean?).
         }
     }
     return static_cast<int>(valid_child_indices.size());
@@ -95,9 +95,9 @@ int up_prop_mean(Data<Field::Occupancy, ColB, SemB>& parent_data,
 
 namespace detail {
 
-template<Colour ColB, Semantics SemB, typename IsBetterF>
-int up_prop_best(Data<Field::Occupancy, ColB, SemB>& parent_data,
-                 const std::array<Data<Field::Occupancy, ColB, SemB>, 8>& child_data,
+template<Colour ColB, Id IdB, typename IsBetterF>
+int up_prop_best(Data<Field::Occupancy, ColB, IdB>& parent_data,
+                 const std::array<Data<Field::Occupancy, ColB, IdB>, 8>& child_data,
                  const field_t worst_occupancy,
                  IsBetterF is_better)
 {
@@ -129,9 +129,9 @@ int up_prop_best(Data<Field::Occupancy, ColB, SemB>& parent_data,
 
 
 
-template<Colour ColB, Semantics SemB>
-int up_prop_min(Data<Field::Occupancy, ColB, SemB>& parent_min_data,
-                const std::array<Data<Field::Occupancy, ColB, SemB>, 8>& child_min_data)
+template<Colour ColB, Id IdB>
+int up_prop_min(Data<Field::Occupancy, ColB, IdB>& parent_min_data,
+                const std::array<Data<Field::Occupancy, ColB, IdB>, 8>& child_min_data)
 {
     return detail::up_prop_best(parent_min_data,
                                 child_min_data,
@@ -141,9 +141,9 @@ int up_prop_min(Data<Field::Occupancy, ColB, SemB>& parent_min_data,
 
 
 
-template<Colour ColB, Semantics SemB>
-int up_prop_max(Data<Field::Occupancy, ColB, SemB>& parent_max_data,
-                const std::array<Data<Field::Occupancy, ColB, SemB>, 8>& child_max_data)
+template<Colour ColB, Id IdB>
+int up_prop_max(Data<Field::Occupancy, ColB, IdB>& parent_max_data,
+                const std::array<Data<Field::Occupancy, ColB, IdB>, 8>& child_max_data)
 {
     return detail::up_prop_best(parent_max_data,
                                 child_max_data,

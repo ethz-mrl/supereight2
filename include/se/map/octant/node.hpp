@@ -40,9 +40,9 @@ struct NodeData {
 /** Specialization of se::NodeData for se::Field::Occupancy. It contains minimum and maximum
  * up-propagated data.
  */
-template<Colour ColB, Semantics SemB, Res ResT>
-struct NodeData<Data<Field::Occupancy, ColB, SemB>, ResT> {
-    typedef Data<Field::Occupancy, ColB, SemB> DataType;
+template<Colour ColB, Id IdB, Res ResT>
+struct NodeData<Data<Field::Occupancy, ColB, IdB>, ResT> {
+    typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
     /** The minimum data among the node's children or the node's data if it's a leaf. */
     DataType min_data;

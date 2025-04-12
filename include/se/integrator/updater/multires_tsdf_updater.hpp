@@ -15,9 +15,9 @@
 namespace se {
 
 /** Specialization of se::Updater for multi-resolution TSDF mapping. */
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-struct Updater<Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize>, SensorT> {
-    typedef Map<Data<Field::TSDF, ColB, SemB>, Res::Multi, BlockSize> MapType;
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+struct Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT> {
+    typedef Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
     typedef typename MapType::BlockType BlockType;

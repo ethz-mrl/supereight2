@@ -44,15 +44,14 @@ class VolumeCarver {
  * \brief Allocate the frustum using a map-to-camera volume carving approach
  *
  * \tparam ColB
- * \tparam SemB
+ * \tparam IdB
  * \tparam BlockSize
  * \tparam SensorT
  */
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
-                   SensorT> {
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>, SensorT> {
     public:
-    typedef Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize> MapType;
+    typedef Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize> MapType;
     typedef typename MapType::OctreeType OctreeType;
     typedef typename OctreeType::NodeType NodeType;
     typedef typename OctreeType::BlockType BlockType;

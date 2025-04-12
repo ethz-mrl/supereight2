@@ -16,10 +16,10 @@ namespace se {
 
 
 // Multi-res Occupancy updater
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-class Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT> {
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+class Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT> {
     public:
-    typedef Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize> MapType;
+    typedef Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> MapType;
     typedef typename MapType::DataType DataType;
     typedef typename MapType::OctreeType OctreeType;
     typedef typename MapType::NodeType NodeType;

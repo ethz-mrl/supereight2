@@ -57,16 +57,16 @@ class BlockMultiRes {
 
 
 
-template<Field FldT, Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<FldT, ColB, SemB>, BlockSize, DerivedT> {
+template<Field FldT, Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+class BlockMultiRes<Data<FldT, ColB, IdB>, BlockSize, DerivedT> {
 };
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<Field::TSDF, ColB, SemB>, BlockSize, DerivedT> {
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     public:
-    typedef Data<Field::TSDF, ColB, SemB> DataType;
+    typedef Data<Field::TSDF, ColB, IdB> DataType;
 
     /** Contains data from a previous point in time which is used to compute changes over time for
      * delta down-propagation.
@@ -173,10 +173,10 @@ class Block;
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     public:
-    typedef Data<Field::Occupancy, ColB, SemB> DataType;
+    typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
     static constexpr int max_scale = math::log2_const(BlockSize);
     int min_scale = -1;
@@ -185,9 +185,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, SemB>, BlockSize, DerivedT> {
 
     BlockMultiRes(const DataType init_data = DataType());
 
-    BlockMultiRes(const Block<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>& block);
+    BlockMultiRes(const Block<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>& block);
 
-    void operator=(const Block<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>& block);
+    void operator=(const Block<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>& block);
 
     ~BlockMultiRes();
 

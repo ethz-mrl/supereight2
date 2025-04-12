@@ -71,7 +71,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     }
     file << "\n";
 
-    if constexpr (FaceT::col == Colour::On) {
+    if constexpr (FaceT::col_ == Colour::On) {
         file << "POINT_DATA " << num_vertices << "\n\n";
         file << "COLOR_SCALARS color 3\n";
         for (const auto& face : mesh_M) {
@@ -96,7 +96,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     file << "COLOR_SCALARS scale_colour 3\n";
     for (const auto& face : mesh_M) {
         RGB rgb;
-        if constexpr (FaceT::col == Colour::On) {
+        if constexpr (FaceT::col_ == Colour::On) {
             rgb = face.colour.face;
         }
         else {
@@ -109,7 +109,6 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     file.close();
     return 0;
 }
-
 
 
 template<typename FaceT>
@@ -135,12 +134,12 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
     file << "property float x\n";
     file << "property float y\n";
     file << "property float z\n";
-    if constexpr (FaceT::col == Colour::On) {
+    if constexpr (FaceT::col_ == Colour::On) {
         file << "property uchar red\n";
         file << "property uchar green\n";
         file << "property uchar blue\n";
     }
-    if constexpr (FaceT::sem == Semantics::On) {
+    if constexpr (FaceT::id_ == Id::On) {
         file << "property int segment_id\n";
     }
     file << "element face " << num_faces << "\n";
@@ -155,12 +154,12 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         for (size_t v = 0; v < FaceT::num_vertexes; ++v) {
             const Eigen::Vector3f vertex_W = T_OM * face.vertexes[v];
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
-            if constexpr (FaceT::col == Colour::On) {
+            if constexpr (FaceT::col_ == Colour::On) {
                 const auto colour = face.colour.vertexes[v];
                 file << " " << int(colour.r) << " " << int(colour.g) << " " << int(colour.b);
             }
-            if constexpr (FaceT::sem == Semantics::On) {
-                const auto segment_id = face.semantic.segment_id;
+            if constexpr (FaceT::id_ == Id::On) {
+                const auto segment_id = face.id.segment_id;
                 file << " " << int(segment_id);
             }
             file << "\n";
@@ -175,7 +174,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         }
         // Write the face colour.
         RGB rgb;
-        if constexpr (FaceT::col == Colour::On) {
+        if constexpr (FaceT::col_ == Colour::On) {
             rgb = mesh_M[f].colour.face;
         }
         else {

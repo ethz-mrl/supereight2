@@ -15,8 +15,8 @@ namespace se {
 
 
 // Multi-res Occupancy updater
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::Updater(
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Updater(
     MapType& map,
     const timestamp_t timestamp,
     const Measurements<SensorT>& measurements) :
@@ -44,7 +44,7 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
         }
     }
 
-    if constexpr (SemB == Semantics::On) {
+    if constexpr (IdB == Id::On) {
         if (has_features_) {
             T_CsC_ = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
         }
@@ -53,8 +53,8 @@ Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::operator()(
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::operator()(
     VolumeCarverAllocation& allocation_list,
     std::set<const OctantBase*>* const updated_octants)
 {
@@ -120,8 +120,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
              SensorT>::propagateToRoot(std::vector<OctantBase*>& block_list)
 {
     for (const auto& octant_ptr : block_list) {
@@ -169,8 +169,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::freeBlock(
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::freeBlock(
     OctantBase* octant_ptr)
 {
     assert(octant_ptr);
@@ -273,7 +273,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                     auto& buffer_data = block_ptr->bufferData(buffer_idx);
                     block_ptr->incrBufferObservedCount(
                         updater::free_voxel(buffer_data, map_.getDataConfig()));
-                    // We don't update colour or semantics in free space.
+                    // We don't update colour or identifiers in free space.
                 } // x
             }     // y
         }         // z
@@ -299,7 +299,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
                 auto& voxel_data = block_ptr->currData(voxel_idx);
                 block_ptr->incrCurrObservedCount(
                     updater::free_voxel(voxel_data, map_.getDataConfig()));
-                // We don't update colour or semantics in free space.
+                // We don't update colour or identifiers in free space.
             } // x
         }     // y
     }         // z
@@ -309,8 +309,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, SensorT>::updateBlock(
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::updateBlock(
     OctantBase* octant_ptr,
     bool low_variance,
     bool project_inside)
@@ -421,9 +421,9 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>, Sen
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
 template<bool UpdateBuffer>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
              SensorT>::updateBlockData(BlockType& block,
                                        const Eigen::Vector3f& block_centre_C,
                                        const int scale,
@@ -470,7 +470,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                 bool newly_observed;
                 if (low_variance) {
                     newly_observed = updater::free_voxel(data, map_.getDataConfig());
-                    // We don't update colour or semantics in free space.
+                    // We don't update colour or Id in free space.
                 }
                 else {
                     const float sample_point_C_m = sensor_.measurementFromPoint(sample_point_C);
@@ -481,7 +481,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                         data, range_diff, tau, three_sigma, map_.getDataConfig());
                     const bool field_updated = range_diff < tau;
 
-                    // Never update colour or semantics beyond the far plane.
+                    // Never update colour or Id beyond the far plane.
                     if (depth_value > sensor_.far_plane) {
                         continue;
                     }
@@ -489,7 +489,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                     // Compute the coordinates of the depth hit in the depth sensor frame C if
                     // data other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
-                    if constexpr (ColB == Colour::On || SemB == Semantics::On) {
+                    if constexpr (ColB == Colour::On || IdB == Id::On) {
                         if ((has_colour_ || has_features_) && field_updated) {
                             sensor_.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
@@ -516,7 +516,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
                     // Update the segment data if possible and only if the field was updated,
                     // that is if we have corresponding depth information.
-                    if constexpr (SemB == Semantics::On) {
+                    if constexpr (IdB == Id::On) {
                         if (has_features_ && field_updated) {
                             const bool near_surface = data.field.occupancy
                                 > 0.95 * map_.getDataConfig().field.log_odd_min;
@@ -528,7 +528,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
                                     == srl::projection::ProjectionStatus::Successful) {
                                     const Eigen::Vector2i segment_pixel =
                                         se::round_pixel(segment_pixel_f);
-                                    data.semantic.update(
+                                    data.id.update(
                                         (*feature_img_)(segment_pixel.x(), segment_pixel.y()));
                                 }
                             }
@@ -555,8 +555,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
 
 
 
-template<Colour ColB, Semantics SemB, int BlockSize, typename SensorT>
-void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
+template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
+void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
              SensorT>::freeNodeRecurse(OctantBase* octant_ptr, int depth)
 {
     assert(octant_ptr);
@@ -570,13 +570,13 @@ void Updater<Map<Data<Field::Occupancy, ColB, SemB>, Res::Multi, BlockSize>,
         // Update the node data to free since we don't need to update at a finer level.
         node_data.field.update(map_.getDataConfig().field.log_odd_min,
                                map_.getDataConfig().field.max_weight);
-        // We don't update colour or semantics in free space.
+        // We don't update colour or Id in free space.
         node_ptr->min_data = node_data;
         node_ptr->max_data = node_ptr->min_data;
         // Don't update colour in free space.
         // Reset the segment ID to keep the map consistent in case something went from occupied to free.
-        if constexpr (SemB == Semantics::On) {
-            node_data.semantic = typename NodeType::DataType::SemanticType();
+        if constexpr (IdB == Id::On) {
+            node_data.id = typename NodeType::DataType::IdType();
         }
 #pragma omp critical(node_lock)
         { // Add node to node list for later up-propagation (finest node for this tree-branch)

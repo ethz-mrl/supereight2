@@ -11,24 +11,24 @@
 #include <array>
 #include <se/map/data_colour.hpp>
 #include <se/map/data_field.hpp>
-#include <se/map/data_semantics.hpp>
+#include <se/map/data_id.hpp>
 
 namespace se {
 
-template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Semantics SemB = Semantics::Off>
+template<Field FldT = Field::TSDF, Colour ColB = Colour::Off, Id IdB = Id::Off>
 struct Data {
     typedef FieldData<FldT> FieldType;
     typedef ColourData<ColB> ColourType;
-    typedef SemanticData<SemB> SemanticType;
+    typedef IdData<IdB> IdType;
 
     FieldType field;
     ColourType colour;
-    SemanticType semantic;
+    IdType id;
 
     struct Config {
         typename FieldType::Config field;
         typename ColourType::Config colour;
-        typename SemanticType::Config semantic;
+        typename IdType::Config id;
 
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the
          * YAML file aren't modified.
@@ -37,7 +37,7 @@ struct Data {
         {
             field.readYaml(yaml_file);
             colour.readYaml(yaml_file);
-            semantic.readYaml(yaml_file);
+            id.readYaml(yaml_file);
         }
 
         // The definition of this function MUST be inside the definition of Config for template
@@ -46,14 +46,14 @@ struct Data {
         {
             os << c.field;
             os << c.colour;
-            os << c.semantic;
+            os << c.id;
             return os;
         }
     };
 
     static constexpr Field fld_ = FldT;
     static constexpr Colour col_ = ColB;
-    static constexpr Semantics sem_ = SemB;
+    static constexpr Id id_ = IdB;
     static constexpr bool normals_along_gradient = FieldData<FldT>::normals_along_gradient;
     static constexpr field_t surface_boundary = FieldData<FldT>::surface_boundary;
 };
@@ -65,96 +65,96 @@ namespace data {
 /** Up-propagate the mean of the valid \p child_data into \p parent_data and return the number of
  * children with valid data.
  */
-template<Field FldT, Colour ColB, Semantics SemB>
-int up_prop_mean(Data<FldT, ColB, SemB>& parent_data,
-                 const std::array<Data<FldT, ColB, SemB>, 8>& child_data);
+template<Field FldT, Colour ColB, Id IdB>
+int up_prop_mean(Data<FldT, ColB, IdB>& parent_data,
+                 const std::array<Data<FldT, ColB, IdB>, 8>& child_data);
 
 /** Up-propagate the minimum of the valid \p child_data into \p parent_data and return the number of
  * children with valid data.
  */
-template<Field FldT, Colour ColB, Semantics SemB>
-int up_prop_min(Data<FldT, ColB, SemB>& parent_min_data,
-                const std::array<Data<FldT, ColB, SemB>, 8>& child_min_data);
+template<Field FldT, Colour ColB, Id IdB>
+int up_prop_min(Data<FldT, ColB, IdB>& parent_min_data,
+                const std::array<Data<FldT, ColB, IdB>, 8>& child_min_data);
 
 /** Up-propagate the maximum of the valid \p child_data into \p parent_data and return the number of
  * children with valid data.
  */
-template<Field FldT, Colour ColB, Semantics SemB>
-int up_prop_max(Data<FldT, ColB, SemB>& parent_max_data,
-                const std::array<Data<FldT, ColB, SemB>, 8>& child_max_data);
+template<Field FldT, Colour ColB, Id IdB>
+int up_prop_max(Data<FldT, ColB, IdB>& parent_max_data,
+                const std::array<Data<FldT, ColB, IdB>, 8>& child_max_data);
 
 } // namespace data
 
-template<Field FldT, Colour ColB, Semantics SemB>
-inline void set_invalid(Data<FldT, ColB, SemB>& data);
+template<Field FldT, Colour ColB, Id IdB>
+inline void set_invalid(Data<FldT, ColB, IdB>& data);
 
-template<Colour ColB, Semantics SemB>
-inline void set_invalid(Data<Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline void set_invalid(Data<Field::TSDF, ColB, IdB>& data)
 {
-    data = Data<Field::TSDF, ColB, SemB>();
+    data = Data<Field::TSDF, ColB, IdB>();
 }
 
-template<Colour ColB, Semantics SemB>
-inline void set_invalid(Data<Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline void set_invalid(Data<Field::Occupancy, ColB, IdB>& data)
 {
-    data = Data<Field::Occupancy, ColB, SemB>();
+    data = Data<Field::Occupancy, ColB, IdB>();
 }
 
 
 
-template<Field FldT, Colour ColB, Semantics SemB>
-inline bool is_valid(const Data<FldT, ColB, SemB>& data)
+template<Field FldT, Colour ColB, Id IdB>
+inline bool is_valid(const Data<FldT, ColB, IdB>& data)
 {
     return data.field.valid();
 }
 
 
 
-template<Field FldT, Colour ColB, Semantics SemB>
-inline field_t get_field(const Data<FldT, ColB, SemB>& data);
+template<Field FldT, Colour ColB, Id IdB>
+inline field_t get_field(const Data<FldT, ColB, IdB>& data);
 
-template<Colour ColB, Semantics SemB>
-inline field_t get_field(const Data<Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline field_t get_field(const Data<Field::TSDF, ColB, IdB>& data)
 {
     return data.field.tsdf;
 }
 
-template<Colour ColB, Semantics SemB>
-inline field_t get_field(const Data<Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline field_t get_field(const Data<Field::Occupancy, ColB, IdB>& data)
 {
     return data.field.occupancy * data.field.weight;
 }
 
 
 
-template<Field FldT, Colour ColB, Semantics SemB>
-inline bool is_inside(const Data<FldT, ColB, SemB>& data);
+template<Field FldT, Colour ColB, Id IdB>
+inline bool is_inside(const Data<FldT, ColB, IdB>& data);
 
-template<Colour ColB, Semantics SemB>
-inline bool is_inside(const Data<Field::TSDF, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline bool is_inside(const Data<Field::TSDF, ColB, IdB>& data)
 {
-    return get_field(data) < Data<Field::TSDF, ColB, SemB>::surface_boundary;
+    return get_field(data) < Data<Field::TSDF, ColB, IdB>::surface_boundary;
 }
 
-template<Colour ColB, Semantics SemB>
-inline bool is_inside(const Data<Field::Occupancy, ColB, SemB>& data)
+template<Colour ColB, Id IdB>
+inline bool is_inside(const Data<Field::Occupancy, ColB, IdB>& data)
 {
-    return get_field(data) > Data<Field::Occupancy, ColB, SemB>::surface_boundary;
+    return get_field(data) > Data<Field::Occupancy, ColB, IdB>::surface_boundary;
 }
 
 
 
 // Occupancy data setups
-typedef Data<Field::Occupancy, Colour::Off, Semantics::Off> OccupancyData;
-typedef Data<Field::Occupancy, Colour::On, Semantics::Off> OccupancyColData;
-typedef Data<Field::Occupancy, Colour::Off, Semantics::On> OccupancySemData;
-typedef Data<Field::Occupancy, Colour::On, Semantics::On> OccupancyColSemData;
+typedef Data<Field::Occupancy, Colour::Off, Id::Off> OccupancyData;
+typedef Data<Field::Occupancy, Colour::On, Id::Off> OccupancyColData;
+typedef Data<Field::Occupancy, Colour::Off, Id::On> OccupancyIdData;
+typedef Data<Field::Occupancy, Colour::On, Id::On> OccupancyColIdData;
 
 // TSDF data setups
-typedef Data<Field::TSDF, Colour::Off, Semantics::Off> TSDFData;
-typedef Data<Field::TSDF, Colour::On, Semantics::Off> TSDFColData;
-typedef Data<Field::TSDF, Colour::Off, Semantics::On> TSDFSemData;
-typedef Data<Field::TSDF, Colour::On, Semantics::On> TSDFColSemData;
+typedef Data<Field::TSDF, Colour::Off, Id::Off> TSDFData;
+typedef Data<Field::TSDF, Colour::On, Id::Off> TSDFColData;
+typedef Data<Field::TSDF, Colour::Off, Id::On> TSDFIdData;
+typedef Data<Field::TSDF, Colour::On, Id::On> TSDFColIdData;
 
 } // namespace se
 

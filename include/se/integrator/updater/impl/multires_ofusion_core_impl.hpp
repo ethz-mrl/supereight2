@@ -83,8 +83,8 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
     voxel_data.field.update(config.field.log_odd_min, config.field.max_weight);
     // Don't update colour in free space.
     // Reset the segment ID to keep the map consistent in case something went from occupied to free.
-    if constexpr (DataT::sem_ == Semantics::On) {
-        voxel_data.semantic = typename DataT::SemanticType();
+    if constexpr (DataT::id_ == Id::On) {
+        voxel_data.id = typename DataT::IdType();
     }
     return newly_observed;
 }
@@ -176,14 +176,14 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                 child_max_data[child_idx] = max_data_at_child_scale[child_data_idx];
                                 child_idx++;
                             } // i
-                        }     // j
-                    }         // k
+                        } // j
+                    } // k
 
                     data::up_prop_min(parent_min_data, child_min_data);
                     data::up_prop_max(parent_max_data, child_max_data);
                 } // x
-            }     // y
-        }         // z
+            } // y
+        } // z
     }
     else {
         DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
@@ -212,15 +212,15 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                 child_data[child_idx] = data_at_child_scale[child_data_idx];
                                 child_idx++;
                             } // i
-                        }     // j
-                    }         // k
+                        } // j
+                    } // k
 
                     data::up_prop_mean(parent_data, child_data);
                     data::up_prop_min(parent_min_data, child_data);
                     data::up_prop_max(parent_max_data, child_data);
                 } // x
-            }     // y
-        }         // z
+            } // y
+        } // z
     }
 
     for (parent_scale += 1; parent_scale <= BlockT::max_scale; ++parent_scale) {
@@ -263,15 +263,15 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
                                 child_max_data[child_idx] = max_data_at_child_scale[child_data_idx];
                                 child_idx++;
                             } // i
-                        }     // j
-                    }         // k
+                        } // j
+                    } // k
 
                     data::up_prop_mean(parent_data, child_data);
                     data::up_prop_min(parent_min_data, child_min_data);
                     data::up_prop_max(parent_max_data, child_max_data);
                 } // x
-            }     // y
-        }         // z
+            } // y
+        } // z
     }
 }
 

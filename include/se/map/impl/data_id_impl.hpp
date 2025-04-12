@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SE_DATA_SEMANTICS_IMPL_HPP
-#define SE_DATA_SEMANTICS_IMPL_HPP
+#ifndef SE_DATA_ID_IMPL_HPP
+#define SE_DATA_ID_IMPL_HPP
 
 namespace se {
 
-inline bool SemanticData<Semantics::On>::update(const segment_id_t segment_id_)
+inline bool IdData<Id::On>::update(const segment_id_t segment_id_)
 {
     if (segment_id_ != g_not_segmented) {
         segment_id = segment_id_;
@@ -20,4 +20,4 @@ inline bool SemanticData<Semantics::On>::update(const segment_id_t segment_id_)
 
 } // namespace se
 
-#endif // SE_DATA_SEMANTICS_IMPL_HPP
+#endif // SE_DATA_ID_IMPL_HPP

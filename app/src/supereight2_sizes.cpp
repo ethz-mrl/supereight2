@@ -28,14 +28,14 @@ int main()
                  "Data (B)\n";
     sizes(se::OccupancyMap<>);
     sizes(se::OccupancyColMap<>);
-    sizes(se::OccupancySemMap<>);
-    sizes(se::OccupancyColSemMap<>);
+    sizes(se::OccupancyIdMap<>);
+    sizes(se::OccupancyColIdMap<>);
     sizes(se::TSDFMap<>);
     sizes(se::TSDFColMap<>);
-    sizes(se::TSDFSemMap<>);
-    sizes(se::TSDFColSemMap<>);
+    sizes(se::TSDFIdMap<>);
+    sizes(se::TSDFColIdMap<>);
     sizes(se::TSDFMap<se::Res::Multi>);
     sizes(se::TSDFColMap<se::Res::Multi>);
-    sizes(se::TSDFSemMap<se::Res::Multi>);
-    sizes(se::TSDFColSemMap<se::Res::Multi>);
+    sizes(se::TSDFIdMap<se::Res::Multi>);
+    sizes(se::TSDFColIdMap<se::Res::Multi>);
 }

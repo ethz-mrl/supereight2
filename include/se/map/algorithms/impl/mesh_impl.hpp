@@ -9,13 +9,13 @@
 
 namespace se {
 
-template<Colour ColB, Semantics SemB>
-TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_mesh)
+template<Colour ColB, Id IdB>
+TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_mesh)
 {
     // Contains the indices of the quad vertices that should be used for the vertices of each of the
     // two resulting triangles.
     static constexpr std::array<std::array<int, 3>, 2> tri_to_quad = {{{0, 1, 2}, {0, 2, 3}}};
-    TriangleMesh<ColB, SemB> triangle_mesh;
+    TriangleMesh<ColB, IdB> triangle_mesh;
     triangle_mesh.reserve(2 * quad_mesh.size());
     for (const auto& quad : quad_mesh) {
         for (const auto& indices : tri_to_quad) {
@@ -30,8 +30,8 @@ TriangleMesh<ColB, SemB> quad_to_triangle_mesh(const QuadMesh<ColB, SemB>& quad_
                     triangle.colour.vertexes[i] = quad.colour.vertexes[indices[i]];
                     triangle.colour.face = quad.colour.face;
                 }
-                if constexpr (SemB == Semantics::On) {
-                    triangle.semantic.segment_id = quad.semantic.segment_id;
+                if constexpr (IdB == Id::On) {
+                    triangle.id.segment_id = quad.id.segment_id;
                 }
             }
         }
@@ -48,7 +48,7 @@ std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh)
 {
     std::map<segment_id_t, SegmentInfo> info;
     for (const auto& face : mesh) {
-        const auto id = face.semantic.segment_id;
+        const auto id = face.id.segment_id;
         if (id) {
             const auto [it, _] = info.try_emplace(id);
             for (size_t v = 0; v < FaceT::num_vertexes; v++) {
@@ -81,7 +81,7 @@ std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& me
 {
     std::map<segment_id_t, Mesh<FaceT>> meshes;
     for (const auto& face : mesh) {
-        const auto id = face.semantic.segment_id;
+        const auto id = face.id.segment_id;
         if (extract_segment(id)) {
             const auto [it, _] = meshes.try_emplace(id);
             it->second.push_back(face);
@@ -100,7 +100,7 @@ void colour_mesh_by_segment(Mesh<FaceT>& mesh,
 {
     const Eigen::Vector3f ambient_light_f(ambient_light.r, ambient_light.g, ambient_light.b);
     for (auto& face : mesh) {
-        face.colour.face = segment_id_colour(face.semantic.segment_id);
+        face.colour.face = segment_id_colour(face.id.segment_id);
         if (enable_shading) {
             const Eigen::Vector3f diffuse_colour(
                 face.colour.face.r, face.colour.face.g, face.colour.face.b);

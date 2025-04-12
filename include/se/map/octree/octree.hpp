@@ -41,8 +41,8 @@ class Octree {
     typedef typename DataT::Config DataConfigType;
     typedef Node<DataT, ResT> NodeType;
     typedef Block<DataT, ResT, BlockSize> BlockType;
-    typedef TriangleMesh<DataT::col_, DataT::sem_> SurfaceMesh;
-    typedef QuadMesh<Colour::Off, Semantics::Off> StructureMesh;
+    typedef TriangleMesh<DataT::col_, DataT::id_> SurfaceMesh;
+    typedef QuadMesh<Colour::Off, Id::Off> StructureMesh;
 
     /** Initialize an octree with an edge length of at least \p size voxels. The actual edge length
      * in voxels, as returned by se::Octree::getSize(), will be the smallest power of 2 that at
@@ -161,7 +161,7 @@ class Octree {
 
     static constexpr Field fld_ = DataT::fld_;
     static constexpr Colour col_ = DataT::col_;
-    static constexpr Semantics sem_ = DataT::sem_;
+    static constexpr Id id_ = DataT::id_;
     static constexpr Res res_ = ResT;
     /** The edge length of a block in voxels. */
     static constexpr int block_size = BlockSize;

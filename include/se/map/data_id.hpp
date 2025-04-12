@@ -5,17 +5,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SE_DATA_SEMANTICS_HPP
-#define SE_DATA_SEMANTICS_HPP
+#ifndef SE_DATA_ID_HPP
+#define SE_DATA_ID_HPP
 
 #include <se/map/utils/setup_util.hpp>
 #include <se/map/utils/type_util.hpp>
 
 namespace se {
 
-// Semantic data
-template<Semantics SemB>
-struct SemanticData {
+template<Id IdB>
+struct IdData {
     struct Config {
         void readYaml(const std::string& /* yaml_file */)
         {
@@ -23,9 +22,8 @@ struct SemanticData {
     };
 };
 
-// Semantic data
 template<>
-struct SemanticData<Semantics::On> {
+struct IdData<Id::On> {
     segment_id_t segment_id = g_not_segmented;
 
     /** Set the segment ID to \p segment_id if \p segment_id is non-zero and return whether the data
@@ -41,11 +39,11 @@ struct SemanticData<Semantics::On> {
     };
 };
 
-std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::Off>::Config& c);
-std::ostream& operator<<(std::ostream& os, const SemanticData<Semantics::On>::Config& c);
+std::ostream& operator<<(std::ostream& os, const IdData<Id::Off>::Config& c);
+std::ostream& operator<<(std::ostream& os, const IdData<Id::On>::Config& c);
 
 } // namespace se
 
-#include "impl/data_semantics_impl.hpp"
+#include "impl/data_id_impl.hpp"
 
-#endif // SE_DATA_SEMANTICS_HPP
+#endif // SE_DATA_ID_HPP

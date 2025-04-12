@@ -11,8 +11,8 @@
 
 namespace se {
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
               SensorT>::RayIntegrator(MapType& map,
                                       const SensorT& sensor,
                                       const Eigen::Vector3f& ray,
@@ -40,8 +40,8 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
     updated_octants_ = updated_octants;
 }
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::resetIntegrator(const Eigen::Vector3f& ray,
                                              const Eigen::Isometry3f& T_WS,
                                              const timestamp_t timestamp,
@@ -67,18 +67,16 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     T_SW_ = T_WS.inverse();
     computed_integration_scale_ = 0;
     tau_ = compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig());
-    three_sigma_ = compute_three_sigma(ray_dist_,
-                                       config_.sigma_min,
-                                       config_.sigma_max,
-                                       map_.getDataConfig());
+    three_sigma_ =
+        compute_three_sigma(ray_dist_, config_.sigma_min, config_.sigma_max, map_.getDataConfig());
     last_visited_voxel_ = Eigen::Vector3i::Constant(-1);
     timestamp_ = timestamp;
     return true;
 }
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::operator()()
 {
     /// (0) Get Root Pointer
@@ -132,8 +130,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     }
 }
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::propagateBlocksToCoarsestScale()
 {
 #pragma omp parallel for num_threads(3)
@@ -142,8 +140,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
     }
 }
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                            SensorT>::computeVariance(const float ray_step_depth)
 {
     // Assume worst case scenario -> no multiplication with proj_scale
@@ -166,10 +164,10 @@ se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::
 }
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 template<class SensorTDummy>
 typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, void>
-RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
               SensorT>::operator()(const Eigen::Vector3f& ray_sample,
                                    const Eigen::Vector3i& voxel_coord,
                                    se::RayState rayState,
@@ -236,8 +234,8 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockS
 }
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::updateBlock(se::OctantBase* octant_ptr,
                                          Eigen::Vector3i& voxel_coords,
                                          int desired_scale,
@@ -303,8 +301,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
 }
 
 
-template<se::Colour ColB, se::Semantics SemB, int BlockSize, typename SensorT>
-void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, BlockSize>,
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::propagateToRoot()
 {
     // Retrieving Parent Nodes for all updated blocks
@@ -350,8 +348,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, SemB>, se::Res::Multi, B
                 }
 
             } // if parent
-        }     // nodes at depth d
-    }         // depth d
+        } // nodes at depth d
+    } // depth d
 
     ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
 }
