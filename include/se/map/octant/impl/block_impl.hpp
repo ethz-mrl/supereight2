@@ -622,8 +622,9 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::dele
     block_min_data_.push_back(block_data_.back());
     block_max_data_.push_back(block_data_.back());
 
-    // XXX: This should probably set current_scale and curr_data_ as well.
+    current_scale = new_min_scale;
     min_scale = new_min_scale;
+    curr_data_ = block_data_[max_scale - new_min_scale];
 }
 
 
@@ -750,6 +751,9 @@ bool BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::swit
                 new DataType[num_voxels_at_scale]; ///<< Data must still be initialised.
             block_max_data_[max_scale - (buffer_scale_ + 1)] =
                 new DataType[num_voxels_at_scale]; ///<< Data must still be initialised.
+            current_scale = buffer_scale_;
+            min_scale = buffer_scale_;
+            curr_data_ = buffer_data_;
         }
         else { ///<< Switch to coarser scale.
             deleteUpTo(buffer_scale_);
@@ -769,10 +773,6 @@ bool BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::swit
             }
         }
 
-        current_scale = buffer_scale_;
-        min_scale = buffer_scale_;
-
-        curr_data_ = buffer_data_;
         curr_integr_count_ = buffer_integr_count_;
         curr_observed_count_ = buffer_observed_count_;
         buffer_data_ = nullptr;

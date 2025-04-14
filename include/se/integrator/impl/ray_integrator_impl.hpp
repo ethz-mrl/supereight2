@@ -278,7 +278,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         se::ray_integrator::propagate_block_to_scale<BlockType>(block_ptr, desired_scale);
         integration_scale = desired_scale;
         block_ptr->deleteUpTo(integration_scale);
-        block_ptr->current_scale = integration_scale;
     }
 
     /// Determine voxels to be updated
