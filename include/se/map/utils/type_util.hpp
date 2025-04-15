@@ -66,6 +66,29 @@ inline constexpr segment_id_t g_not_segmented = 0;
  * well-defined for unsigned integers. */
 inline constexpr segment_id_t g_not_mapped = -1;
 
+
+/** Function that generates a unique color based on the id received
+ * \param[in] id The segment id
+ * \param[out] The RGB color
+ */
+static inline RGB segment_id_colour(const segment_id_t id)
+{
+    switch (id) {
+    case g_not_mapped:
+        return {0x00, 0x00, 0x00};
+    case g_not_segmented:
+        return {0xFF, 0xFF, 0xFF};
+    default: {
+        // Inspired from the following and naively modified for 16-bit integers.
+        // https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key/12996028#12996028
+        const uint8_t r = ((id >> 8) ^ id) * 0x45d9f3b;
+        const uint8_t g = ((id >> 8) ^ r) * 0x45d9f3b;
+        const uint8_t b = ((id >> 8) ^ g) * 0x45d9f3b;
+        return {r, g, b};
+    }
+    }
+}
+
 } // namespace se
 
 #endif // SE_TYPE_UTIL_HPP
