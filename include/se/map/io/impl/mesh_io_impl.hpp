@@ -140,7 +140,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         file << "property uchar blue\n";
     }
     if constexpr (FaceT::id_ == Id::On) {
-        file << "property int segment_id\n";
+        file << "property int id\n";
     }
     file << "element face " << num_faces << "\n";
     file << "property list uchar int vertex_index\n";
@@ -159,8 +159,8 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
                 file << " " << int(colour.r) << " " << int(colour.g) << " " << int(colour.b);
             }
             if constexpr (FaceT::id_ == Id::On) {
-                const auto segment_id = face.id.segment_id;
-                file << " " << int(segment_id);
+                const auto id = face.id.id;
+                file << " " << int(id);
             }
             file << "\n";
         }

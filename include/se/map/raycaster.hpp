@@ -61,7 +61,7 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
                     se::Image<colour_t>* surface_colour = nullptr,
-                    se::Image<segment_id_t>* surface_segment_id = nullptr);
+                    se::Image<id_t>* surface_id = nullptr);
 
 /** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render.
  * The colour of each point is returned by the functor \p get_diffuse_colour which must have the
@@ -113,10 +113,10 @@ void render_volume_colour(se::Image<RGBA>& render,
  * this function extracts the ids for each pixel in the depth image.
  */
 template<typename MapT, typename SensorT>
-Image<segment_id_t> lookup_segment_ids(const MapT& map,
-                                       const Image<float>& depth,
-                                       const SensorT& sensor,
-                                       const Eigen::Isometry3f& T_WC);
+Image<id_t> lookup_ids(const MapT& map,
+                       const Image<float>& depth,
+                       const SensorT& sensor,
+                       const Eigen::Isometry3f& T_WC);
 
 } // namespace raycaster
 } // namespace se

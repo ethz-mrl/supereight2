@@ -82,7 +82,7 @@ bool free_voxel(DataT& voxel_data, const ConfigT config)
     const bool newly_observed = !voxel_data.field.observed;
     voxel_data.field.update(config.field.log_odd_min, config.field.max_weight);
     // Don't update colour in free space.
-    // Reset the segment ID to keep the map consistent in case something went from occupied to free.
+    // Reset the ID to keep the map consistent in case something went from occupied to free.
     if constexpr (DataT::id_ == Id::On) {
         voxel_data.id = typename DataT::IdType();
     }

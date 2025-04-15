@@ -31,7 +31,7 @@ TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_me
                     triangle.colour.face = quad.colour.face;
                 }
                 if constexpr (IdB == Id::On) {
-                    triangle.id.segment_id = quad.id.segment_id;
+                    triangle.id.id = quad.id.id;
                 }
             }
         }
@@ -41,14 +41,14 @@ TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_me
 
 
 
-namespace segment {
+namespace id {
 
 template<typename FaceT, typename>
-std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh)
+std::map<id_t, IdInfo> mesh_id_info(const Mesh<FaceT>& mesh)
 {
-    std::map<segment_id_t, SegmentInfo> info;
+    std::map<id_t, IdInfo> info;
     for (const auto& face : mesh) {
-        const auto id = face.id.segment_id;
+        const auto id = face.id.id;
         if (id) {
             const auto [it, _] = info.try_emplace(id);
             for (size_t v = 0; v < FaceT::num_vertexes; v++) {
@@ -68,21 +68,20 @@ std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh)
 
 
 template<typename FaceT, typename>
-std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh)
+std::map<id_t, Mesh<FaceT>> extract_id_meshes(const Mesh<FaceT>& mesh)
 {
-    return extract_segment_meshes(mesh, [](const segment_id_t id) { return id > 0; });
+    return extract_id_meshes(mesh, [](const id_t id) { return id > 0; });
 }
 
 
 
-template<typename FaceT, typename ExtractSegmentF, typename>
-std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh,
-                                                           ExtractSegmentF extract_segment)
+template<typename FaceT, typename ExtractIdF, typename>
+std::map<id_t, Mesh<FaceT>> extract_id_meshes(const Mesh<FaceT>& mesh, ExtractIdF extract_id)
 {
-    std::map<segment_id_t, Mesh<FaceT>> meshes;
+    std::map<id_t, Mesh<FaceT>> meshes;
     for (const auto& face : mesh) {
-        const auto id = face.id.segment_id;
-        if (extract_segment(id)) {
+        const auto id = face.id.id;
+        if (extract_id(id)) {
             const auto [it, _] = meshes.try_emplace(id);
             it->second.push_back(face);
         }
@@ -93,14 +92,14 @@ std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& me
 
 
 template<typename FaceT, typename>
-void colour_mesh_by_segment(Mesh<FaceT>& mesh,
-                            const bool enable_shading,
-                            const Eigen::Vector3f& light_dir_W,
-                            const RGB ambient_light)
+void colour_mesh_by_id(Mesh<FaceT>& mesh,
+                       const bool enable_shading,
+                       const Eigen::Vector3f& light_dir_W,
+                       const RGB ambient_light)
 {
     const Eigen::Vector3f ambient_light_f(ambient_light.r, ambient_light.g, ambient_light.b);
     for (auto& face : mesh) {
-        face.colour.face = segment_id_colour(face.id.segment_id);
+        face.colour.face = id_colour(face.id.id);
         if (enable_shading) {
             const Eigen::Vector3f diffuse_colour(
                 face.colour.face.r, face.colour.face.g, face.colour.face.b);
@@ -116,7 +115,7 @@ void colour_mesh_by_segment(Mesh<FaceT>& mesh,
     }
 }
 
-} // namespace segment
+} // namespace id
 
 
 

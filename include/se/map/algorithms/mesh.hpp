@@ -39,7 +39,7 @@ struct MeshFaceIdData {};
 
 template<size_t NumVertexes>
 struct MeshFaceIdData<NumVertexes, Id::On> {
-    segment_id_t segment_id = segment_id_t(0);
+    id_t id = id_t(0);
 };
 
 
@@ -89,45 +89,42 @@ TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_me
 
 
 
-namespace segment {
+namespace id {
 
-struct SegmentInfo {
+struct IdInfo {
     Eigen::Vector3f centroid = Eigen::Vector3f::Zero();
     Eigen::AlignedBox3f aabb;
     size_t num_vertices = 0;
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-/** Return information about all segments in \p mesh. The spatial information is in the same
+/** Return information about all identifiers in \p mesh. The spatial information is in the same
  * coordinate frame as \p mesh.
  */
 template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
-std::map<segment_id_t, SegmentInfo> mesh_segment_info(const Mesh<FaceT>& mesh);
+std::map<id_t, IdInfo> mesh_id_info(const Mesh<FaceT>& mesh);
 
-/** Extract per-segment meshes for all segments in \p mesh. */
+/** Extract per-identifier meshes for all identifiers in \p mesh. */
 template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
-std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh);
+std::map<id_t, Mesh<FaceT>> extract_id_meshes(const Mesh<FaceT>& mesh);
 
-/** Extract per-segment meshes for all segments in \p mesh for whose IDs \p extract_segment returns
- * true. \p extract_segment must be a functor with the following signature:
+/** Extract per-identifier meshes for all identifiers in \p mesh for whose IDs \p extract_id
+ * returns true. \p extract_id must be a functor with the following signature:
  * \code{.cpp}
- * bool extract_segment(const segment_id_t);
+ * bool extract_id(const id_t);
  * \endcode
  */
-template<typename FaceT,
-         typename ExtractSegmentF,
-         typename = std::enable_if_t<FaceT::id_ == Id::On>>
-std::map<segment_id_t, Mesh<FaceT>> extract_segment_meshes(const Mesh<FaceT>& mesh,
-                                                           ExtractSegmentF extract_segment);
+template<typename FaceT, typename ExtractIdF, typename = std::enable_if_t<FaceT::id_ == Id::On>>
+std::map<id_t, Mesh<FaceT>> extract_id_meshes(const Mesh<FaceT>& mesh, ExtractIdF extract_id);
 
-/** Colour the faces of \p mesh by their segment ID. */
+/** Colour the faces of \p mesh by their ID. */
 template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
-void colour_mesh_by_segment(Mesh<FaceT>& mesh,
-                            const bool enable_shading = true,
-                            const Eigen::Vector3f& light_dir_W = Eigen::Vector3f(-1, 0, -1),
-                            const RGB ambient = RGB{0x40, 0x40, 0x40});
+void colour_mesh_by_id(Mesh<FaceT>& mesh,
+                       const bool enable_shading = true,
+                       const Eigen::Vector3f& light_dir_W = Eigen::Vector3f(-1, 0, -1),
+                       const RGB ambient = RGB{0x40, 0x40, 0x40});
 
-} // namespace segment
+} // namespace id
 
 
 

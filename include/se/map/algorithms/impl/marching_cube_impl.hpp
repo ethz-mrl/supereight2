@@ -871,9 +871,8 @@ marching_cube_kernel(const OctreeT& octree,
                             }
                         }
                         if constexpr (Face::id_ == Id::On) {
-                            face.id.segment_id =
-                                visitor::getData(octree, block_ptr, Eigen::Vector3i(x, y, z))
-                                    .id.segment_id;
+                            face.id.id =
+                                visitor::getData(octree, block_ptr, Eigen::Vector3i(x, y, z)).id.id;
                         }
 #pragma omp critical(marching_cubes)
                         {
@@ -963,10 +962,10 @@ dual_marching_cube_kernel(const OctreeT& octree,
                         }
                         if constexpr (Face::id_ == Id::On) {
                             int _;
-                            face.id.segment_id =
+                            face.id.id =
                                 visitor::getData(
                                     octree, block_ptr, Eigen::Vector3i(x, y, z), voxel_scale, _)
-                                    .id.segment_id;
+                                    .id.id;
                         }
 #pragma omp critical(dual_marching_cubes)
                         {

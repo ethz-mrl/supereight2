@@ -57,26 +57,24 @@ typedef int timestamp_t; ///< The type of the time stamp
 typedef RGB colour_t; ///< The type of the colour
 
 /** The type used to represent identifiers. */
-typedef uint16_t segment_id_t;
-/** Indicates the absence of an identifier.
- * XXX: rename to g_no_id
- */
-inline constexpr segment_id_t g_not_segmented = 0;
+typedef uint16_t id_t;
+/** Indicates the absence of an identifier. */
+inline constexpr id_t g_no_id = 0;
 /** Used to distinguish a region that's unmapped from a region without an identifier. Underflow is
  * well-defined for unsigned integers. */
-inline constexpr segment_id_t g_not_mapped = -1;
+inline constexpr id_t g_not_mapped = -1;
 
 
 /** Function that generates a unique color based on the id received
  * \param[in] id The segment id
  * \param[out] The RGB color
  */
-static inline RGB segment_id_colour(const segment_id_t id)
+static inline RGB id_colour(const id_t id)
 {
     switch (id) {
     case g_not_mapped:
         return {0x00, 0x00, 0x00};
-    case g_not_segmented:
+    case g_no_id:
         return {0xFF, 0xFF, 0xFF};
     default: {
         // Inspired from the following and naively modified for 16-bit integers.

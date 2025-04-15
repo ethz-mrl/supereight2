@@ -101,10 +101,10 @@ class Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sen
     const Image<colour_t>* const colour_img_;
     Eigen::Isometry3f T_CcC_;
     const bool has_colour_;
-    const SensorT* const feature_sensor_;
-    const Image<segment_id_t>* const feature_img_;
-    Eigen::Isometry3f T_CsC_;
-    const bool has_features_;
+    const SensorT* const id_sensor_;
+    const Image<id_t>* const id_img_;
+    Eigen::Isometry3f T_CidC_;
+    const bool has_id_;
     const timestamp_t timestamp_;
     const float map_res_;
     const UpdaterConfig config_;

@@ -542,7 +542,7 @@ void raycast_volume(const MapT& map,
                     se::Image<Eigen::Vector3f>& surface_normals_W,
                     se::Image<int8_t>& surface_scale,
                     se::Image<colour_t>* surface_colour,
-                    se::Image<segment_id_t>* surface_segment_id)
+                    se::Image<id_t>* surface_id)
 {
     assert(surface_point_cloud_W.width() == surface_normals_W.width());
     assert(surface_point_cloud_W.height() == surface_normals_W.height());
@@ -555,9 +555,9 @@ void raycast_volume(const MapT& map,
         }
     }
     if constexpr (MapT::id_ == Id::On) {
-        if (surface_segment_id) {
-            assert(surface_point_cloud_W.width() == surface_segment_id->width());
-            assert(surface_point_cloud_W.height() == surface_segment_id->height());
+        if (surface_id) {
+            assert(surface_point_cloud_W.width() == surface_id->width());
+            assert(surface_point_cloud_W.height() == surface_id->height());
         }
     }
     const typename MapT::OctreeType& octree = map.getOctree();
@@ -603,9 +603,8 @@ void raycast_volume(const MapT& map,
                     }
                 }
                 if constexpr (MapT::id_ == Id::On) {
-                    if (surface_segment_id) {
-                        (*surface_segment_id)[idx] =
-                            map.getData(surface_intersection_W->head<3>()).id.segment_id;
+                    if (surface_id) {
+                        (*surface_id)[idx] = map.getData(surface_intersection_W->head<3>()).id.id;
                     }
                 }
             }
@@ -618,8 +617,8 @@ void raycast_volume(const MapT& map,
                     }
                 }
                 if constexpr (MapT::id_ == Id::On) {
-                    if (surface_segment_id) {
-                        (*surface_segment_id)[idx] = g_not_mapped;
+                    if (surface_id) {
+                        (*surface_id)[idx] = g_not_mapped;
                     }
                 }
             }
@@ -667,26 +666,26 @@ void render_volume(se::Image<RGBA>& render,
 
 
 template<typename MapT, typename SensorT>
-Image<segment_id_t> lookup_segment_ids(const MapT& map,
-                                       const Image<float>& depth,
-                                       const SensorT& sensor,
-                                       const Eigen::Isometry3f& T_WC)
+Image<id_t> lookup_ids(const MapT& map,
+                       const Image<float>& depth,
+                       const SensorT& sensor,
+                       const Eigen::Isometry3f& T_WC)
 {
     Image<Eigen::Vector3f> point_cloud_C(depth.width(), depth.height());
     preprocessor::depth_to_point_cloud(point_cloud_C, depth, sensor);
-    Image<segment_id_t> segment_id(depth.width(), depth.height());
+    Image<id_t> ids(depth.width(), depth.height());
     for (size_t i = 0; i < point_cloud_C.size(); i++) {
         const bool valid_depth = depth[i] >= sensor.near_plane && depth[i] <= sensor.far_plane;
         const Eigen::Vector3f point_W = T_WC * point_cloud_C[i];
         if (valid_depth && map.contains(point_W)) {
             const auto& data = map.getData(point_W);
-            segment_id[i] = is_valid(data) ? data.id.segment_id : g_not_mapped;
+            ids[i] = is_valid(data) ? data.id.id : g_not_mapped;
         }
         else {
-            segment_id[i] = g_not_mapped;
+            ids[i] = g_not_mapped;
         }
     }
-    return segment_id;
+    return ids;
 }
 
 } // namespace raycaster

@@ -27,11 +27,11 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
         }
     }
 
-    const bool has_segments = IdB == Id::On && measurements.segments;
-    Eigen::Isometry3f T_CsC;
+    const bool has_id = IdB == Id::On && measurements.ids;
+    Eigen::Isometry3f T_CidC;
     if constexpr (IdB == Id::On) {
-        if (has_segments) {
-            T_CsC = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
+        if (has_id) {
+            T_CidC = measurements.ids->T_WC.inverse() * measurements.depth.T_WC;
         }
     }
 
@@ -80,7 +80,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                     data_union.past_data.colour.weight = 0;
                 }
                 if constexpr (IdB == Id::On) {
-                    data_union.past_data.id.segment_id = data_union.data.id.segment_id;
+                    data_union.past_data.id.id = data_union.data.id.id;
                 }
             };
 
@@ -131,10 +131,8 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                             }
                         }
                         if constexpr (IdB == Id::On) {
-                            child_data_union.data.id.segment_id =
-                                parent_data_union.data.id.segment_id;
-                            child_data_union.past_data.id.segment_id =
-                                child_data_union.data.id.segment_id;
+                            child_data_union.data.id.id = parent_data_union.data.id.id;
+                            child_data_union.past_data.id.id = child_data_union.data.id.id;
                         }
                     }
                 }
@@ -188,7 +186,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                     // other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
                     if constexpr (ColB == Colour::On || IdB == Id::On) {
-                        if ((has_colour || has_segments) && field_updated) {
+                        if ((has_colour || has_id) && field_updated) {
                             measurements.depth.sensor.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
                         }
@@ -212,20 +210,18 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                         }
                     }
 
-                    // Update the segment data if possible and only if the field was updated, that
+                    // Update the identifier data if possible and only if the field was updated, that
                     // is if we have corresponding depth information.
                     if constexpr (IdB == Id::On) {
-                        if (has_segments && field_updated) {
-                            // Project the depth hit onto the segment image.
-                            const Eigen::Vector3f hit_Cs = T_CsC * hit_C;
-                            Eigen::Vector2f segment_pixel_f;
-                            if (measurements.segments->sensor.model.project(hit_Cs,
-                                                                            &segment_pixel_f)
+                        if (has_id && field_updated) {
+                            // Project the depth hit onto the identifier image.
+                            const Eigen::Vector3f hit_Cid = T_CidC * hit_C;
+                            Eigen::Vector2f id_pixel_f;
+                            if (measurements.ids->sensor.model.project(hit_Cid, &id_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
-                                const Eigen::Vector2i segment_pixel =
-                                    se::round_pixel(segment_pixel_f);
-                                data_union.data.id.update(measurements.segments->image(
-                                    segment_pixel.x(), segment_pixel.y()));
+                                const Eigen::Vector2i id_pixel = se::round_pixel(id_pixel_f);
+                                data_union.data.id.update(
+                                    measurements.ids->image(id_pixel.x(), id_pixel.y()));
                             }
                         }
                     }

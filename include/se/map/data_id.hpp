@@ -24,12 +24,10 @@ struct IdData {
 
 template<>
 struct IdData<Id::On> {
-    segment_id_t segment_id = g_not_segmented;
+    id_t id = g_no_id;
 
-    /** Set the segment ID to \p segment_id if \p segment_id is non-zero and return whether the data
-     * was updated.
-     */
-    bool update(const segment_id_t segment_id);
+    /** Set the ID to \p id if \p id is non-zero and return whether the data was updated. */
+    bool update(const id_t id);
 
     struct Config {
         /** Reads the struct members from the "data" node of a YAML file. Members not present in the

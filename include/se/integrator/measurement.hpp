@@ -39,7 +39,7 @@ template<typename SensorT>
 struct Measurements {
     Measurement<SensorT, float> depth;
     std::optional<Measurement<SensorT, colour_t>> colour = std::nullopt;
-    std::optional<Measurement<SensorT, segment_id_t>> segments = std::nullopt;
+    std::optional<Measurement<SensorT, id_t>> ids = std::nullopt;
     se::Image<float>* depth_sigma = nullptr;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -58,12 +58,12 @@ Measurements(const Measurement<SensorT, float>&, const Measurement<SensorT, colo
 template<typename SensorT>
 Measurements(const Measurement<SensorT, float>&,
              const Measurement<SensorT, colour_t>&,
-             const Measurement<SensorT, segment_id_t>&) -> Measurements<SensorT>;
+             const Measurement<SensorT, id_t>&) -> Measurements<SensorT>;
 
 template<typename SensorT>
 Measurements(const Measurement<SensorT, float>&,
              const Measurement<SensorT, colour_t>&,
-             const Measurement<SensorT, segment_id_t>&,
+             const Measurement<SensorT, id_t>&,
              const Image<float>*) -> Measurements<SensorT>;
 
 } // namespace se

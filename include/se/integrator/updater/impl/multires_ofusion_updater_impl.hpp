@@ -29,9 +29,9 @@ Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>:
         colour_sensor_(measurements.colour ? &measurements.colour->sensor : nullptr),
         colour_img_(measurements.colour ? &measurements.colour->image : nullptr),
         has_colour_(measurements.colour),
-        feature_sensor_(measurements.segments ? &measurements.segments->sensor : nullptr),
-        feature_img_(measurements.segments ? &measurements.segments->image : nullptr),
-        has_features_(measurements.segments),
+        id_sensor_(measurements.ids ? &measurements.ids->sensor : nullptr),
+        id_img_(measurements.ids ? &measurements.ids->image : nullptr),
+        has_id_(measurements.ids),
         timestamp_(timestamp),
         map_res_(map.getRes()),
         config_(map),
@@ -45,8 +45,8 @@ Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>:
     }
 
     if constexpr (IdB == Id::On) {
-        if (has_features_) {
-            T_CsC_ = measurements.segments->T_WC.inverse() * measurements.depth.T_WC;
+        if (has_id_) {
+            T_CidC_ = measurements.ids->T_WC.inverse() * measurements.depth.T_WC;
         }
     }
 }
@@ -490,7 +490,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                     // data other than depth needs to be integrated.
                     Eigen::Vector3f hit_C;
                     if constexpr (ColB == Colour::On || IdB == Id::On) {
-                        if ((has_colour_ || has_features_) && field_updated) {
+                        if ((has_colour_ || has_id_) && field_updated) {
                             sensor_.model.backProject(depth_pixel_f, &hit_C);
                             hit_C.array() *= depth_value;
                         }
@@ -514,22 +514,20 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                         }
                     }
 
-                    // Update the segment data if possible and only if the field was updated,
+                    // Update the identifier data if possible and only if the field was updated,
                     // that is if we have corresponding depth information.
                     if constexpr (IdB == Id::On) {
-                        if (has_features_ && field_updated) {
+                        if (has_id_ && field_updated) {
                             const bool near_surface = data.field.occupancy
                                 > 0.95 * map_.getDataConfig().field.log_odd_min;
                             if (near_surface) {
                                 // Project the depth hit onto the segment image.
-                                const Eigen::Vector3f hit_Cs = T_CsC_ * hit_C;
-                                Eigen::Vector2f segment_pixel_f;
-                                if (feature_sensor_->model.project(hit_Cs, &segment_pixel_f)
+                                const Eigen::Vector3f hit_Cid = T_CidC_ * hit_C;
+                                Eigen::Vector2f id_pixel_f;
+                                if (id_sensor_->model.project(hit_Cid, &id_pixel_f)
                                     == srl::projection::ProjectionStatus::Successful) {
-                                    const Eigen::Vector2i segment_pixel =
-                                        se::round_pixel(segment_pixel_f);
-                                    data.id.update(
-                                        (*feature_img_)(segment_pixel.x(), segment_pixel.y()));
+                                    const Eigen::Vector2i id_pixel = se::round_pixel(id_pixel_f);
+                                    data.id.update((*id_img_)(id_pixel.x(), id_pixel.y()));
                                 }
                             }
                         }
@@ -574,7 +572,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
         node_ptr->min_data = node_data;
         node_ptr->max_data = node_ptr->min_data;
         // Don't update colour in free space.
-        // Reset the segment ID to keep the map consistent in case something went from occupied to free.
+        // Reset the ID to keep the map consistent in case something went from occupied to free.
         if constexpr (IdB == Id::On) {
             node_data.id = typename NodeType::DataType::IdType();
         }

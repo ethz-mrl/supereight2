@@ -9,10 +9,10 @@
 
 namespace se {
 
-inline bool IdData<Id::On>::update(const segment_id_t segment_id_)
+inline bool IdData<Id::On>::update(const id_t id_)
 {
-    if (segment_id_ != g_not_segmented) {
-        segment_id = segment_id_;
+    if (id_ != g_no_id) {
+        id = id_;
         return true;
     }
     return false;
