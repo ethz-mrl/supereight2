@@ -226,6 +226,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const int parent_scale = last_scale;
                 const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
+                const auto* const parent_data_at_parent_scale =
+                    block_ptr->blockDataAtScale(parent_scale);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
@@ -235,8 +237,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                         for (unsigned int x = 0; x < size_at_parent_scale_li; x++) {
                             const int parent_idx =
                                 x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
-                            const auto& parent_data =
-                                block_ptr->currData(parent_idx); // TODO: CAN BE MADE FASTER
+                            const auto& parent_data = parent_data_at_parent_scale[parent_idx];
 
                             for (unsigned int k = 0; k < 2; k++) {
                                 for (unsigned int j = 0; j < 2; j++) {
@@ -290,15 +291,15 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
 
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
     const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
+    auto* const data_at_integration_scale = block_ptr->blockDataAtScale(integration_scale);
 
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
             for (unsigned int x = 0; x < size_at_integration_scale_li; x++) {
                 const int voxel_idx =
                     x + y * size_at_integration_scale_li + z * size_at_integration_scale_sq;
-                auto& voxel_data = block_ptr->currData(voxel_idx);
-                block_ptr->incrCurrObservedCount(
-                    updater::free_voxel(voxel_data, map_.getDataConfig()));
+                block_ptr->incrCurrObservedCount(updater::free_voxel(
+                    data_at_integration_scale[voxel_idx], map_.getDataConfig()));
                 // We don't update colour or identifiers in free space.
             } // x
         }     // y
@@ -369,6 +370,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const int parent_scale = last_scale;
                 const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
+                const auto* const parent_data_at_parent_scale =
+                    block_ptr->blockDataAtScale(parent_scale);
 
                 const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
@@ -378,8 +381,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                         for (unsigned int x = 0; x < size_at_parent_scale_li; x++) {
                             const int parent_idx =
                                 x + y * size_at_parent_scale_li + z * size_at_parent_scale_sq;
-                            const auto& parent_data =
-                                block_ptr->currData(parent_idx); // TODO: CAN BE MADE FASTER
+                            const auto& parent_data = parent_data_at_parent_scale[parent_idx];
 
                             for (unsigned int k = 0; k < 2; k++) {
                                 for (unsigned int j = 0; j < 2; j++) {
@@ -433,6 +435,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
     const int stride = octantops::scale_to_size(scale);
     const int size_at_scale = BlockType::size >> scale;
     const int size_at_scale_sq = math::sq(size_at_scale);
+    auto* const data_at_scale = block.blockDataAtScale(scale);
     Eigen::Vector3f sample_point_base_W;
     map_.voxelToPoint(block.coord, stride, sample_point_base_W);
     const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;
@@ -466,7 +469,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                 const float three_sigma = 3.0f * (*sigma_img_)(depth_pixel.x(), depth_pixel.y());
 
                 const int idx = x + y * size_at_scale + z * size_at_scale_sq;
-                auto& data = UpdateBuffer ? block.bufferData(idx) : block.currData(idx);
+                auto& data = UpdateBuffer ? block.bufferData(idx) : data_at_scale[idx];
                 bool newly_observed;
                 if (low_variance) {
                     newly_observed = updater::free_voxel(data, map_.getDataConfig());

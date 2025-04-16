@@ -439,40 +439,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     }
 
     /**
-     * \brief Get a `const` reference to the mean voxel data at the current scale via the voxel index.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_idx The voxel index of the data to be accessed.
-     *
-     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
-     */
-    const DataType& currData(const int voxel_idx) const
-    {
-        assert(curr_data_);
-        assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> current_scale));
-        return curr_data_[voxel_idx];
-    }
-
-    /**
-     * \brief Get a reference to the mean voxel data at the current scale via the voxel index.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_idx The voxel index of the data to be accessed.
-     *
-     * \return Reference to the mean voxel data at the current scale for the provided voxel index.
-     */
-    DataType& currData(const int voxel_idx)
-    {
-        assert(curr_data_);
-        assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> current_scale));
-        return curr_data_[voxel_idx];
-    }
-
-    /**
      * \brief Get a pointer to the mean block data array at a given scale.
      *
      * \param[in] scale The scale to return the mean block data array from.
@@ -508,7 +474,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     std::vector<DataType*> block_min_data_;
     std::vector<DataType*> block_max_data_;
 
-    DataType* curr_data_ = nullptr; ///<< Pointer to the data at the current integration scale.
     size_t curr_integr_count_;      ///<< Number of integrations at that current scale.
     size_t curr_observed_count_;    ///<< Number of observed voxels at the current scale
 
