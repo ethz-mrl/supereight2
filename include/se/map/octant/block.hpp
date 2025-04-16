@@ -286,11 +286,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
         return block_max_data_[0][0];
     }
 
-    const std::vector<DataType*>& blockData() const
-    {
-        return block_data_;
-    }
-
     /**
      * \brief Get the number of integrations at the current scale.
      */
