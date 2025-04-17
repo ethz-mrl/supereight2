@@ -46,9 +46,10 @@ template<typename DataT, int BlockSize, typename DerivedT>
 const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
 BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_coord) const
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
-        + voxel_offset.z() * underlying()->size_sq;
+    // Compute a column-major index from block-relative voxel coordinates:
+    // int voxel_idx = x + (y * BlockSize) + (z * BlockSize * BlockSize);
+    static const Eigen::Vector3i column_major_coeffs(1, BlockSize, math::sq(BlockSize));
+    const int voxel_idx = (voxel_coord - underlying()->coord).dot(column_major_coeffs);
     return data(voxel_idx);
 }
 
@@ -58,9 +59,10 @@ template<typename DataT, int BlockSize, typename DerivedT>
 typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
 BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_coord)
 {
-    const Eigen::Vector3i voxel_offset = voxel_coord - underlying()->coord;
-    const int voxel_idx = voxel_offset.x() + voxel_offset.y() * underlying()->size
-        + voxel_offset.z() * underlying()->size_sq;
+    // Compute a column-major index from block-relative voxel coordinates:
+    // int voxel_idx = x + (y * BlockSize) + (z * BlockSize * BlockSize);
+    static const Eigen::Vector3i column_major_coeffs(1, BlockSize, math::sq(BlockSize));
+    const int voxel_idx = (voxel_coord - underlying()->coord).dot(column_major_coeffs);
     return data(voxel_idx);
 }
 
