@@ -5,6 +5,26 @@
 
 
 
+## Programming conventions
+
+### TODO/XXX comments
+
+TODO and XXX comments should follow the convention described
+[here](https://drewdevault.com/2023/03/09/2023-03-09-Comment-or-no-comment.html).
+In short:
+
+* TODO is used when the implementation is wrong or incomplete. There might be a
+  known bug, some edge case that isn't handled, etc.
+* XXX is used when the implementation is correct but it might not be as
+  efficient or readable as it could be. It might be using an inefficient
+  algorithm, a deprecated API, the code could be simplified with some
+  restructuring, etc.
+
+Keep in mind that the above usage might not be consistent in all of supereight2
+yet and there might be TODO comments that should have been XXX comments.
+
+
+
 ## Using Eigen
 
 **The
