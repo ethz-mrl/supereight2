@@ -253,8 +253,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     /**
      * \brief Get the block's data at the coarsest scale.
      *
-     * \warning The function does not return a reference to the data.
-     *
      * \return The block's data at the coarsest scale
      */
     const DataType& data() const
@@ -278,8 +276,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
 
     /**
      * \brief Get the block's max data at the coarsest scale.
-     *
-     * \warning The function does not return a reference to the data.
      *
      * \return The block's max data at the coarsest scale
      */
@@ -309,7 +305,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     size_t currObservedCount() const
     {
         return curr_observed_count_;
-    } ///<
+    }
 
     /**
      * \brief Increment the number of integrations at the current scale by 1.
