@@ -65,60 +65,58 @@ const Block<DataT, ResT, BlockSize>* BlockData<DataT, ResT, BlockSize>::derived(
 
 
 
-/// Multi-res Block ///
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_coord));
+        const_cast<const BlockData<DataType, Res::Multi, BlockSize>*>(this)->data(voxel_coord));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+const typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord) const
 {
     return data(voxel_coord, current_scale);
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_coord,
-                                                                                    scale));
+        const_cast<const BlockData<DataType, Res::Multi, BlockSize>*>(this)->data(voxel_coord,
+                                                                                  scale));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+const typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
     return data(voxelIdx(voxel_coord, scale));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale_desired,
     int& scale_returned)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(
+        const_cast<const BlockData<DataType, Res::Multi, BlockSize>*>(this)->data(
             voxel_coord, scale_desired, scale_returned));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+template<Colour ColB, Id IdB, int BlockSize>
+const typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale_desired,
     int& scale_returned) const
@@ -127,26 +125,26 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     return data(voxelIdx(voxel_coord, scale_returned));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx)
+template<Colour ColB, Id IdB, int BlockSize>
+typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(const int voxel_idx)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_idx));
+        const_cast<const BlockData<DataType, Res::Multi, BlockSize>*>(this)->data(voxel_idx));
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx) const
+template<Colour ColB, Id IdB, int BlockSize>
+const typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataType&
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::data(const int voxel_idx) const
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < data_.size());
     return data_[voxel_idx];
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataUnion
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::dataUnion(
+template<Colour ColB, Id IdB, int BlockSize>
+typename BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::DataUnion
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::dataUnion(
     const Eigen::Vector3i& voxel_coord,
     const int scale)
 {
@@ -163,9 +161,8 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::dataUnion(
     };
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
-    const DataType& init_data)
+template<Colour ColB, Id IdB, int BlockSize>
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::BlockData(const DataType& init_data)
 {
     // XXX: The std::array constructor will default-initialize all std::array elements. The
     // following .fill() and init_data parameter are only necessary if we need initialization to
@@ -174,8 +171,8 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
     data_.fill(init_data);
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::voxelIdx(
+template<Colour ColB, Id IdB, int BlockSize>
+int BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::voxelIdx(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
@@ -189,10 +186,11 @@ int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::voxelIdx(
         + voxel_offset.z() * math::sq(size_at_scale);
 }
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const DerivedT* BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::derived() const
+template<Colour ColB, Id IdB, int BlockSize>
+const Block<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>*
+BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::derived() const
 {
-    return static_cast<const DerivedT*>(this);
+    return static_cast<const Block<DataType, Res::Multi, BlockSize>*>(this);
 }
 
 
@@ -858,7 +856,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
                    true,
                    parent_ptr),
         std::conditional<
-            ResT == Res::Single,
+            DataT::fld_ == Field::TSDF,
             BlockData<DataT, ResT, BlockSize>,
             BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(init_data)
 {

@@ -60,21 +60,10 @@ struct BlockData {
 
 
 
-template<typename DataT, int BlockSize, typename DerivedT>
-class BlockMultiRes {
-};
-
-
-
-template<Field FldT, Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<FldT, ColB, IdB>, BlockSize, DerivedT> {
-};
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
-    public:
+/** Specialization of se::BlockData for se::Res::Multi se::Field::TSDF. It contains an array holding
+ * the se::Data for all scales. */
+template<Colour ColB, Id IdB, int BlockSize>
+struct BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize> {
     typedef Data<Field::TSDF, ColB, IdB> DataType;
 
     /** Contains data from a previous point in time which is used to compute changes over time for
@@ -129,7 +118,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    BlockMultiRes(const DataType& init_data = DataType());
+    BlockData(const DataType& init_data = DataType());
 
     private:
     /** Return the total number of voxels in all scales. */
@@ -177,7 +166,19 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /** Cast to the derived class se::Block to allow accessing its members. */
-    const DerivedT* derived() const;
+    const Block<DataType, Res::Multi, BlockSize>* derived() const;
+};
+
+
+
+template<typename DataT, int BlockSize, typename DerivedT>
+class BlockMultiRes {
+};
+
+
+
+template<Field FldT, Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+class BlockMultiRes<Data<FldT, ColB, IdB>, BlockSize, DerivedT> {
 };
 
 
@@ -532,7 +533,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
 template<typename DataT, Res ResT, int BlockSize>
 class Block : public OctantBase,
               public std::conditional<
-                  ResT == Res::Single,
+                  DataT::fld_ == Field::TSDF,
                   BlockData<DataT, ResT, BlockSize>,
                   BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type
 
