@@ -32,8 +32,6 @@ class BlockSingleRes {
     static constexpr int min_scale = 0;
     static constexpr int current_scale = 0;
 
-    BlockSingleRes(const DataType init_data = DataType());
-
     const DataType& data(const int voxel_idx) const;
 
     DataType& data(const int voxel_idx);
@@ -43,6 +41,9 @@ class BlockSingleRes {
     DataType& data(const Eigen::Vector3i& voxel_coord);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    protected:
+    BlockSingleRes(const DataType init_data = DataType());
 
     private:
     std::array<DataType, BlockSize * BlockSize * BlockSize> block_data_;

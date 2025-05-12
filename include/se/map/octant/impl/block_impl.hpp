@@ -14,13 +14,6 @@ namespace se {
 /// Single-res Block ///
 
 template<typename DataT, int BlockSize, typename DerivedT>
-BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_data)
-{
-    block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
-}
-
-
-template<typename DataT, int BlockSize, typename DerivedT>
 const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
 BlockSingleRes<DataT, BlockSize, DerivedT>::data(const int voxel_idx) const
 {
@@ -64,6 +57,12 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_co
     static const Eigen::Vector3i column_major_coeffs(1, BlockSize, math::sq(BlockSize));
     const int voxel_idx = (voxel_coord - underlying()->coord).dot(column_major_coeffs);
     return data(voxel_idx);
+}
+
+template<typename DataT, int BlockSize, typename DerivedT>
+BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_data)
+{
+    block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
 
 
