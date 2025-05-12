@@ -89,9 +89,9 @@ bool VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Blo
     assert(node_size > 0);
     Eigen::Vector3f voxel_coord_f;
     map_.pointToVoxel(T_WS.translation(), voxel_coord_f);
-    if (voxel_coord_f.x() >= node_coord.x() && voxel_coord_f.x() <= node_coord.x() + node_size
-        && voxel_coord_f.y() >= node_coord.y() && voxel_coord_f.y() <= node_coord.y() + node_size
-        && voxel_coord_f.z() >= node_coord.z() && voxel_coord_f.z() <= node_coord.z() + node_size) {
+    if (voxel_coord_f.x() >= node_coord.x() && voxel_coord_f.x() < node_coord.x() + node_size
+        && voxel_coord_f.y() >= node_coord.y() && voxel_coord_f.y() < node_coord.y() + node_size
+        && voxel_coord_f.z() >= node_coord.z() && voxel_coord_f.z() < node_coord.z() + node_size) {
         return true;
     }
     return false;
