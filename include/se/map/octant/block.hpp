@@ -33,13 +33,11 @@ class BlockSingleRes {
     static constexpr int min_scale = 0;
     static constexpr int current_scale = 0;
 
-    const DataType& data(const int voxel_idx) const;
-
-    DataType& data(const int voxel_idx);
-
+    DataType& data(const Eigen::Vector3i& voxel_coord);
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord);
+    DataType& data(const int voxel_idx);
+    const DataType& data(const int voxel_idx) const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
