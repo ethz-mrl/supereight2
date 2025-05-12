@@ -45,7 +45,7 @@ class BlockSingleRes {
     BlockSingleRes(const DataType init_data = DataType());
 
     private:
-    std::array<DataType, BlockSize * BlockSize * BlockSize> data_;
+    std::array<DataType, math::cu(BlockSize)> data_;
 
     const DerivedT* derived() const;
 };
