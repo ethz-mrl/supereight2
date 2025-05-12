@@ -15,6 +15,10 @@ namespace se {
 template<typename DataT, Res ResT>
 class Node;
 
+// Forward declare Block to allow accessing it from BlockData.
+template<typename DataT, Res ResT, int BlockSize>
+class Block;
+
 
 
 /**
@@ -164,12 +168,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
         return static_cast<const DerivedT*>(this);
     }
 };
-
-
-
-// Forward decleration
-template<typename DataT, Res ResT, int BlockSize>
-class Block;
 
 
 
