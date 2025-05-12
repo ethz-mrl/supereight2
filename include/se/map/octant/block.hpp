@@ -47,9 +47,9 @@ class BlockSingleRes {
     BlockSingleRes(const DataType init_data = DataType());
 
     private:
-    std::array<DataType, BlockSize * BlockSize * BlockSize> block_data_;
+    std::array<DataType, BlockSize * BlockSize * BlockSize> data_;
 
-    const DerivedT* underlying() const
+    const DerivedT* derived() const
     {
         return static_cast<const DerivedT*>(this);
     }
