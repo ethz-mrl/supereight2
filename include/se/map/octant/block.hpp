@@ -21,12 +21,12 @@ class Block;
 
 
 
-/**
- * \brief The base used for single-resolution blocks
+/** Contains se::Data stored in se::Block and appropriate methods. Partial template specilization is
+ * used so that se::Block doesn't contain unnecessary data. This non-specialized version contains an
+ * array of se::Data with size BlockSize³, as used for se::Res::Single se::Field::TSDF.
  */
-template<typename DataT, int BlockSize, typename DerivedT>
-class BlockSingleRes {
-    public:
+template<typename DataT, Res ResT, int BlockSize>
+struct BlockData {
     typedef DataT DataType;
 
     /** The maximum scale of the stored data. */
@@ -49,13 +49,13 @@ class BlockSingleRes {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    BlockSingleRes(const DataType init_data = DataType());
+    BlockData(const DataType& init_data = DataType());
 
     private:
     std::array<DataType, math::cu(BlockSize)> data_;
 
     /** Cast to the derived class se::Block to allow accessing its members. */
-    const DerivedT* derived() const;
+    const Block<DataType, ResT, BlockSize>* derived() const;
 };
 
 
@@ -527,7 +527,7 @@ template<typename DataT, Res ResT, int BlockSize>
 class Block : public OctantBase,
               public std::conditional<
                   ResT == Res::Single,
-                  BlockSingleRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>,
+                  BlockData<DataT, ResT, BlockSize>,
                   BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type
 
 {

@@ -11,19 +11,17 @@
 
 namespace se {
 
-/// Single-res Block ///
-
-template<typename DataT, int BlockSize, typename DerivedT>
-typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
-BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_coord)
+template<typename DataT, Res ResT, int BlockSize>
+typename BlockData<DataT, ResT, BlockSize>::DataType&
+BlockData<DataT, ResT, BlockSize>::data(const Eigen::Vector3i& voxel_coord)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockSingleRes<DataT, BlockSize, DerivedT>*>(this)->data(voxel_coord));
+        const_cast<const BlockData<DataT, ResT, BlockSize>*>(this)->data(voxel_coord));
 }
 
-template<typename DataT, int BlockSize, typename DerivedT>
-const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
-BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_coord) const
+template<typename DataT, Res ResT, int BlockSize>
+const typename BlockData<DataT, ResT, BlockSize>::DataType&
+BlockData<DataT, ResT, BlockSize>::data(const Eigen::Vector3i& voxel_coord) const
 {
     // Compute a column-major index from block-relative voxel coordinates:
     // int voxel_idx = x + (y * BlockSize) + (z * BlockSize * BlockSize);
@@ -32,25 +30,25 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::data(const Eigen::Vector3i& voxel_co
     return data(voxel_idx);
 }
 
-template<typename DataT, int BlockSize, typename DerivedT>
-typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
-BlockSingleRes<DataT, BlockSize, DerivedT>::data(const int voxel_idx)
+template<typename DataT, Res ResT, int BlockSize>
+typename BlockData<DataT, ResT, BlockSize>::DataType&
+BlockData<DataT, ResT, BlockSize>::data(const int voxel_idx)
 {
     return const_cast<DataType&>(
-        const_cast<const BlockSingleRes<DataT, BlockSize, DerivedT>*>(this)->data(voxel_idx));
+        const_cast<const BlockData<DataT, ResT, BlockSize>*>(this)->data(voxel_idx));
 }
 
-template<typename DataT, int BlockSize, typename DerivedT>
-const typename BlockSingleRes<DataT, BlockSize, DerivedT>::DataType&
-BlockSingleRes<DataT, BlockSize, DerivedT>::data(const int voxel_idx) const
+template<typename DataT, Res ResT, int BlockSize>
+const typename BlockData<DataT, ResT, BlockSize>::DataType&
+BlockData<DataT, ResT, BlockSize>::data(const int voxel_idx) const
 {
     assert(voxel_idx >= 0);
     assert(static_cast<size_t>(voxel_idx) < data_.size());
     return data_[voxel_idx];
 }
 
-template<typename DataT, int BlockSize, typename DerivedT>
-BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_data)
+template<typename DataT, Res ResT, int BlockSize>
+BlockData<DataT, ResT, BlockSize>::BlockData(const DataType& init_data)
 {
     // XXX: The std::array constructor will default-initialize all std::array elements. The
     // following .fill() and init_data parameter are only necessary if we need initialization to
@@ -59,10 +57,10 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_d
     data_.fill(init_data);
 }
 
-template<typename DataT, int BlockSize, typename DerivedT>
-const DerivedT* BlockSingleRes<DataT, BlockSize, DerivedT>::derived() const
+template<typename DataT, Res ResT, int BlockSize>
+const Block<DataT, ResT, BlockSize>* BlockData<DataT, ResT, BlockSize>::derived() const
 {
-    return static_cast<const DerivedT*>(this);
+    return static_cast<const Block<DataT, ResT, BlockSize>*>(this);
 }
 
 
@@ -866,7 +864,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
                    parent_ptr),
         std::conditional<
             ResT == Res::Single,
-            BlockSingleRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>,
+            BlockData<DataT, ResT, BlockSize>,
             BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type(init_data)
 {
     assert(BlockSize == (parent_ptr->size >> 1));
