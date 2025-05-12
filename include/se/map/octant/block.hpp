@@ -47,10 +47,7 @@ class BlockSingleRes {
     private:
     std::array<DataType, BlockSize * BlockSize * BlockSize> data_;
 
-    const DerivedT* derived() const
-    {
-        return static_cast<const DerivedT*>(this);
-    }
+    const DerivedT* derived() const;
 };
 
 

@@ -55,6 +55,12 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_d
     data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
 
+template<typename DataT, int BlockSize, typename DerivedT>
+const DerivedT* BlockSingleRes<DataT, BlockSize, DerivedT>::derived() const
+{
+    return static_cast<const DerivedT*>(this);
+}
+
 
 
 /// Multi-res Block ///
