@@ -52,7 +52,11 @@ BlockSingleRes<DataT, BlockSize, DerivedT>::data(const int voxel_idx) const
 template<typename DataT, int BlockSize, typename DerivedT>
 BlockSingleRes<DataT, BlockSize, DerivedT>::BlockSingleRes(const DataType init_data)
 {
-    data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
+    // XXX: The std::array constructor will default-initialize all std::array elements. The
+    // following .fill() and init_data parameter are only necessary if we need initialization to
+    // non-default values. Removing the .fill() will result in a (maybe insignificant) performance
+    // increase.
+    data_.fill(init_data);
 }
 
 template<typename DataT, int BlockSize, typename DerivedT>

@@ -29,14 +29,21 @@ class BlockSingleRes {
     public:
     typedef DataT DataType;
 
+    /** The maximum scale of the stored data. */
     static constexpr int max_scale = 0;
+    /** The minimum scale the data has been updated at. */
     static constexpr int min_scale = 0;
+    /** The scale the data was last updated at. */
     static constexpr int current_scale = 0;
 
+    /** Return a reference to the data at voxel coordinates \p voxel_coord. */
     DataType& data(const Eigen::Vector3i& voxel_coord);
+    /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
+    /** Return a reference to the data at linear index \p voxel_idx ∈ [0, BlockSize³ - 1]. */
     DataType& data(const int voxel_idx);
+    /** \constoverload */
     const DataType& data(const int voxel_idx) const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -47,6 +54,7 @@ class BlockSingleRes {
     private:
     std::array<DataType, math::cu(BlockSize)> data_;
 
+    /** Cast to the derived class se::Block to allow accessing its members. */
     const DerivedT* derived() const;
 };
 
