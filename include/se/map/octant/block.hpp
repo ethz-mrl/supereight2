@@ -29,6 +29,7 @@ class BlockSingleRes {
     public:
     typedef DataT DataType;
 
+    static constexpr int max_scale = 0;
     static constexpr int min_scale = 0;
     static constexpr int current_scale = 0;
 
