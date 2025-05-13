@@ -82,8 +82,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
      */
     typedef DataType PastDataType;
 
-    BlockMultiRes(const DataType init_data = DataType());
-
     struct DataUnion {
         const Eigen::Vector3i coord;
         const int scale;
@@ -130,6 +128,9 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     DataUnion dataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    protected:
+    BlockMultiRes(const DataType init_data = DataType());
 
     private:
     static constexpr int compute_num_voxels()

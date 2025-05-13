@@ -68,15 +68,6 @@ const Block<DataT, ResT, BlockSize>* BlockData<DataT, ResT, BlockSize>::derived(
 /// Multi-res Block ///
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
-    const DataType init_data)
-{
-    block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
-}
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
@@ -198,6 +189,13 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::dataUnion(
         block_past_data_[voxel_idx],
         voxel_idx,
     };
+}
+
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
+    const DataType init_data)
+{
+    block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
 
 
