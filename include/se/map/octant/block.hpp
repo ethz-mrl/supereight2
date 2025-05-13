@@ -94,12 +94,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     int min_scale = -1;
     int current_scale = -1;
 
-    /// Get coarsest block data
-
-    const DataType& data() const;
-
-    DataType& data();
-
     /// Get data at current scale
 
     const DataType& data(const int voxel_idx) const;
