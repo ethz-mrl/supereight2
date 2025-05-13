@@ -40,8 +40,8 @@ struct NodeData {
 /** Specialization of se::NodeData for se::Field::Occupancy. It contains minimum and maximum
  * up-propagated data.
  */
-template<Colour ColB, Id IdB, Res ResT>
-struct NodeData<Data<Field::Occupancy, ColB, IdB>, ResT> {
+template<Colour ColB, Id IdB>
+struct NodeData<Data<Field::Occupancy, ColB, IdB>, Res::Multi> {
     typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
     /** The minimum data among the node's children or the node's data if it's a leaf. */
@@ -68,9 +68,9 @@ struct NodeData<Data<Field::Occupancy, ColB, IdB>, ResT> {
 
     private:
     /** Cast to the derived class se::Node to allow accessing its members. */
-    const Node<DataType, ResT>* derived() const
+    const Node<DataType, Res::Multi>* derived() const
     {
-        return static_cast<const Node<DataType, ResT>*>(this);
+        return static_cast<const Node<DataType, Res::Multi>*>(this);
     }
 };
 
