@@ -183,6 +183,12 @@ int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::voxelIdx(
         + voxel_offset.z() * math::sq(size_at_scale);
 }
 
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+const DerivedT* BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::derived() const
+{
+    return static_cast<const DerivedT*>(this);
+}
+
 
 
 /// Multi-res occupancy

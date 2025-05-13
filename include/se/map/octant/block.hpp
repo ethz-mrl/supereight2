@@ -153,10 +153,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
 
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    const DerivedT* derived() const
-    {
-        return static_cast<const DerivedT*>(this);
-    }
+    const DerivedT* derived() const;
 };
 
 
