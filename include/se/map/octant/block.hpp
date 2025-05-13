@@ -195,10 +195,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
 
     BlockMultiRes(const DataType init_data = DataType());
 
-    BlockMultiRes(const Block<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>& block);
-
-    void operator=(const Block<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>& block);
-
     ~BlockMultiRes();
 
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
