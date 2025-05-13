@@ -254,9 +254,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      */
     const DataType& data() const
     {
-        assert(!block_data_.empty());
-        assert(block_data_.front());
-        return block_data_[0][0];
+        assert(!data_.empty());
+        assert(data_.front());
+        return data_[0][0];
     }
 
     /**
@@ -266,9 +266,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      */
     const DataType& minData() const
     {
-        assert(!block_min_data_.empty());
-        assert(block_min_data_.front());
-        return block_min_data_[0][0];
+        assert(!min_data_.empty());
+        assert(min_data_.front());
+        return min_data_[0][0];
     }
 
     /**
@@ -278,9 +278,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      */
     const DataType& maxData() const
     {
-        assert(!block_max_data_.empty());
-        assert(block_max_data_.front());
-        return block_max_data_[0][0];
+        assert(!max_data_.empty());
+        assert(max_data_.front());
+        return max_data_[0][0];
     }
 
     /**
@@ -471,9 +471,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     ~BlockMultiRes();
 
     private:
-    std::vector<DataType*> block_data_;
-    std::vector<DataType*> block_min_data_;
-    std::vector<DataType*> block_max_data_;
+    std::vector<DataType*> data_;
+    std::vector<DataType*> min_data_;
+    std::vector<DataType*> max_data_;
 
     size_t curr_integr_count_;      ///<< Number of integrations at that current scale.
     size_t curr_observed_count_;    ///<< Number of observed voxels at the current scale
@@ -487,14 +487,14 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      *        Recommended scale < current scale:
      *            The buffer_data_ points to a independently allocated array of voxel data. The data is initialised with
      *            the parent data at the current integration scale. Once the scale changes the data is inserted into the
-     *            block_data_ and block_max_data_ vector.
+     *            data_ and max_data_ vector.
      *        Recommended scale > current scale:
-     *            The buffer_data_ points to according scale in the block_data_ vector. The data integration starts from
+     *            The buffer_data_ points to according scale in the data_ vector. The data integration starts from
      *            the mean up-propagated value. Up until the recommened scale > current scale the mean up-propagation starts
      *            from the recommened scale such that the data is not overwritten by the up-propagation from the current scale.
      *            However the max up-propagation continues from the current integration scale. Once the scale changes the
-     *            current_data_ and current_scale_ is set to the buffer setup, the finest scale in the block_data_ and
-     *            block_max_data_ is deleted and the new finest scales in the buffers adjusted accordingly.
+     *            current_data_ and current_scale_ is set to the buffer setup, the finest scale in the data_ and
+     *            max_data_ is deleted and the new finest scales in the buffers adjusted accordingly.
      *
      * \note  The recommended scale can only differ by +/-1 scale from the current scale.
      *        The overhead of integrating at two different scales is insignificant compared to switching immediately as
@@ -507,9 +507,9 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
 
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    const DerivedT* underlying() const
+    const DerivedT* derived() const
     {
         return static_cast<const DerivedT*>(this);
     }
