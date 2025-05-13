@@ -164,12 +164,12 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     static constexpr std::array<int, max_scale + 1> size_at_scales_ = compute_size_at_scales();
     static constexpr std::array<int, max_scale + 1> scale_offsets_ = compute_scale_offsets();
 
-    std::array<DataType, num_voxels_> block_data_;
-    std::array<PastDataType, num_voxels_> block_past_data_;
+    std::array<DataType, num_voxels_> data_;
+    std::array<PastDataType, num_voxels_> past_data_;
 
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    const DerivedT* underlying() const
+    const DerivedT* derived() const
     {
         return static_cast<const DerivedT*>(this);
     }
