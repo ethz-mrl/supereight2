@@ -72,7 +72,8 @@ typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataT
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord)
 {
-    return data(voxel_coord, current_scale);
+    return const_cast<DataType&>(
+        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_coord));
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -89,7 +90,9 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale)
 {
-    return data(voxelIdx(voxel_coord, scale));
+    return const_cast<DataType&>(
+        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_coord,
+                                                                                    scale));
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -108,8 +111,9 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     const int scale_desired,
     int& scale_returned)
 {
-    scale_returned = std::max(scale_desired, current_scale);
-    return data(voxelIdx(voxel_coord, scale_returned));
+    return const_cast<DataType&>(
+        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(
+            voxel_coord, scale_desired, scale_returned));
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -127,9 +131,8 @@ template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx)
 {
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < data_.size());
-    return data_[voxel_idx];
+    return const_cast<DataType&>(
+        const_cast<const BlockMultiRes<DataType, BlockSize, DerivedT>*>(this)->data(voxel_idx));
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
