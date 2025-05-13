@@ -94,8 +94,6 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     int min_scale = -1;
     int current_scale = -1;
 
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
-
     /// Get coarsest block data
 
     const DataType& data() const;
@@ -168,6 +166,8 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
 
     std::array<DataType, num_voxels_> block_data_;
     std::array<PastDataType, num_voxels_> block_past_data_;
+
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     const DerivedT* underlying() const
     {

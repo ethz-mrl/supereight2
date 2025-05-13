@@ -68,21 +68,6 @@ const Block<DataT, ResT, BlockSize>* BlockData<DataT, ResT, BlockSize>::derived(
 /// Multi-res Block ///
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale) const
-{
-    assert(scale >= 0);
-    assert(scale <= max_scale);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
-    const int size_at_scale = size_at_scales_[scale];
-    return scale_offsets_[scale] + voxel_offset.x() + voxel_offset.y() * size_at_scale
-        + voxel_offset.z() * math::sq(size_at_scale);
-}
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx) const
 {
@@ -196,6 +181,19 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
     const DataType init_data)
 {
     block_data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
+}
+
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+int BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
+    const Eigen::Vector3i& voxel_coord,
+    const int scale) const
+{
+    assert(scale >= 0);
+    assert(scale <= max_scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
+    const int size_at_scale = size_at_scales_[scale];
+    return scale_offsets_[scale] + voxel_offset.x() + voxel_offset.y() * size_at_scale
+        + voxel_offset.z() * math::sq(size_at_scale);
 }
 
 
