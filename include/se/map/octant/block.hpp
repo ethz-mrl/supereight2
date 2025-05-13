@@ -94,28 +94,18 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     int min_scale = -1;
     int current_scale = -1;
 
-    /// Get data at current scale
-
-    const DataType& data(const int voxel_idx) const;
-
-    DataType& data(const int voxel_idx);
-
+    DataType& data(const Eigen::Vector3i& voxel_coord);
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord);
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
+    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    /// Get data at current scale or coarser
-
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
     const DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
-
-    /// Get data at scale
-
-    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
-
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
+    DataType& data(const int voxel_idx);
+    const DataType& data(const int voxel_idx) const;
 
     DataUnion dataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 

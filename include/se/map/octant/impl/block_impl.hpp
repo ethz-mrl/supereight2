@@ -68,26 +68,12 @@ const Block<DataT, ResT, BlockSize>* BlockData<DataT, ResT, BlockSize>::derived(
 /// Multi-res Block ///
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx) const
-{
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < data_.size());
-    return data_[voxel_idx];
-}
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx)
+BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
+    const Eigen::Vector3i& voxel_coord)
 {
-    assert(voxel_idx >= 0);
-    assert(static_cast<size_t>(voxel_idx) < data_.size());
-    return data_[voxel_idx];
+    return data(voxel_coord, current_scale);
 }
-
-
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
@@ -97,30 +83,23 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     return data(voxel_coord, current_scale);
 }
 
-
-
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
-    const Eigen::Vector3i& voxel_coord)
+    const Eigen::Vector3i& voxel_coord,
+    const int scale)
 {
-    return data(voxel_coord, current_scale);
+    return data(voxelIdx(voxel_coord, scale));
 }
-
-
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_desired,
-    int& scale_returned) const
+    const int scale) const
 {
-    scale_returned = std::max(scale_desired, current_scale);
-    return data(voxelIdx(voxel_coord, scale_returned));
+    return data(voxelIdx(voxel_coord, scale));
 }
-
-
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
@@ -133,29 +112,34 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     return data(voxelIdx(voxel_coord, scale_returned));
 }
 
-
-
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord,
-    const int scale) const
+    const int scale_desired,
+    int& scale_returned) const
 {
-    return data(voxelIdx(voxel_coord, scale));
+    scale_returned = std::max(scale_desired, current_scale);
+    return data(voxelIdx(voxel_coord, scale_returned));
 }
-
-
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
-BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale)
+BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx)
 {
-    return data(voxelIdx(voxel_coord, scale));
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < data_.size());
+    return data_[voxel_idx];
 }
 
-
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+const typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataType&
+BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::data(const int voxel_idx) const
+{
+    assert(voxel_idx >= 0);
+    assert(static_cast<size_t>(voxel_idx) < data_.size());
+    return data_[voxel_idx];
+}
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::DataUnion
