@@ -198,55 +198,6 @@ BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::derived() const
 /// Multi-res occupancy
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
-    const DataType init_data) :
-        init_data(init_data)
-{
-    const int num_voxels_at_scale = 1;
-    DataType* data_at_scale = new DataType[num_voxels_at_scale];
-    std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
-    block_data_.push_back(data_at_scale);
-    block_min_data_.push_back(data_at_scale);
-    block_max_data_.push_back(data_at_scale);
-}
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::~BlockMultiRes()
-{
-    for (DataType* data_at_scale : block_data_) {
-        delete[] data_at_scale;
-    }
-
-    // Avoid double free as the last element of block_min_data_ is the same as the last element of
-    // block_data_.
-    if (!block_min_data_.empty()) {
-        block_min_data_.pop_back();
-    }
-    for (DataType* min_data_at_scale : block_min_data_) {
-        delete[] min_data_at_scale;
-    }
-
-    // Avoid double free as the last element of block_max_data_ is the same as the last element of
-    // block_data_.
-    if (!block_max_data_.empty()) {
-        block_max_data_.pop_back();
-    }
-    for (DataType* max_data_at_scale : block_max_data_) {
-        delete[] max_data_at_scale;
-    }
-
-    // If buffer_scale_ >= min_scale then buffer_data_ will contain the same value as some element
-    // of block_data_ which has already been deallocated.
-    if (buffer_data_ && buffer_scale_ < min_scale) {
-        delete[] buffer_data_;
-    }
-}
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 int BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
@@ -839,6 +790,51 @@ BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::blockMaxD
     }
     else {
         return block_max_data_[max_scale - scale];
+    }
+}
+
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
+    const DataType init_data) :
+        init_data(init_data)
+{
+    const int num_voxels_at_scale = 1;
+    DataType* data_at_scale = new DataType[num_voxels_at_scale];
+    std::fill(data_at_scale, data_at_scale + num_voxels_at_scale, init_data);
+    block_data_.push_back(data_at_scale);
+    block_min_data_.push_back(data_at_scale);
+    block_max_data_.push_back(data_at_scale);
+}
+
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::~BlockMultiRes()
+{
+    for (DataType* data_at_scale : block_data_) {
+        delete[] data_at_scale;
+    }
+
+    // Avoid double free as the last element of block_min_data_ is the same as the last element of
+    // block_data_.
+    if (!block_min_data_.empty()) {
+        block_min_data_.pop_back();
+    }
+    for (DataType* min_data_at_scale : block_min_data_) {
+        delete[] min_data_at_scale;
+    }
+
+    // Avoid double free as the last element of block_max_data_ is the same as the last element of
+    // block_data_.
+    if (!block_max_data_.empty()) {
+        block_max_data_.pop_back();
+    }
+    for (DataType* max_data_at_scale : block_max_data_) {
+        delete[] max_data_at_scale;
+    }
+
+    // If buffer_scale_ >= min_scale then buffer_data_ will contain the same value as some element
+    // of block_data_ which has already been deallocated.
+    if (buffer_data_ && buffer_scale_ < min_scale) {
+        delete[] buffer_data_;
     }
 }
 

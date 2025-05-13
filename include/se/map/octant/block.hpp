@@ -193,10 +193,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     int current_scale = max_scale;
     DataType init_data;
 
-    BlockMultiRes(const DataType init_data = DataType());
-
-    ~BlockMultiRes();
-
     int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
 
@@ -474,6 +470,10 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType* blockMaxDataAtScale(const int scale);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    protected:
+    BlockMultiRes(const DataType init_data = DataType());
+    ~BlockMultiRes();
 
     private:
     std::vector<DataType*> block_data_;
