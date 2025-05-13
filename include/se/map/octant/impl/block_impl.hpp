@@ -167,7 +167,11 @@ template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
     const DataType& init_data)
 {
-    data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
+    // XXX: The std::array constructor will default-initialize all std::array elements. The
+    // following .fill() and init_data parameter are only necessary if we need initialization to
+    // non-default values. Removing the .fill() will result in a (maybe insignificant) performance
+    // increase.
+    data_.fill(init_data);
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>

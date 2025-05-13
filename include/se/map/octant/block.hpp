@@ -82,6 +82,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
      */
     typedef DataType PastDataType;
 
+    /** Simplifies access to current and past data at the same voxel coordinates. */
     struct DataUnion {
         const Eigen::Vector3i coord;
         const int scale;
@@ -90,24 +91,39 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
         const int data_idx;
     };
 
+    /** The maximum scale of the stored data. */
     static constexpr int max_scale = math::log2_const(BlockSize);
+    /** The minimum scale the data has been updated at. -1 if no update has been performed. */
     int min_scale = -1;
+    /** The scale the data was last updated at. -1 if no update has been performed. */
     int current_scale = -1;
 
+    /** Return a reference to the data at the current scale at voxel coordinates \p voxel_coord. */
     DataType& data(const Eigen::Vector3i& voxel_coord);
+    /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
+    /** Return a reference to the data at scale \p scale at voxel coordinates \p voxel_coord. */
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
+    /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Return a reference to the data at scale \p scale_desired or coarser at voxel coordinates \p
+     * voxel_coord. The actual scale of the data is written to \p scale_returned and is no finer
+     * than current_scale.
+     */
     DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
+    /** \constoverload */
     const DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
+    /** Return a reference to the data at linear index \p voxel_idx ∈ [0, num_voxels_ - 1]. */
     DataType& data(const int voxel_idx);
+    /** \constoverload */
     const DataType& data(const int voxel_idx) const;
 
+    /** Return the current and past data at scale \p scale at voxel coordinates \p voxel_coord. */
     DataUnion dataUnion(const Eigen::Vector3i& voxel_coord, const int scale);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -116,6 +132,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     BlockMultiRes(const DataType& init_data = DataType());
 
     private:
+    /** Return the total number of voxels in all scales. */
     static constexpr int compute_num_voxels()
     {
         size_t voxel_count = 0;
@@ -125,6 +142,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
         return voxel_count;
     }
 
+    /** Return the edge length in voxels at each scale. */
     static constexpr std::array<int, max_scale + 1> compute_size_at_scales()
     {
         std::array<int, max_scale + 1> size_at_scales{};
@@ -135,6 +153,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
         return size_at_scales;
     }
 
+    /** Return the offsets in elements into data_ that the data for each scale begins at. */
     static constexpr std::array<int, max_scale + 1> compute_scale_offsets()
     {
         std::array<int, max_scale + 1> scale_offsets{0};
@@ -152,8 +171,12 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     std::array<DataType, num_voxels_> data_;
     std::array<PastDataType, num_voxels_> past_data_;
 
+    /** Return the index into data_ for the data at voxel coordinates \p voxel_coord and scale \p
+     * scale .
+     */
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Cast to the derived class se::Block to allow accessing its members. */
     const DerivedT* derived() const;
 };
 
