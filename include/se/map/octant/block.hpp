@@ -100,9 +100,10 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
     const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType&
+    data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
     const DataType&
-    data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     DataType& data(const int voxel_idx);
     const DataType& data(const int voxel_idx) const;
