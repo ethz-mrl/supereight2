@@ -113,7 +113,7 @@ class BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    BlockMultiRes(const DataType init_data = DataType());
+    BlockMultiRes(const DataType& init_data = DataType());
 
     private:
     static constexpr int compute_num_voxels()

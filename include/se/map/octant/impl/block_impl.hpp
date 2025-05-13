@@ -165,7 +165,7 @@ BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::dataUnion(
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 BlockMultiRes<Data<Field::TSDF, ColB, IdB>, BlockSize, DerivedT>::BlockMultiRes(
-    const DataType init_data)
+    const DataType& init_data)
 {
     data_.fill(init_data); // TODO: Verify that initialisation doesn't cause regression
 }
