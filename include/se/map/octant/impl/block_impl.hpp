@@ -197,21 +197,6 @@ BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::derived() const
 
 /// Multi-res occupancy
 
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-int BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
-    const Eigen::Vector3i& voxel_coord,
-    const int scale) const
-{
-    assert(scale >= 0);
-    assert(scale <= max_scale);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
-    const int size_at_scale = BlockSize >> scale;
-    return voxel_offset.x() + voxel_offset.y() * size_at_scale
-        + voxel_offset.z() * math::sq(size_at_scale);
-}
-
-
-
 /// Get data at current scale
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -836,6 +821,19 @@ BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::~BlockMul
     if (buffer_data_ && buffer_scale_ < min_scale) {
         delete[] buffer_data_;
     }
+}
+
+template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
+int BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::getVoxelIdx(
+    const Eigen::Vector3i& voxel_coord,
+    const int scale) const
+{
+    assert(scale >= 0);
+    assert(scale <= max_scale);
+    const Eigen::Vector3i voxel_offset = (voxel_coord - underlying()->coord) / (1 << scale);
+    const int size_at_scale = BlockSize >> scale;
+    return voxel_offset.x() + voxel_offset.y() * size_at_scale
+        + voxel_offset.z() * math::sq(size_at_scale);
 }
 
 

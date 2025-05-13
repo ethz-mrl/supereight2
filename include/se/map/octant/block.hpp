@@ -192,11 +192,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     int min_scale = -1;
     int current_scale = max_scale;
     DataType init_data;
-
-    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
-
-
-
     /// Get data at current scale
 
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
@@ -511,6 +506,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     size_t
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
+
+    int getVoxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     const DerivedT* underlying() const
     {
