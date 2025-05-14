@@ -446,6 +446,23 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
         buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
     size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
 
+    DataType&
+    data(const std::vector<DataType*> data, const Eigen::Vector3i& voxel_coord, const int scale);
+
+    const DataType& data(const std::vector<DataType*> data,
+                         const Eigen::Vector3i& voxel_coord,
+                         const int scale) const;
+
+    DataType& data(const std::vector<DataType*> data,
+                   const Eigen::Vector3i& voxel_coord,
+                   const int scale_desired,
+                   int& scale_returned);
+
+    const DataType& data(const std::vector<DataType*> data,
+                         const Eigen::Vector3i& voxel_coord,
+                         const int scale_desired,
+                         int& scale_returned) const;
+
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     const DerivedT* derived() const;
