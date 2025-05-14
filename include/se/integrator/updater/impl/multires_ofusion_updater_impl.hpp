@@ -146,7 +146,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
 
             if (node_data.field.observed
                 && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
-                auto* node_ptr = static_cast<NodeType*>(octant_ptr);
+                auto* const node_ptr = static_cast<NodeType*>(octant_ptr);
                 if (updated_octants_) {
                     for (int i = 0; i < 8; i++) {
                         OctantBase* const child_ptr = node_ptr->getChild(i);
