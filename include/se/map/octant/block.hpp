@@ -252,60 +252,36 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      *
      * \return The block's data at the coarsest scale
      */
-    const DataType& data() const
-    {
-        assert(!data_.empty());
-        assert(data_.front());
-        return data_[0][0];
-    }
+    const DataType& data() const;
 
     /**
      * \brief Get the block's min data at the coarsest scale.
      *
      * \return The block's min data at the coarsest scale
      */
-    const DataType& minData() const
-    {
-        assert(!min_data_.empty());
-        assert(min_data_.front());
-        return min_data_[0][0];
-    }
+    const DataType& minData() const;
 
     /**
      * \brief Get the block's max data at the coarsest scale.
      *
      * \return The block's max data at the coarsest scale
      */
-    const DataType& maxData() const
-    {
-        assert(!max_data_.empty());
-        assert(max_data_.front());
-        return max_data_[0][0];
-    }
+    const DataType& maxData() const;
 
     /**
      * \brief Get the number of integrations at the current scale.
      */
-    size_t currIntegrCount() const
-    {
-        return curr_integr_count_;
-    }
+    size_t currIntegrCount() const;
 
     /**
      * \brief Get the number of observed voxels at the current scale.
      */
-    size_t currObservedCount() const
-    {
-        return curr_observed_count_;
-    }
+    size_t currObservedCount() const;
 
     /**
      * \brief Increment the number of integrations at the current scale by 1.
      */
-    void incrCurrIntegrCount()
-    {
-        curr_integr_count_++;
-    }
+    void incrCurrIntegrCount();
 
     /**
      * \brief Increment the number of observed voxels in at the current scale by 1.
@@ -329,18 +305,11 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     /**
      * \return The integration scale of the buffer.
      */
-    int buffer_scale() const
-    {
-        return buffer_scale_;
-    }
-    size_t bufferIntegrCount() const
-    {
-        return buffer_integr_count_;
-    }
-    size_t bufferObservedCount() const
-    {
-        return buffer_observed_count_;
-    }
+    int buffer_scale() const;
+
+    size_t bufferIntegrCount() const;
+
+    size_t bufferObservedCount() const;
 
     /**
      * \brief Increment the buffer count if incrementation criterion is met.
@@ -410,13 +379,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      *
      * \return `const` reference to the voxel data in the buffer for the provided voxel index.
      */
-    const DataType& bufferData(const int voxel_idx) const
-    {
-        assert(buffer_data_);
-        assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> buffer_scale_));
-        return buffer_data_[voxel_idx];
-    }
+    const DataType& bufferData(const int voxel_idx) const;
 
     /**
      * \brief Get a reference to the voxel data in the buffer at the voxel index.
@@ -427,13 +390,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      *
      * \return Reference to the voxel data in the buffer for the provided voxel index.
      */
-    DataType& bufferData(const int voxel_idx)
-    {
-        assert(buffer_data_);
-        assert(voxel_idx >= 0);
-        assert(voxel_idx < math::cu(BlockSize >> buffer_scale_));
-        return buffer_data_[voxel_idx];
-    }
+    DataType& bufferData(const int voxel_idx);
 
     /**
      * \brief Get a pointer to the mean block data array at a given scale.
@@ -509,10 +466,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
 
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    const DerivedT* derived() const
-    {
-        return static_cast<const DerivedT*>(this);
-    }
+    const DerivedT* derived() const;
 };
 
 
