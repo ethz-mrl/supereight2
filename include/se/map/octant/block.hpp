@@ -186,222 +186,194 @@ class BlockMultiRes<Data<FldT, ColB, IdB>, BlockSize, DerivedT> {
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     public:
+    /** The type of the stored data. */
     typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
+    /** The maximum scale of the stored data. */
     static constexpr int max_scale = math::log2_const(BlockSize);
+    /** The minimum scale the data has been updated at. -1 if no update has been performed. */
     int min_scale = -1;
+    /** The scale the data was last updated at. */
     int current_scale = max_scale;
+    /** The data the block was initialised with. */
     DataType init_data;
 
+
+    /** \name Data access */
+    /**@{*/
+    /** Return a reference to the data at the current scale at voxel coordinates \p voxel_coord. */
     DataType& data(const Eigen::Vector3i& voxel_coord);
+    /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
+    /** Return a reference to the data at scale \p scale at voxel coordinates \p voxel_coord. */
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
+    /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Return a reference to the data at scale \p scale_desired or coarser at voxel coordinates \p
+     * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
+     * than current_scale.
+     */
     DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
+    /** \constoverload */
     const DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's data at the coarsest scale. */
     const DataType& data() const;
 
-    /**
-     * \brief Get a pointer to the mean block data array at a given scale.
-     *
-     * \param[in] scale The scale to return the mean block data array from.
-     *
-     * \return The pointer to the mean block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
+    /** Return a pointer to the block data array for scale \p scale. Return `nullptr` if \p scale
+     * is smaller than the finest allocated scale.
      */
     DataType* blockDataAtScale(const int scale);
+    /**@}*/
 
 
+    /** \name Minimum data access */
+    /**@{*/
+    /** Return a reference to the minimum data at the current scale at voxel coordinates \p
+     * voxel_coord.
+     */
     DataType& minData(const Eigen::Vector3i& voxel_coord);
+    /** \constoverload */
     const DataType& minData(const Eigen::Vector3i& voxel_coord) const;
 
+    /** Return a reference to the minimum data at scale \p scale at voxel coordinates \p
+     * voxel_coord.
+     */
     DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
+    /** \constoverload */
     const DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Return a reference to the minimum data at scale \p scale or coarser at voxel coordinates \p
+     * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
+     * than current_scale.
+     */
     DataType&
     minData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
+    /** \constoverload */
     const DataType&
     minData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's minimum data at the coarsest scale. */
     const DataType& minData() const;
 
-    /**
-     * \brief Get a pointer to the min block data array at a given scale.
-     *
-     * \param[in] scale The scale to return the min block data array from.
-     *
-     * \return The pointer to the min block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
+    /** Return a pointer to the block minimum data array for scale \p scale. Return `nullptr` if \p
+     * scale is smaller than the finest allocated scale.
      */
     DataType* blockMinDataAtScale(const int scale);
+    /**@}*/
 
 
+    /** \name Maximum data access */
+    /**@{*/
     DataType& maxData(const Eigen::Vector3i& voxel_coord);
+    /** \constoverload */
     const DataType& maxData(const Eigen::Vector3i& voxel_coord) const;
 
     DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
+    /** \constoverload */
     const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Return a reference to the maximum data at scale \p scale or coarser at voxel coordinates \p
+     * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
+     * than current_scale.
+     */
     DataType&
     maxData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
+    /** \constoverload */
     const DataType&
     maxData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's maximum data at the coarsest scale. */
     const DataType& maxData() const;
 
-    /**
-     * \brief Get a pointer to the max block data array at a given scale.
-     *
-     * \param[in] scale The scale to return the max block data array from.
-     *
-     * \return The pointer to the max block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
+    /** Return a pointer to the block maximum data array for scale \p scale. Return `nullptr` if \p
+     * scale is smaller than the finest allocated scale.
      */
     DataType* blockMaxDataAtScale(const int scale);
+    /**@}*/
 
 
-    /**
-     * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
-     */
+    /** \name Scale (de)allocation */
+    /**@{*/
+    /** Allocate the mip-mapped scales down to scale \p new_min_scale. */
     void allocateDownTo(const int new_min_scale = 0);
 
-    /**
-     * \brief Delete the mip-mapped scales up to 'new_min_scale'.
-     */
+    /** Delete the mip-mapped scales up to scale \p new_min_scale. */
     void deleteUpTo(const int new_min_scale);
+    /**@}*/
 
-    /**
-     * \brief Get the number of integrations at the current scale.
-     */
+
+    /** \name Buffer management */
+    /**@{*/
+    /** Return the number of integrations at the current scale. */
     size_t currIntegrCount() const;
 
-    /**
-     * \brief Get the number of observed voxels at the current scale.
-     */
+    /** Return the number of observed voxels at the current scale. */
     size_t currObservedCount() const;
 
-    /**
-     * \brief Increment the number of integrations at the current scale by 1.
-     */
+    /** Increment the number of integrations at the current scale by 1. */
     void incrCurrIntegrCount();
 
-    /**
-     * \brief Increment the number of observed voxels in at the current scale by 1.
-     *
-     * \param[in] do_increment The optional flag indicating if the counter should be incremented.
+    /** Increment the number of observed voxels in at the current scale by 1 if \p do_increment is
+     * true.
      */
     void incrCurrObservedCount(bool do_increment = true);
 
-    /**
-     * \brief When a block is initialised from an observed block (i.e. init_data.observed == true), set the current
-     *        observed count to all voxels observed and the integration count to the nodes value. Otherwise reset the current
-     *        count.
+    /** When a block is initialised from an observed block (i.e. init_data.observed == true), set
+     * the current observed count to all voxels observed and the integration count to the nodes
+     * value. Otherwise reset the current count.
      */
     void initCurrCount();
 
-    /**
-     * \brief Reset the current integration and observation count to 0.
-     */
+    /** Reset the current integration and observation counts to 0. */
     void resetCurrCount();
 
-    /**
-     * \return The integration scale of the buffer.
-     */
+    /** Return the buffer integration scale. */
     int bufferScale() const;
 
+    /** Return the number of integrations in the buffer. */
     size_t bufferIntegrCount() const;
 
+    /** Return the number of observed voxels in the buffer. */
     size_t bufferObservedCount() const;
 
-    /**
-     * \brief Increment the buffer count if incrementation criterion is met.
-     *        I.e. the scale normalised number of observations at the buffer scale >= 95% observations at the current scale.
+    /** Increment the number of integrations in the buffer by 1 if \p do_increment is true.
+     * Typically \p do_increment is true if the scale normalised number of observations at the
+     * buffer scale >= 95% of the observations at the current scale.
      */
     void incrBufferIntegrCount(const bool do_increment = true);
 
-
-    /**
-     * \brief Increment the number of observed voxels at the buffers scale by 1.
-     *
-     * \param[in] do_increment The optional flag indicating if the counter should be incremented.
-     */
+    /** Increment the number of observed voxels in the buffer by 1 if \p do_increment is true. */
     void incrBufferObservedCount(const bool do_increment = true);
 
-    /**
-     * \brief Init buffer variables.
-     *
-     * \param[in] buffer_scale The scale the buffer should be initialised at.
-     */
+    /** Initialise the buffer at scale \p buffer_scale. */
     void initBuffer(const int buffer_scale);
 
-    /**
-     * \brief Reset the buffer integration and observation count to 0.
-     */
+    /** Reset the buffer integration and observation counts to 0. */
     void resetBufferCount();
 
-    /**
-     *  \brief Reset buffer variables to the initial values and free the buffer data if applicable.
-     */
+    /** Reset the buffer and free any associated data. */
     void resetBuffer();
 
-    /**
-     * \brief Check if the scale should be switched from the current scale to the recommended.
-     *
-     * \return True is data is switched to recommended scale.
-     */
+    /** Switch the buffer data into the block data if possible and return whether the switch was
+     * made. */
     bool switchData();
 
-    /**
-     * \brief Get a reference to the voxel data in the buffer at the voxel coordinates.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
-     *
-     * \return Reference to the voxel data in the buffer for the provided voxel coordinates.
-     */
+    /** Return a reference to the buffer data at voxel coordinates \p voxel_coord. */
     DataType& bufferData(const Eigen::Vector3i& voxel_coord);
-
-    /**
-     * \brief Get a `const` reference to the voxel data in the buffer at the voxel coordinates.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
-     *
-     * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
-     */
+    /** \constoverload */
     const DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
 
-    /**
-     * \brief Get a reference to the voxel data in the buffer at the voxel index.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_idx The voxel index of the data to be accessed.
-     *
-     * \return Reference to the voxel data in the buffer for the provided voxel index.
-     */
+    /** Return a reference to the buffer data at linear index \p voxel_idx. The maximum value of \p
+     * voxel_idx depends on the buffer scale. */
     DataType& bufferData(const int voxel_idx);
-
-    /**
-     * \brief Get a `const` reference to the voxel data in the buffer at the voxel index.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_idx The voxel index of the data to be accessed.
-     *
-     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
-     */
+    /** \constoverload */
     const DataType& bufferData(const int voxel_idx) const;
+    /**@}*/
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -410,61 +382,84 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     ~BlockMultiRes();
 
     private:
+    /** The block data. Each element is a pointer to the data at some scale, starting from the
+     * coarsest. */
     std::vector<DataType*> data_;
+    /** The minimum block data. Organised like data_. */
     std::vector<DataType*> min_data_;
+    /** The maximum block data. Organised like data_. */
     std::vector<DataType*> max_data_;
 
-    size_t curr_integr_count_;      ///<< Number of integrations at that current scale.
-    size_t curr_observed_count_;    ///<< Number of observed voxels at the current scale
+    /** The number of integrations at the current scale. */
+    size_t curr_integr_count_;
+    /** The number of observed voxels at the current scale. */
+    size_t curr_observed_count_;
 
-    /**
-     * \brief Rather than switching directly to a different integration scale once the integration scale computation
-     *        recommends a different scale, data is continued to be integrated at the current scale and additionally into
-     *        a buffer at the recommended scale.
-     *        Recommended scale == current scale:
-     *            The buffer_data_ points to a `nullptr`
-     *        Recommended scale < current scale:
-     *            The buffer_data_ points to a independently allocated array of voxel data. The data is initialised with
-     *            the parent data at the current integration scale. Once the scale changes the data is inserted into the
-     *            data_ and max_data_ vector.
-     *        Recommended scale > current scale:
-     *            The buffer_data_ points to according scale in the data_ vector. The data integration starts from
-     *            the mean up-propagated value. Up until the recommened scale > current scale the mean up-propagation starts
-     *            from the recommened scale such that the data is not overwritten by the up-propagation from the current scale.
-     *            However the max up-propagation continues from the current integration scale. Once the scale changes the
-     *            current_data_ and current_scale_ is set to the buffer setup, the finest scale in the data_ and
-     *            max_data_ is deleted and the new finest scales in the buffers adjusted accordingly.
+    /** The buffer data. Rather than switching directly to a different integration scale once the
+     * integration scale computation recommends a different scale, data is continued to be
+     * integrated at the current scale and additionally into a buffer at the recommended scale.
      *
-     * \note  The recommended scale can only differ by +/-1 scale from the current scale.
-     *        The overhead of integrating at two different scales is insignificant compared to switching immediately as
-     *        the double integration only happens in areas where the recommended integration scale changed and stops
-     *        as soon as the criteria for switching to the finer or coarser scale.
+     * - recommended scale == current scale:
+     *       buffer_data_ is `nullptr`
+     * - recommended scale < current scale:
+     *       The buffer_data_ points to a independently allocated array of voxel data. The data is
+     *       initialised with the parent data at the current integration scale. Once the scale
+     *       changes the data is inserted into the data_ and max_data_ vector.
+     * - recommended scale > current scale:
+     *       The buffer_data_ points to according scale in the data_ vector. The data integration
+     *       starts from the mean up-propagated value. Up until the recommened scale > current scale
+     *       the mean up-propagation starts from the recommened scale such that the data is not
+     *       overwritten by the up-propagation from the current scale. However the max
+     *       up-propagation continues from the current integration scale. Once the scale changes the
+     *       current_data_ and current_scale_ is set to the buffer setup, the finest scale in the
+     *       data_ and max_data_ is deleted and the new finest scales in the buffers adjusted
+     *       accordingly.
+     *
+     * \note  The recommended scale can only differ by ±1 scale from the current scale. The
+     * overhead of integrating at two different scales is insignificant compared to switching
+     * immediately as the double integration only happens in areas where the recommended integration
+     * scale changed and stops as soon as the criteria for switching to the finer or coarser scale.
      */
-    DataType* buffer_data_ = nullptr; ///<< Pointer to the buffer data.
-    int buffer_scale_ = -1;           ///<< The scale of the buffer.
-    size_t
-        buffer_integr_count_; ///<< Number of integrations at the buffer scale. \note Is only incremented when 95% of the current observations are reached.
-    size_t buffer_observed_count_; ///<< Number of observed voxels in the buffer.
+    DataType* buffer_data_ = nullptr;
+    /** The buffer scale. */
+    int buffer_scale_ = -1;
+    /** The number of integrations at the buffer scale.
+     * \note Is only incremented when 95% of the current observations are reached.
+     */
+    size_t buffer_integr_count_;
+    /** The number of observed voxels in the buffer. */
+    size_t buffer_observed_count_;
 
+    /** Return a reference to the data of \p data corresponding to voxel coordinates \p voxel_coord
+     * and scale \p scale.
+     */
     DataType&
     data(const std::vector<DataType*> data, const Eigen::Vector3i& voxel_coord, const int scale);
-
+    /** \constoverload */
     const DataType& data(const std::vector<DataType*> data,
                          const Eigen::Vector3i& voxel_coord,
                          const int scale) const;
 
+    /** Return a reference to the data of \p data corresponding to voxel coordinates \p voxel_coord
+     * and scale \p scale_desired. The actual scale of the data is written to \p scale_returned and
+     * is no finer than current_scale.
+     */
     DataType& data(const std::vector<DataType*> data,
                    const Eigen::Vector3i& voxel_coord,
                    const int scale_desired,
                    int& scale_returned);
-
+    /** \constoverload */
     const DataType& data(const std::vector<DataType*> data,
                          const Eigen::Vector3i& voxel_coord,
                          const int scale_desired,
                          int& scale_returned) const;
 
+    /** Return the index into the respective element of data_/min_data_/max_data_ for the data at
+     * voxel coordinates \p voxel_coord and scale \p scale .
+     */
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    /** Cast to the derived class se::Block to allow accessing its members. */
     const DerivedT* derived() const;
 };
 
