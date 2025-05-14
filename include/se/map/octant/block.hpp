@@ -171,21 +171,10 @@ struct BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize> {
 
 
 
-template<typename DataT, int BlockSize, typename DerivedT>
-class BlockMultiRes {
-};
-
-
-
-template<Field FldT, Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<FldT, ColB, IdB>, BlockSize, DerivedT> {
-};
-
-
-
-template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
-    public:
+/** Specialization of se::BlockData for se::Field::Occupancy. It contains mean, minimum, and maximum
+ * data up to some scale. */
+template<Colour ColB, Id IdB, int BlockSize>
+struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** The type of the stored data. */
     typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
@@ -378,8 +367,8 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    BlockMultiRes(const DataType init_data = DataType());
-    ~BlockMultiRes();
+    BlockData(const DataType init_data = DataType());
+    ~BlockData();
 
     private:
     /** The block data. Each element is a pointer to the data at some scale, starting from the
@@ -460,7 +449,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     int voxelIdx(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /** Cast to the derived class se::Block to allow accessing its members. */
-    const DerivedT* derived() const;
+    const Block<DataType, Res::Multi, BlockSize>* derived() const;
 };
 
 
@@ -472,13 +461,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
  * \tparam BlockSize The edge length of se::Block in voxels.
  */
 template<typename DataT, Res ResT, int BlockSize>
-class Block : public OctantBase,
-              public std::conditional<
-                  DataT::fld_ == Field::TSDF,
-                  BlockData<DataT, ResT, BlockSize>,
-                  BlockMultiRes<DataT, BlockSize, Block<DataT, ResT, BlockSize>>>::type
-
-{
+class Block : public OctantBase, public BlockData<DataT, ResT, BlockSize> {
     public:
     typedef DataT DataType;
 
