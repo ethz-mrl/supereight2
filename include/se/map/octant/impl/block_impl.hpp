@@ -576,7 +576,7 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::incr
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-void BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::initCurrCout()
+void BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::initCurrCount()
 {
     if (init_data.field.observed) {
         int size_at_scale = BlockSize >> current_scale;
@@ -597,7 +597,7 @@ void BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::rese
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
-int BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::buffer_scale() const
+int BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::bufferScale() const
 {
     return buffer_scale_;
 }

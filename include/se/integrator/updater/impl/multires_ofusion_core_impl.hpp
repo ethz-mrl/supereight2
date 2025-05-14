@@ -148,7 +148,7 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
     int size_at_parent_scale_li = BlockT::size >> parent_scale;
     int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
-    if (block.buffer_scale() > block.current_scale) {
+    if (block.bufferScale() > block.current_scale) {
         DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
         DataType* min_data_at_child_scale = block.blockDataAtScale(child_scale);
         DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);

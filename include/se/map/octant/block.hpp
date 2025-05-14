@@ -305,7 +305,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      *        observed count to all voxels observed and the integration count to the nodes value. Otherwise reset the current
      *        count.
      */
-    void initCurrCout();
+    void initCurrCount();
 
     /**
      * \brief Reset the current integration and observation count to 0.
@@ -315,7 +315,7 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     /**
      * \return The integration scale of the buffer.
      */
-    int buffer_scale() const;
+    int bufferScale() const;
 
     size_t bufferIntegrCount() const;
 

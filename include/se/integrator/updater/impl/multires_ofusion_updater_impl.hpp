@@ -212,13 +212,13 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
         integration_scale = recommended_scale;
         block_ptr->allocateDownTo(integration_scale);
         block_ptr->current_scale = integration_scale;
-        block_ptr->initCurrCout();
+        block_ptr->initCurrCount();
         block_ptr->init_data = DataType();
     }
     else if (recommended_scale != last_scale) // Potential double integration
     {
         if (recommended_scale
-            != block_ptr->buffer_scale()) // Start from scratch and initialise buffer
+            != block_ptr->bufferScale()) // Start from scratch and initialise buffer
         {
             block_ptr->initBuffer(recommended_scale);
 
@@ -356,13 +356,13 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
         integration_scale = recommended_scale;
         block_ptr->allocateDownTo(integration_scale);
         block_ptr->current_scale = integration_scale;
-        block_ptr->initCurrCout();
+        block_ptr->initCurrCount();
         block_ptr->init_data = DataType();
     }
     else if (recommended_scale != last_scale) // Potential double integration
     {
         if (recommended_scale
-            != block_ptr->buffer_scale()) // Start from scratch and initialise buffer
+            != block_ptr->bufferScale()) // Start from scratch and initialise buffer
         {
             block_ptr->initBuffer(recommended_scale);
 
