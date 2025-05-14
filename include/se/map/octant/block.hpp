@@ -199,9 +199,10 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
     const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType&
+    data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
     const DataType&
-    data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's data at the coarsest scale. */
     const DataType& data() const;
@@ -223,9 +224,10 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
     const DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType&
+    minData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
     const DataType&
-    minData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    minData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's minimum data at the coarsest scale. */
     const DataType& minData() const;
@@ -247,9 +249,10 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
     const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
-    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    DataType&
+    maxData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
     const DataType&
-    maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
+    maxData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned) const;
 
     /** Return a const reference to the block's maximum data at the coarsest scale. */
     const DataType& maxData() const;

@@ -253,22 +253,22 @@ template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out)
+    const int scale_desired,
+    int& scale_returned)
 {
-    scale_out = std::max(scale_in, current_scale);
-    return data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::data(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out) const
+    const int scale_desired,
+    int& scale_returned) const
 {
-    scale_out = std::max(scale_in, current_scale);
-    return data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -351,22 +351,22 @@ template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::minData(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out)
+    const int scale_desired,
+    int& scale_returned)
 {
-    scale_out = std::max(scale_in, current_scale);
-    return min_data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return min_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::minData(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out) const
+    const int scale_desired,
+    int& scale_returned) const
 {
-    scale_out = std::max(scale_in, current_scale);
-    return min_data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return min_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
@@ -449,22 +449,22 @@ template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out)
+    const int scale_desired,
+    int& scale_returned)
 {
-    scale_out = std::max(scale_in, current_scale);
-    return max_data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return max_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
 const typename BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::DataType&
 BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT>::maxData(
     const Eigen::Vector3i& voxel_coord,
-    const int scale_in,
-    int& scale_out) const
+    const int scale_desired,
+    int& scale_returned) const
 {
-    scale_out = std::max(scale_in, current_scale);
-    return max_data_[max_scale - scale_out][voxelIdx(voxel_coord, scale_out)];
+    scale_returned = std::max(scale_desired, current_scale);
+    return max_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize, typename DerivedT>
