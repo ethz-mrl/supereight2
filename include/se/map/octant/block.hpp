@@ -192,50 +192,78 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     int min_scale = -1;
     int current_scale = max_scale;
     DataType init_data;
-    /// Get data at current scale
-
-    const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
     DataType& data(const Eigen::Vector3i& voxel_coord);
+    const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    /// Get data at current scale or coarser
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
+    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
+    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
     const DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    /** Return a const reference to the block's data at the coarsest scale. */
+    const DataType& data() const;
 
-    /// Get data at scale
+    /**
+     * \brief Get a pointer to the mean block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the mean block data array from.
+     *
+     * \return The pointer to the mean block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockDataAtScale(const int scale);
 
-    const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
-
-    DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
-
-    const DataType& minData(const Eigen::Vector3i& voxel_coord) const;
 
     DataType& minData(const Eigen::Vector3i& voxel_coord);
+    const DataType& minData(const Eigen::Vector3i& voxel_coord) const;
 
+    DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
+    const DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+
+    DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
     const DataType&
     minData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    /** Return a const reference to the block's minimum data at the coarsest scale. */
+    const DataType& minData() const;
 
-    const DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    /**
+     * \brief Get a pointer to the min block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the min block data array from.
+     *
+     * \return The pointer to the min block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockMinDataAtScale(const int scale);
 
-    DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
-
-    const DataType& maxData(const Eigen::Vector3i& voxel_coord) const;
 
     DataType& maxData(const Eigen::Vector3i& voxel_coord);
+    const DataType& maxData(const Eigen::Vector3i& voxel_coord) const;
 
+    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
+    const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+
+    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
     const DataType&
     maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out) const;
 
-    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale_in, int& scale_out);
+    /** Return a const reference to the block's maximum data at the coarsest scale. */
+    const DataType& maxData() const;
 
-    const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
+    /**
+     * \brief Get a pointer to the max block data array at a given scale.
+     *
+     * \param[in] scale The scale to return the max block data array from.
+     *
+     * \return The pointer to the max block data array at the provided scale.
+     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     */
+    DataType* blockMaxDataAtScale(const int scale);
 
-    DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
 
     /**
      * \brief Allocate the mip-mapped scales down to 'new_min_scale'.
@@ -246,27 +274,6 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      * \brief Delete the mip-mapped scales up to 'new_min_scale'.
      */
     void deleteUpTo(const int new_min_scale);
-
-    /**
-     * \brief Get the block's data at the coarsest scale.
-     *
-     * \return The block's data at the coarsest scale
-     */
-    const DataType& data() const;
-
-    /**
-     * \brief Get the block's min data at the coarsest scale.
-     *
-     * \return The block's min data at the coarsest scale
-     */
-    const DataType& minData() const;
-
-    /**
-     * \brief Get the block's max data at the coarsest scale.
-     *
-     * \return The block's max data at the coarsest scale
-     */
-    const DataType& maxData() const;
 
     /**
      * \brief Get the number of integrations at the current scale.
@@ -291,16 +298,16 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     void incrCurrObservedCount(bool do_increment = true);
 
     /**
-     * \brief Reset the current integration and observation count to 0.
-     */
-    void resetCurrCount();
-
-    /**
      * \brief When a block is initialised from an observed block (i.e. init_data.observed == true), set the current
      *        observed count to all voxels observed and the integration count to the nodes value. Otherwise reset the current
      *        count.
      */
     void initCurrCout();
+
+    /**
+     * \brief Reset the current integration and observation count to 0.
+     */
+    void resetCurrCount();
 
     /**
      * \return The integration scale of the buffer.
@@ -324,6 +331,14 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
      * \param[in] do_increment The optional flag indicating if the counter should be incremented.
      */
     void incrBufferObservedCount(const bool do_increment = true);
+
+    /**
+     * \brief Init buffer variables.
+     *
+     * \param[in] buffer_scale The scale the buffer should be initialised at.
+     */
+    void initBuffer(const int buffer_scale);
+
     /**
      * \brief Reset the buffer integration and observation count to 0.
      */
@@ -335,29 +350,11 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     void resetBuffer();
 
     /**
-     * \brief Init buffer variables.
-     *
-     * \param[in] buffer_scale The scale the buffer should be initialised at.
-     */
-    void initBuffer(const int buffer_scale);
-
-    /**
      * \brief Check if the scale should be switched from the current scale to the recommended.
      *
      * \return True is data is switched to recommended scale.
      */
     bool switchData();
-
-    /**
-     * \brief Get a `const` reference to the voxel data in the buffer at the voxel coordinates.
-     *
-     * \warning The function does not not check if the voxel_idx exceeds the array size.
-     *
-     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
-     *
-     * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
-     */
-    const DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
 
     /**
      * \brief Get a reference to the voxel data in the buffer at the voxel coordinates.
@@ -371,15 +368,15 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType& bufferData(const Eigen::Vector3i& voxel_coord);
 
     /**
-     * \brief Get a `const` reference to the voxel data in the buffer at the voxel index.
+     * \brief Get a `const` reference to the voxel data in the buffer at the voxel coordinates.
      *
      * \warning The function does not not check if the voxel_idx exceeds the array size.
      *
-     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     * \param[in] voxel_coord The voxel coordinates of the data to be accessed.
      *
-     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
+     * \return `const` reference to the voxel data in the buffer for the provided voxel coordinates.
      */
-    const DataType& bufferData(const int voxel_idx) const;
+    const DataType& bufferData(const Eigen::Vector3i& voxel_coord) const;
 
     /**
      * \brief Get a reference to the voxel data in the buffer at the voxel index.
@@ -393,33 +390,15 @@ class BlockMultiRes<Data<Field::Occupancy, ColB, IdB>, BlockSize, DerivedT> {
     DataType& bufferData(const int voxel_idx);
 
     /**
-     * \brief Get a pointer to the mean block data array at a given scale.
+     * \brief Get a `const` reference to the voxel data in the buffer at the voxel index.
      *
-     * \param[in] scale The scale to return the mean block data array from.
+     * \warning The function does not not check if the voxel_idx exceeds the array size.
      *
-     * \return The pointer to the mean block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
+     * \param[in] voxel_idx The voxel index of the data to be accessed.
+     *
+     * \return `const` reference to the voxel data in the buffer for the provided voxel index.
      */
-    DataType* blockDataAtScale(const int scale);
-
-    /**
-     * \brief Get a pointer to the min block data array at a given scale.
-     *
-     * \param[in] scale The scale to return the min block data array from.
-     *
-     * \return The pointer to the min block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
-     */
-    DataType* blockMinDataAtScale(const int scale);
-    /**
-     * \brief Get a pointer to the max block data array at a given scale.
-     *
-     * \param[in] scale The scale to return the max block data array from.
-     *
-     * \return The pointer to the max block data array at the provided scale.
-     *         Returns a nullptr if the scale smaller than the min allocated scale.
-     */
-    DataType* blockMaxDataAtScale(const int scale);
+    const DataType& bufferData(const int voxel_idx) const;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
