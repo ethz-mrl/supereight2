@@ -131,9 +131,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
     }
 
     for (int d = octree_.getBlockDepth() - 1; d > 0; d--) {
-        std::set<OctantBase*>::iterator it;
-        for (it = node_set_[d].begin(); it != node_set_[d].end(); ++it) {
-            OctantBase* octant_ptr = *it;
+        for (OctantBase* const octant_ptr : node_set_[d]) {
+            assert(octant_ptr);
             if (octant_ptr->timestamp == timestamp_) {
                 continue;
             }
