@@ -122,7 +122,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
 
 template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
-             SensorT>::propagateToRoot(std::vector<OctantBase*>& block_list)
+             SensorT>::propagateToRoot(const std::vector<OctantBase*>& block_list)
 {
     for (const auto& octant_ptr : block_list) {
         BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);

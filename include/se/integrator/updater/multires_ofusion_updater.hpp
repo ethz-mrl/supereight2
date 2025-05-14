@@ -59,7 +59,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sen
     /**
    . * \brief Propage all newly integrated values from the voxel block depth up to the root of the octree.
    . */
-    void propagateToRoot(std::vector<OctantBase*>& block_list);
+    void propagateToRoot(const std::vector<OctantBase*>& block_list);
 
     void freeBlock(OctantBase* octant_ptr);
 
