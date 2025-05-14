@@ -124,11 +124,10 @@ template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
              SensorT>::propagateToRoot(const std::vector<OctantBase*>& block_list)
 {
-    for (const auto& octant_ptr : block_list) {
-        BlockType* block_ptr = static_cast<BlockType*>(octant_ptr);
-        if (block_ptr->parent()) {
-            node_set_[octree_.getBlockDepth() - 1].insert(block_ptr->parent());
-        }
+    for (OctantBase* const octant_ptr : block_list) {
+        assert(octant_ptr);
+        assert(octant_ptr->parent());
+        node_set_[octree_.getBlockDepth() - 1].insert(octant_ptr->parent());
     }
 
     for (int d = octree_.getBlockDepth() - 1; d > 0; d--) {
@@ -138,29 +137,27 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
             if (octant_ptr->timestamp == timestamp_) {
                 continue;
             }
-            if (octant_ptr->parent()) {
-                auto node_data =
-                    updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, timestamp_);
-                node_set_[d - 1].insert(octant_ptr->parent());
-                if (updated_octants_) {
-                    updated_octants_->insert(octant_ptr);
-                }
+            assert(octant_ptr->parent());
+            auto node_data =
+                updater::propagate_to_parent_node<NodeType, BlockType>(octant_ptr, timestamp_);
+            node_set_[d - 1].insert(octant_ptr->parent());
+            if (updated_octants_) {
+                updated_octants_->insert(octant_ptr);
+            }
 
-                if (node_data.field.observed
-                    && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
-                    auto* node_ptr = static_cast<NodeType*>(octant_ptr);
-                    if (updated_octants_) {
-                        for (int i = 0; i < 8; i++) {
-                            OctantBase* const child_ptr = node_ptr->getChild(i);
-                            if (child_ptr) {
-                                updated_octants_->erase(child_ptr);
-                            }
+            if (node_data.field.observed
+                && get_field(node_data) <= 0.95 * MapType::DataType::FieldType::min_occupancy) {
+                auto* node_ptr = static_cast<NodeType*>(octant_ptr);
+                if (updated_octants_) {
+                    for (int i = 0; i < 8; i++) {
+                        OctantBase* const child_ptr = node_ptr->getChild(i);
+                        if (child_ptr) {
+                            updated_octants_->erase(child_ptr);
                         }
                     }
-                    octree_.deleteChildren(node_ptr);
                 }
-
-            } // if parent
+                octree_.deleteChildren(node_ptr);
+            }
         }     // nodes at depth d
     }         // depth d
 
