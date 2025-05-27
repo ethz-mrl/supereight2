@@ -130,10 +130,6 @@ class Node : public OctantBase, public NodeData<DataT, ResT> {
     private:
     // Pointers to the eight node children. Must be nullptr for unallocated children.
     std::array<OctantBase*, 8> children_ptr_;
-
-    public:
-    /** The edge length of the node in voxels. */
-    const int size;
 };
 
 } // namespace se

@@ -13,7 +13,7 @@ namespace se {
 
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
-        OctantBase(coord, false, nullptr), NodeData<DataT, ResT>(init_data), size(size)
+        OctantBase(coord, size, false, nullptr), NodeData<DataT, ResT>(init_data)
 {
     assert(math::is_power_of_two(size));
     children_ptr_.fill(nullptr);
@@ -23,9 +23,8 @@ Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const Data
 
 template<typename DataT, Res ResT>
 Node<DataT, ResT>::Node(Node* const parent_ptr, const int child_idx, const DataT& init_data) :
-        OctantBase(parent_ptr->getChildCoord(child_idx), false, parent_ptr),
-        NodeData<DataT, ResT>(init_data),
-        size(parent_ptr->size / 2)
+        OctantBase(parent_ptr->getChildCoord(child_idx), parent_ptr->size / 2, false, parent_ptr),
+        NodeData<DataT, ResT>(init_data)
 {
     assert(child_idx >= 0);
     assert(static_cast<size_t>(child_idx) < children_ptr_.size());

@@ -894,6 +894,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
                            * Eigen::Vector3i((1 & child_idx) > 0,
                                              (2 & child_idx) > 0,
                                              (4 & child_idx) > 0),
+                   BlockSize,
                    true,
                    parent_ptr),
         BlockData<DataT, ResT, BlockSize>(init_data)

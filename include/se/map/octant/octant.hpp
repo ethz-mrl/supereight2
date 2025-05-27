@@ -25,6 +25,9 @@ class OctantBase {
     /** The coordinates in voxels of the octant's vertex closest to the origin. */
     const Eigen::Vector3i coord;
 
+    /** The edge length of the octant in voxels. */
+    const int size;
+
     /** The time the octant was last updated at. */
     timestamp_t timestamp;
 
@@ -40,12 +43,20 @@ class OctantBase {
 
     protected:
     /** Construct an octant given the non-negative coordinates in voxels of its vertex closest to
-     * the origin (\p coord), whether it's an se::Block (\p is_block) and the pointer to its parent
-     * octant (\p parent_ptr). When constructing the root octant of an se::Octree, \p parent_ptr
-     * must be null.
+     * the origin (\p coord), its edge length in voxels (\p size), whether it's an se::Block (\p
+     * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root
+     * octant of an se::Octree, \p parent_ptr must be null.
      */
-    OctantBase(const Eigen::Vector3i& coord, const bool is_block, OctantBase* const parent_ptr) :
-            parent_ptr_(parent_ptr), coord(coord), timestamp(-1), child_mask(0u), is_block(is_block)
+    OctantBase(const Eigen::Vector3i& coord,
+               const int size,
+               const bool is_block,
+               OctantBase* const parent_ptr) :
+            parent_ptr_(parent_ptr),
+            coord(coord),
+            size(size),
+            timestamp(-1),
+            child_mask(0u),
+            is_block(is_block)
     {
     }
 
