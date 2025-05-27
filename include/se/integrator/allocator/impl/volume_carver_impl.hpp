@@ -57,7 +57,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
     // can't be done on the octree side.
     for (const OctantBase* octant : allocation_list_.node_list) {
         if (octant->isLeaf()) {
-            octree_.aabbExtend(octant->coord, static_cast<const NodeType*>(octant)->size);
+            octree_.aabbExtend(octant->coord, octant->size);
         }
     }
 

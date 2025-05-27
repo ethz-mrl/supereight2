@@ -121,10 +121,7 @@ static void expect_valid_non_leaf_node(const NodeType& node)
     for (int child_idx = 0; child_idx < 8; child_idx++) {
         const se::OctantBase* const child_ptr = node.getChild(child_idx);
         if (child_ptr) {
-            const int child_size = child_ptr->is_block
-                ? static_cast<const BlockType*>(child_ptr)->size
-                : static_cast<const NodeType*>(child_ptr)->size;
-            EXPECT_EQ(child_size, node.size / 2);
+            EXPECT_EQ(child_ptr->size, node.size / 2);
 
             const DataType& child_min_data = child_ptr->is_block
                 ? static_cast<const BlockType*>(child_ptr)->minData()

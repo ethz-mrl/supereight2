@@ -23,13 +23,9 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
     auto has_smaller_key = [](const se::OctantBase* block_ptr_lhs,
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
-        se::keyops::encode_key(block_ptr_lhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->size),
-                               key_lhs);
+        se::keyops::encode_key(block_ptr_lhs->coord, size_to_scale(block_ptr_lhs->size), key_lhs);
         se::key_t key_rhs;
-        se::keyops::encode_key(block_ptr_rhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->size),
-                               key_rhs);
+        se::keyops::encode_key(block_ptr_rhs->coord, size_to_scale(block_ptr_rhs->size), key_rhs);
         return key_lhs < key_rhs;
     };
     std::sort(block_ptrs.begin(), block_ptrs.end(), has_smaller_key);
@@ -44,13 +40,9 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs)
     auto has_smaller_key = [](const se::OctantBase* block_ptr_lhs,
                               const se::OctantBase* block_ptr_rhs) {
         se::key_t key_lhs;
-        se::keyops::encode_key(block_ptr_lhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_lhs)->size),
-                               key_lhs);
+        se::keyops::encode_key(block_ptr_lhs->coord, size_to_scale(block_ptr_lhs->size), key_lhs);
         se::key_t key_rhs;
-        se::keyops::encode_key(block_ptr_rhs->coord,
-                               size_to_scale(static_cast<const BlockT*>(block_ptr_rhs)->size),
-                               key_rhs);
+        se::keyops::encode_key(block_ptr_rhs->coord, size_to_scale(block_ptr_rhs->size), key_rhs);
         return key_lhs < key_rhs;
     };
     std::sort(block_ptrs.begin(), block_ptrs.end(), has_smaller_key);
@@ -75,26 +67,9 @@ constexpr int scale_to_size(const int scale)
 
 
 template<typename OctreeT>
-inline int octant_to_size(const se::OctantBase* octant_ptr)
-{
-    if (octant_ptr->is_block) {
-        typedef typename OctreeT::BlockType BlockType;
-        const BlockType* block_ptr = static_cast<const BlockType*>(octant_ptr);
-        return block_ptr->size;
-    }
-    else {
-        typedef typename OctreeT::NodeType NodeType;
-        const NodeType* node_ptr = static_cast<const NodeType*>(octant_ptr);
-        return node_ptr->size;
-    }
-}
-
-
-
-template<typename OctreeT>
 inline int octant_to_scale(const se::OctantBase* octant_ptr)
 {
-    return se::octantops::size_to_scale(octant_to_size<OctreeT>(octant_ptr));
+    return se::octantops::size_to_scale(octant_ptr->size);
 }
 
 

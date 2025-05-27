@@ -151,12 +151,9 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
 {
     assert(octant_ptr);
     const Eigen::Vector3i& octant_coord = octant_ptr->coord;
-    const int octant_size = octant_ptr->is_block
-        ? static_cast<const typename OctreeT::BlockType*>(octant_ptr)->size
-        : static_cast<const typename OctreeT::NodeType*>(octant_ptr)->size;
-    const int octant_scale = octantops::size_to_scale(octant_size);
+    const int octant_scale = octantops::size_to_scale(octant_ptr->size);
     const Eigen::Matrix<int, 3, 6> neighbour_coords =
-        (octant_size * face_neighbour_offsets).colwise() + octant_coord;
+        (octant_ptr->size * face_neighbour_offsets).colwise() + octant_coord;
     std::vector<const OctantBase*> neighbours;
     for (int i = 0; i < neighbour_coords.cols(); i++) {
         const Eigen::Vector3i& neighbour_coord = neighbour_coords.col(i);
@@ -170,7 +167,7 @@ std::vector<const OctantBase*> face_neighbours(const OctantBase* const octant_pt
             // has been allocated.
             const Eigen::Vector3i& nc = neighbour->coord;
             if ((octant_coord.array() >= nc.array()).all()
-                && (octant_coord.array() < nc.array() + octant_size).all()) {
+                && (octant_coord.array() < nc.array() + octant_ptr->size).all()) {
                 neighbour = nullptr;
             }
         }

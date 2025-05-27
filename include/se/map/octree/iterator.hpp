@@ -217,12 +217,11 @@ struct FrustumIterator : public BaseIterator<FrustumIterator<MapT, SensorT>> {
     bool doIgnore(OctantBase* octant_ptr)
     {
         Eigen::Vector3f octant_centre_point_M;
-        const int octant_size = octantops::octant_to_size<typename MapT::OctreeType>(octant_ptr);
-        map_ptr_->voxelToPoint(octant_ptr->coord, octant_size, octant_centre_point_M);
+        map_ptr_->voxelToPoint(octant_ptr->coord, octant_ptr->size, octant_centre_point_M);
         // Convert it to the sensor frame.
         const Eigen::Vector3f octant_centre_point_S = T_SM_ * octant_centre_point_M;
 
-        float octant_radius = std::sqrt(3.0f) / 2.0f * map_ptr_->getRes() * octant_size;
+        float octant_radius = std::sqrt(3.0f) / 2.0f * map_ptr_->getRes() * octant_ptr->size;
         bool do_ignore = !sensor_ptr_->sphereInFrustum(octant_centre_point_S, octant_radius);
         return do_ignore;
     }

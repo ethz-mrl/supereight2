@@ -415,9 +415,7 @@ bool get_neighbours(const OctreeT& octree,
     if (!base_octant_ptr) {
         return false;
     }
-    const int base_octant_size = (base_octant_ptr->is_block)
-        ? OctreeT::BlockType::size
-        : static_cast<const typename OctreeT::NodeType*>(base_octant_ptr)->size;
+    const int base_octant_size = base_octant_ptr->size;
 
     int crossmask = (((base_coord.x() & (base_octant_size - 1)) == base_octant_size - stride) << 2)
         | (((base_coord.y() & (base_octant_size - 1)) == base_octant_size - stride) << 1)
@@ -913,7 +911,6 @@ getInterp(const OctreeT& octree,
           const int desired_scale,
           int* const returned_scale)
 {
-    typedef typename OctreeT::NodeType NodeType;
     typedef typename OctreeT::BlockType BlockType;
 
     // Interpolate in a multi-resolution octree.
@@ -953,9 +950,8 @@ getInterp(const OctreeT& octree,
 
         if (returned_scale) {
             // Return the correct scale in the case of Nodes.
-            *returned_scale = octant_ptr->is_block
-                ? scale
-                : octantops::size_to_scale(static_cast<const NodeType*>(octant_ptr)->size);
+            *returned_scale =
+                octant_ptr->is_block ? scale : octantops::size_to_scale(octant_ptr->size);
         }
         // Perform trilinear interpolation.
         // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
