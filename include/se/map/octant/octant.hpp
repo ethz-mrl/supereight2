@@ -39,28 +39,6 @@ class OctantBase {
     /** Whether the octant is an se::Block. */
     const bool is_block;
 
-
-
-    protected:
-    /** Construct an octant given the non-negative coordinates in voxels of its vertex closest to
-     * the origin (\p coord), its edge length in voxels (\p size), whether it's an se::Block (\p
-     * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root
-     * octant of an se::Octree, \p parent_ptr must be null.
-     */
-    OctantBase(const Eigen::Vector3i& coord,
-               const int size,
-               const bool is_block,
-               OctantBase* const parent_ptr) :
-            parent_ptr_(parent_ptr),
-            coord(coord),
-            size(size),
-            timestamp(-1),
-            child_mask(0u),
-            is_block(is_block)
-    {
-    }
-
-    public:
     /** Return the pointer to the octant's parent. The parent pointer of the root octant is null. */
     OctantBase* parent()
     {
@@ -80,6 +58,25 @@ class OctantBase {
     }
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    protected:
+    /** Construct an octant given the non-negative coordinates in voxels of its vertex closest to
+     * the origin (\p coord), its edge length in voxels (\p size), whether it's an se::Block (\p
+     * is_block) and the pointer to its parent octant (\p parent_ptr). When constructing the root
+     * octant of an se::Octree, \p parent_ptr must be null.
+     */
+    OctantBase(const Eigen::Vector3i& coord,
+               const int size,
+               const bool is_block,
+               OctantBase* const parent_ptr) :
+            parent_ptr_(parent_ptr),
+            coord(coord),
+            size(size),
+            timestamp(-1),
+            child_mask(0u),
+            is_block(is_block)
+    {
+    }
 };
 
 } // namespace se
