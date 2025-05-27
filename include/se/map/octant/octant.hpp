@@ -45,7 +45,7 @@ class OctantBase {
         return parent_ptr_;
     }
 
-    /** Const version of se::OctantBase::parent(). */
+    /** \constoverload */
     const OctantBase* parent() const
     {
         return parent_ptr_;
