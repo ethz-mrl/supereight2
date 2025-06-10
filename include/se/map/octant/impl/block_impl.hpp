@@ -202,7 +202,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->data(data, voxel_coord));
+            ->data(data_, voxel_coord));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -222,7 +222,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->data(data, voxel_coord, scale));
+            ->data(data_, voxel_coord, scale));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -243,7 +243,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->data(data, voxel_coord, scale_desired, scale_returned));
+            ->data(data_, voxel_coord, scale_desired, scale_returned));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -287,7 +287,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->minData(data, voxel_coord));
+            ->minData(data_, voxel_coord));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -307,7 +307,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->minData(data, voxel_coord, scale));
+            ->minData(data_, voxel_coord, scale));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -328,7 +328,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->minData(data, voxel_coord, scale_desired, scale_returned));
+            ->minData(data_, voxel_coord, scale_desired, scale_returned));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -372,7 +372,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->maxData(data, voxel_coord));
+            ->maxData(data_, voxel_coord));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -392,7 +392,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->maxData(data, voxel_coord, scale));
+            ->maxData(data_, voxel_coord, scale));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -413,7 +413,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
 {
     return const_cast<DataType&>(
         const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->maxData(data, voxel_coord, scale_desired, scale_returned));
+            ->maxData(data_, voxel_coord, scale_desired, scale_returned));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
