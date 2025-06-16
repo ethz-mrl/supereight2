@@ -164,10 +164,10 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
     int size_at_parent_scale_li = BlockT::size >> parent_scale;
     int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
 
-    DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
-    DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
-    DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
-    DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
+    DataType* min_data_at_parent_scale = block.minDataAtScale(parent_scale);
+    DataType* max_data_at_parent_scale = block.maxDataAtScale(parent_scale);
+    DataType* data_at_parent_scale = block.dataAtScale(parent_scale);
+    DataType* data_at_child_scale = block.dataAtScale(child_scale);
 
     // Iter over all parent scale data
     for (int z = 0; z < size_at_parent_scale_li; z++) {
@@ -263,12 +263,12 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
         size_at_child_scale_li = BlockT::size >> child_scale;
         size_at_child_scale_sq = se::math::sq(size_at_child_scale_li);
 
-        DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
-        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
-        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
-        DataType* min_data_at_child_scale = block.blockMinDataAtScale(child_scale);
-        DataType* max_data_at_child_scale = block.blockMaxDataAtScale(child_scale);
-        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
+        DataType* min_data_at_parent_scale = block.minDataAtScale(parent_scale);
+        DataType* max_data_at_parent_scale = block.maxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block.dataAtScale(parent_scale);
+        DataType* min_data_at_child_scale = block.minDataAtScale(child_scale);
+        DataType* max_data_at_child_scale = block.maxDataAtScale(child_scale);
+        DataType* data_at_child_scale = block.dataAtScale(child_scale);
 
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
@@ -385,8 +385,8 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
         int size_at_parent_scale_li = BlockT::size >> parent_scale;
         int size_at_parent_scale_sq = se::math::sq(size_at_parent_scale_li);
 
-        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
-        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
+        DataType* data_at_parent_scale = block.dataAtScale(parent_scale);
+        DataType* data_at_child_scale = block.dataAtScale(child_scale);
 
         // Iter over all parent scale data
         for (int z = 0; z < size_at_parent_scale_li; z++) {

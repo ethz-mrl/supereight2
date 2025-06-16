@@ -272,8 +272,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data() cons
 
 template<Colour ColB, Id IdB, int BlockSize>
 typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::blockDataAtScale(
-    const int scale)
+BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataAtScale(const int scale)
 {
     assert(scale >= 0);
     assert(scale <= max_scale);
@@ -361,8 +360,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData() c
 
 template<Colour ColB, Id IdB, int BlockSize>
 typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::blockMinDataAtScale(
-    const int scale)
+BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minDataAtScale(const int scale)
 {
     assert(scale >= 0);
     assert(scale <= max_scale);
@@ -450,8 +448,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData() c
 
 template<Colour ColB, Id IdB, int BlockSize>
 typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::blockMaxDataAtScale(
-    const int scale)
+BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxDataAtScale(const int scale)
 {
     assert(scale >= 0);
     assert(scale <= max_scale);

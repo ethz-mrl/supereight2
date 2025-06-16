@@ -149,10 +149,10 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
     int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
 
     if (block.bufferScale() > block.current_scale) {
-        DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
-        DataType* min_data_at_child_scale = block.blockDataAtScale(child_scale);
-        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
-        DataType* max_data_at_child_scale = block.blockDataAtScale(child_scale);
+        DataType* min_data_at_parent_scale = block.minDataAtScale(parent_scale);
+        DataType* min_data_at_child_scale = block.dataAtScale(child_scale);
+        DataType* max_data_at_parent_scale = block.maxDataAtScale(parent_scale);
+        DataType* max_data_at_child_scale = block.dataAtScale(child_scale);
 
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
@@ -186,10 +186,10 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
         } // z
     }
     else {
-        DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
-        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
-        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
-        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
+        DataType* min_data_at_parent_scale = block.minDataAtScale(parent_scale);
+        DataType* max_data_at_parent_scale = block.maxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block.dataAtScale(parent_scale);
+        DataType* data_at_child_scale = block.dataAtScale(child_scale);
 
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {
@@ -231,12 +231,12 @@ void propagate_block_to_coarsest_scale(OctantBase* octant_ptr)
         size_at_child_scale_li = BlockT::size >> child_scale;
         size_at_child_scale_sq = math::sq(size_at_child_scale_li);
 
-        DataType* min_data_at_parent_scale = block.blockMinDataAtScale(parent_scale);
-        DataType* max_data_at_parent_scale = block.blockMaxDataAtScale(parent_scale);
-        DataType* data_at_parent_scale = block.blockDataAtScale(parent_scale);
-        DataType* min_data_at_child_scale = block.blockMinDataAtScale(child_scale);
-        DataType* max_data_at_child_scale = block.blockMaxDataAtScale(child_scale);
-        DataType* data_at_child_scale = block.blockDataAtScale(child_scale);
+        DataType* min_data_at_parent_scale = block.minDataAtScale(parent_scale);
+        DataType* max_data_at_parent_scale = block.maxDataAtScale(parent_scale);
+        DataType* data_at_parent_scale = block.dataAtScale(parent_scale);
+        DataType* min_data_at_child_scale = block.minDataAtScale(child_scale);
+        DataType* max_data_at_child_scale = block.maxDataAtScale(child_scale);
+        DataType* data_at_child_scale = block.dataAtScale(child_scale);
 
         for (int z = 0; z < size_at_parent_scale_li; z++) {
             for (int y = 0; y < size_at_parent_scale_li; y++) {

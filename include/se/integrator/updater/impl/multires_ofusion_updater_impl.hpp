@@ -223,7 +223,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
                 const auto* const parent_data_at_parent_scale =
-                    block_ptr->blockDataAtScale(parent_scale);
+                    block_ptr->dataAtScale(parent_scale);
 
                 const unsigned int size_at_buffer_scale_li = 2 * size_at_parent_scale_li;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
@@ -287,7 +287,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
 
     const unsigned int size_at_integration_scale_li = BlockType::size >> integration_scale;
     const unsigned int size_at_integration_scale_sq = math::sq(size_at_integration_scale_li);
-    auto* const data_at_integration_scale = block_ptr->blockDataAtScale(integration_scale);
+    auto* const data_at_integration_scale = block_ptr->dataAtScale(integration_scale);
 
     for (unsigned int z = 0; z < size_at_integration_scale_li; z++) {
         for (unsigned int y = 0; y < size_at_integration_scale_li; y++) {
@@ -367,7 +367,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const unsigned int size_at_parent_scale_li = BlockType::size >> parent_scale;
                 const unsigned int size_at_parent_scale_sq = math::sq(size_at_parent_scale_li);
                 const auto* const parent_data_at_parent_scale =
-                    block_ptr->blockDataAtScale(parent_scale);
+                    block_ptr->dataAtScale(parent_scale);
 
                 const unsigned int size_at_buffer_scale_li = 2 * size_at_parent_scale_li;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
@@ -431,7 +431,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
     const int stride = scale::to_size(scale);
     const int size_at_scale = BlockType::size >> scale;
     const int size_at_scale_sq = math::sq(size_at_scale);
-    auto* const data_at_scale = block.blockDataAtScale(scale);
+    auto* const data_at_scale = block.dataAtScale(scale);
     Eigen::Vector3f sample_point_base_W;
     map_.voxelToPoint(block.coord, stride, sample_point_base_W);
     const Eigen::Vector3f sample_point_base_C = T_CW_ * sample_point_base_W;

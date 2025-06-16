@@ -341,7 +341,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
 
     const int voxel_idx = offset_coords.x() + size_at_integration_scale_li * offset_coords.y()
         + size_at_integration_scale_sq * offset_coords.z();
-    DataType* data_at_scale = block_ptr->blockDataAtScale(integration_scale);
+    DataType* data_at_scale = block_ptr->dataAtScale(integration_scale);
     auto& voxel_data = data_at_scale[voxel_idx];
     float range_diff = sample_dist - ray_dist_;
     ray_integrator::update_voxel(voxel_data, range_diff, tau_, three_sigma_, map_.getDataConfig());

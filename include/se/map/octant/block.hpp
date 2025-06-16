@@ -217,7 +217,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** Return a pointer to the block data array for scale \p scale. Return `nullptr` if \p scale
      * is smaller than the finest allocated scale.
      */
-    DataType* blockDataAtScale(const int scale);
+    DataType* dataAtScale(const int scale);
     /**@}*/
 
 
@@ -253,7 +253,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** Return a pointer to the block minimum data array for scale \p scale. Return `nullptr` if \p
      * scale is smaller than the finest allocated scale.
      */
-    DataType* blockMinDataAtScale(const int scale);
+    DataType* minDataAtScale(const int scale);
     /**@}*/
 
 
@@ -289,7 +289,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** Return a pointer to the block maximum data array for scale \p scale. Return `nullptr` if \p
      * scale is smaller than the finest allocated scale.
      */
-    DataType* blockMaxDataAtScale(const int scale);
+    DataType* maxDataAtScale(const int scale);
     /**@}*/
 
 
