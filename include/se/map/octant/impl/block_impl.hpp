@@ -178,7 +178,8 @@ int BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>::voxelIdx(
 {
     assert(scale >= 0);
     assert(scale <= max_scale);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - derived()->coord) / (1 << scale);
+    const Eigen::Vector3i voxel_offset =
+        (voxel_coord - derived()->coord) / scale::to_size(scale);
     assert((voxel_offset.array() >= 0).all());
     assert((voxel_offset.array() < BlockSize).all());
     const int size_at_scale = size_at_scales_[scale];
@@ -621,8 +622,8 @@ void BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::incrBu
     const bool do_increment)
 {
     if (do_increment
-        || buffer_observed_count_ * math::cu(1 << buffer_scale_)
-            >= 0.90 * curr_observed_count_ * math::cu(1 << current_scale)) {
+        || buffer_observed_count_ * math::cu(scale::to_size(buffer_scale_))
+            >= 0.90 * curr_observed_count_ * math::cu(scale::to_size(current_scale))) {
         buffer_integr_count_++;
     }
 }
@@ -678,10 +679,10 @@ void BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::resetB
 template<Colour ColB, Id IdB, int BlockSize>
 bool BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::switchData()
 {
+    // TODO: Find threshold
     if (buffer_integr_count_ >= 20
-        && buffer_observed_count_ * math::cu(1 << buffer_scale_)
-            >= 0.9 * curr_observed_count_ * math::cu(1 << current_scale)) { // TODO: Find threshold
-
+        && buffer_observed_count_ * math::cu(scale::to_size(buffer_scale_))
+            >= 0.9 * curr_observed_count_ * math::cu(scale::to_size(current_scale))) {
         /// !!! We'll switch !!!
         if (buffer_scale_ < current_scale) { ///<< Switch to finer scale.
             data_.push_back(buffer_data_);
@@ -813,7 +814,8 @@ int BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::voxelId
 {
     assert(scale >= 0);
     assert(scale <= max_scale);
-    const Eigen::Vector3i voxel_offset = (voxel_coord - derived()->coord) / (1 << scale);
+    const Eigen::Vector3i voxel_offset =
+        (voxel_coord - derived()->coord) / scale::to_size(scale);
     const int size_at_scale = BlockSize >> scale;
     return voxel_offset.x() + voxel_offset.y() * size_at_scale
         + voxel_offset.z() * math::sq(size_at_scale);

@@ -81,7 +81,7 @@ struct BlockData<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize> {
     };
 
     /** The maximum scale of the stored data. */
-    static constexpr int max_scale = math::log2_const(BlockSize);
+    static constexpr int max_scale = scale::from_size(BlockSize);
     /** The minimum scale the data has been updated at. -1 if no update has been performed. */
     int min_scale = -1;
     /** The scale the data was last updated at. -1 if no update has been performed. */
@@ -179,7 +179,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     typedef Data<Field::Occupancy, ColB, IdB> DataType;
 
     /** The maximum scale of the stored data. */
-    static constexpr int max_scale = math::log2_const(BlockSize);
+    static constexpr int max_scale = scale::from_size(BlockSize);
     /** The minimum scale the data has been updated at. -1 if no update has been performed. */
     int min_scale = -1;
     /** The scale the data was last updated at. */
