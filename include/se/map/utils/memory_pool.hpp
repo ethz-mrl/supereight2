@@ -28,11 +28,11 @@ template<typename NodeT, typename BlockT>
 class MemoryPool {
     public:
     /** Allocate the root node with coordinates in voxels \p coord and edge length in voxels \p
-     * size.
+     * octree_size.
      */
-    NodeT* allocateRoot(const Eigen::Vector3i& coord, const int size)
+    NodeT* allocateRoot(const int octree_size)
     {
-        return new (node_buffer_.malloc()) NodeT(coord, size, typename NodeT::DataType());
+        return new (node_buffer_.malloc()) NodeT(octree_size, typename NodeT::DataType());
     }
 
     /** Return a pointer to a newly allocated node that is the child with index \p child_idx of \p

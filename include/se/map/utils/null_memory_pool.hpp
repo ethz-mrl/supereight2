@@ -30,9 +30,9 @@ class NullMemoryPool {
         }
     }
 
-    NodeT* allocateRoot(const Eigen::Vector3i& coord, const int size)
+    NodeT* allocateRoot(const int octree_size)
     {
-        auto [it, _] = node_buffer_.emplace(new NodeT(coord, size, typename NodeT::DataType()));
+        auto [it, _] = node_buffer_.emplace(new NodeT(octree_size, typename NodeT::DataType()));
         return *it;
     }
 

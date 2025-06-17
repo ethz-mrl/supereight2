@@ -88,13 +88,13 @@ class Node : public OctantBase, public NodeData<DataT, ResT> {
     public:
     typedef DataT DataType;
 
-    /** Construct a node at coordinates \p coord in voxels, with an edge length \p size in voxels
-     * and initialize its data with \p init_data.
+    /** Construct the octree root node at voxel coordinates [0, 0, 0]ᵀ, with an edge length \p
+     * octree_size in voxels and initialize its data with \p init_data.
      *
      * \warning This constructor should only be used for the octree root node as it doesn't set the
      * parent pointer.
      */
-    Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data);
+    Node(const int octree_size, const DataT& init_data);
 
     /** Construct the child node of \p parent_ptr with index \p child_idx and initialize its data
      * with \p init_data. The value of \p child_idx must be in the interval [0, 7] inclusive.

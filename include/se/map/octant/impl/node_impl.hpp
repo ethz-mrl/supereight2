@@ -12,10 +12,11 @@
 namespace se {
 
 template<typename DataT, Res ResT>
-Node<DataT, ResT>::Node(const Eigen::Vector3i& coord, const int size, const DataT& init_data) :
-        OctantBase(coord, size, false, nullptr), NodeData<DataT, ResT>(init_data)
+Node<DataT, ResT>::Node(const int octree_size, const DataT& init_data) :
+        OctantBase(Eigen::Vector3i::Zero(), octree_size, false, nullptr),
+        NodeData<DataT, ResT>(init_data)
 {
-    assert(math::is_power_of_two(size));
+    assert(math::is_power_of_two(octree_size));
     children_ptr_.fill(nullptr);
 }
 
