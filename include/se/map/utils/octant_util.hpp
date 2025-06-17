@@ -9,8 +9,8 @@
 #ifndef SE_OCTANT_UTIL_HPP
 #define SE_OCTANT_UTIL_HPP
 
+#include <se/common/scale.hpp>
 #include <se/map/octant/octant.hpp>
-
 
 namespace se {
 namespace octantops {
@@ -40,12 +40,6 @@ sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
 template<typename BlockT, se::Sort SortT>
 inline typename std::enable_if_t<SortT == se::Sort::LargeToSmall>
 sort_blocks(std::vector<se::OctantBase*>& block_ptrs);
-
-/** Return the octree scale corresponding to \p octant_size in voxels. */
-constexpr int size_to_scale(const int octant_size);
-
-/** Return the octant size in voxels corresponding to \p octant_scale. */
-constexpr int scale_to_size(const int octant_scale);
 
 } // namespace octantops
 } // namespace se

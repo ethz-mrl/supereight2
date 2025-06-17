@@ -9,6 +9,8 @@
 #ifndef SE_COMMON_SCALE_HPP
 #define SE_COMMON_SCALE_HPP
 
+#include <se/common/math_util.hpp>
+
 namespace se {
 
 /** The scale of some octree volume is in a sense the inverse of its depth. Where the coarsest
@@ -28,6 +30,20 @@ namespace se {
  */
 typedef int Scale;
 
+
+
+namespace octantops {
+
+/** Return the octree scale corresponding to \p octant_size in voxels. */
+constexpr Scale size_to_scale(const int octant_size);
+
+/** Return the octant size in voxels corresponding to \p octant_scale. */
+constexpr int scale_to_size(const Scale octant_scale);
+
+} // namespace octantops
+
 } // namespace se
+
+#include "impl/scale_impl.hpp"
 
 #endif // SE_COMMON_SCALE_HPP
