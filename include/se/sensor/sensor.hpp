@@ -48,7 +48,7 @@ class SensorBase {
 
         /** The pixel-size to voxel-size ratio thresholds, in ascendig order and in physical
          * coordinates, for computing the integration scale. See also
-         * se::SensorBase::computeIntegrationScale(). For example:
+         * se::SensorBase::blockIntegrationScale(). For example:
          * - `pixel/voxel < pixel_voxel_ratio_per_scale[0]` → `scale = 0`
          * - `pixel/voxel < pixel_voxel_ratio_per_scale[1]` → `scale = 1`
          * - etc.
@@ -102,11 +102,11 @@ class SensorBase {
      * \param[in] max_block_scale The maximum possible scale for an se::Block.
      * \return The scale the block should be updated at.
      */
-    int computeIntegrationScale(const Eigen::Vector3f& block_centre_S,
-                                const float map_res,
-                                const int last_scale,
-                                const int min_scale,
-                                const int max_block_scale) const;
+    int blockIntegrationScale(const Eigen::Vector3f& block_centre_S,
+                              const float map_res,
+                              const int last_scale,
+                              const int min_scale,
+                              const int max_block_scale) const;
 
     /** Return the minimum distance along \p ray_S, expressed in the sensor frame, that can be
      * measured.

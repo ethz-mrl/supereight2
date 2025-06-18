@@ -194,7 +194,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
 
         // The recommended integration scale
-        int computed_integration_scale = sensor_.computeIntegrationScale(
+        int computed_integration_scale = sensor_.blockIntegrationScale(
             block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
         if (rayState == se::RayState::FreeSpace
             && (computed_integration_scale < free_space_scale_)) {

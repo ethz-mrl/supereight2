@@ -77,11 +77,11 @@ class PinholeCamera : public SensorBase<PinholeCamera> {
 
     PinholeCamera(const PinholeCamera& pinhole_camera, const float downsampling_factor);
 
-    int computeIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
-                                    const float map_res,
-                                    const int last_scale,
-                                    const int min_scale,
-                                    const int max_block_scale) const;
+    int blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
+                                  const float map_res,
+                                  const int last_scale,
+                                  const int min_scale,
+                                  const int max_block_scale) const;
 
     float nearDistImpl(const Eigen::Vector3f& ray_S) const;
 

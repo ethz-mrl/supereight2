@@ -131,7 +131,7 @@ TEST(RayIntegrator, SingleRay)
         map.voxelToPoint(block_ptr->coord, 8, block_centre_point);
 
         int computedIntegrationScale =
-            sensor.computeIntegrationScale(block_centre_point, res, -1, -1, 3);
+            sensor.blockIntegrationScale(block_centre_point, res, -1, -1, 3);
         if (rayState == se::RayState::FreeSpace && computedIntegrationScale < 1) {
             computedIntegrationScale = 1;
         }

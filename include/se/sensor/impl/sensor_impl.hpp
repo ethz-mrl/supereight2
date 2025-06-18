@@ -38,13 +38,13 @@ SensorBase<DerivedT>::SensorBase(const DerivedT& d) :
 
 
 template<typename DerivedT>
-int SensorBase<DerivedT>::computeIntegrationScale(const Eigen::Vector3f& block_centre_S,
-                                                  const float map_res,
-                                                  const int last_scale,
-                                                  const int min_scale,
-                                                  const int max_block_scale) const
+int SensorBase<DerivedT>::blockIntegrationScale(const Eigen::Vector3f& block_centre_S,
+                                                const float map_res,
+                                                const int last_scale,
+                                                const int min_scale,
+                                                const int max_block_scale) const
 {
-    return underlying()->computeIntegrationScaleImpl(
+    return underlying()->blockIntegrationScaleImpl(
         block_centre_S, map_res, last_scale, min_scale, max_block_scale);
 }
 

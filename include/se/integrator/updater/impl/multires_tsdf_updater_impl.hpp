@@ -58,11 +58,11 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
         const int lower_curr_scale_limit = last_curr_scale - 1;
 
         const int curr_scale =
-            std::max(measurements.depth.sensor.computeIntegrationScale(block_centre_point_C,
-                                                                       map.getRes(),
-                                                                       last_curr_scale,
-                                                                       block.min_scale,
-                                                                       block.max_scale),
+            std::max(measurements.depth.sensor.blockIntegrationScale(block_centre_point_C,
+                                                                     map.getRes(),
+                                                                     last_curr_scale,
+                                                                     block.min_scale,
+                                                                     block.max_scale),
                      lower_curr_scale_limit);
 
         block.min_scale = block.min_scale < 0 ? curr_scale : std::min(block.min_scale, curr_scale);

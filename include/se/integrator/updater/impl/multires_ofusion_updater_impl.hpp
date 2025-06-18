@@ -183,7 +183,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
     const int last_scale = (block_ptr->min_scale == -1) ? 0 : block_ptr->current_scale;
 
     // The recommended integration scale
-    const int computed_integration_scale = sensor_.computeIntegrationScale(
+    const int computed_integration_scale = sensor_.blockIntegrationScale(
         block_centre_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
 
     // The minimum integration scale (change to last if data has already been integrated)
@@ -326,7 +326,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
     const int last_scale = (block_ptr->min_scale == -1) ? 0 : block_ptr->current_scale;
 
     // The recommended integration scale
-    const int computed_integration_scale = sensor_.computeIntegrationScale(
+    const int computed_integration_scale = sensor_.blockIntegrationScale(
         block_centre_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
 
     // The minimum integration scale (change to last if data has already been integrated)

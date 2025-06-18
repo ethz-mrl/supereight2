@@ -109,11 +109,11 @@ se::OusterLidar::OusterLidar(const OusterLidar& ol, const float dsf) :
 
 
 
-int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
-                                                 const float map_res,
-                                                 const int last_scale,
-                                                 const int min_scale,
-                                                 const int max_block_scale) const
+int se::OusterLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
+                                               const float map_res,
+                                               const int last_scale,
+                                               const int min_scale,
+                                               const int max_block_scale) const
 {
     constexpr float deg_to_rad = M_PI / 180.0f;
     const float dist = block_centre.norm();
@@ -144,7 +144,7 @@ int se::OusterLidar::computeIntegrationScaleImpl(const Eigen::Vector3f& block_ce
     }
 
     if (recompute) {
-        return computeIntegrationScaleImpl(
+        return blockIntegrationScaleImpl(
             block_centre_hyst, map_res, last_scale, -1, max_block_scale);
     }
     else {

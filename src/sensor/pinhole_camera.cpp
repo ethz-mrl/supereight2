@@ -112,11 +112,11 @@ se::PinholeCamera::PinholeCamera(const PinholeCamera& pc, const float dsf) :
 
 
 
-int se::PinholeCamera::computeIntegrationScaleImpl(const Eigen::Vector3f& block_centre_S,
-                                                   const float map_res,
-                                                   const int last_scale,
-                                                   const int min_scale,
-                                                   const int max_block_scale) const
+int se::PinholeCamera::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre_S,
+                                                 const float map_res,
+                                                 const int last_scale,
+                                                 const int min_scale,
+                                                 const int max_block_scale) const
 {
     const float dist = block_centre_S.z();
     // Compute the side length in metres of a pixel projected dist metres from the camera
@@ -143,7 +143,7 @@ int se::PinholeCamera::computeIntegrationScaleImpl(const Eigen::Vector3f& block_
     }
 
     if (recompute) {
-        return computeIntegrationScaleImpl(
+        return blockIntegrationScaleImpl(
             block_centre_S_hyst, map_res, last_scale, -1, max_block_scale);
     }
     else {
