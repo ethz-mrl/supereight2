@@ -109,35 +109,14 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getMinData(const Eigen::Vector3f& p
 
 
 template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
-template<typename ValidF, typename GetF, Safe SafeB, Res ResTDummy>
-typename std::enable_if_t<
-    ResTDummy == Res::Multi,
-    std::optional<
-        std::invoke_result_t<GetF, typename Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::DataType>>>
-Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
-                                                       ValidF valid,
-                                                       GetF get,
-                                                       int& returned_scale) const
-{
-    Eigen::Vector3f voxel_coord_f;
-    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
-    if constexpr (SafeB == Safe::On) {
-        if (!is_inside) {
-            return std::nullopt;
-        }
-    }
-    return se::visitor::getInterp(octree_, voxel_coord_f, valid, get, 0, &returned_scale);
-}
-
-
-
-template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
-template<Safe SafeB, typename ValidF, typename GetF>
+template<typename ValidF, typename GetF, Safe SafeB>
 std::optional<
     std::invoke_result_t<GetF, typename Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::DataType>>
 Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& point_W,
                                                        ValidF valid,
-                                                       GetF get) const
+                                                       GetF get,
+                                                       const Scale desired_scale,
+                                                       Scale* const returned_scale) const
 {
     Eigen::Vector3f voxel_coord_f;
     const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
@@ -146,7 +125,7 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& po
             return std::nullopt;
         }
     }
-    return se::visitor::getInterp(octree_, voxel_coord_f, valid, get);
+    return visitor::getInterp(octree_, voxel_coord_f, valid, get, desired_scale, returned_scale);
 }
 
 

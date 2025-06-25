@@ -211,43 +211,44 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
         return se::visitor::getMaxData(octree_, voxel_coord, scale_desired);
     }
 
-    /** Interpolate a member of #DataType at the supplied coordinates and the finest possible scale.
+    /** Interpolate a member of se::Data at \p point_W and scale \p desired_scale.
      *
-     * \param[in] point_W         The coordinates in metres of the point in the world frame W the
-     *                            member will be interpolated at.
-     * \param[in] valid           A functor with the following prototype, returning whether the
+     * \tparam SafeB              \p point_W will be bounds-checked if set to se::Safe::On.
+     * \param[in] point_W         The coordinates, expressed in the world frame W in metres, of the
+     *                            point the data will be interpolated at.
+     * \param[in] valid           A functor with the following declaration, returning whether the
      *                            supplied data is valid and should be used for interpolation:
      *                            \code{.cpp}
-     *                            template<typename OctreeT>
-     *                            bool valid(const typename OctreeT::DataType& data);
+     *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+     *                            bool valid(const typename se::Data<FldT, ColB, IdB>& data);
      *                            \endcode
-     * \param[in] get             A functor with the following prototype, returning the member of
-     *                            type `T` to be interpolated:
+     * \param[in] get             A functor with the following declaration, returning the data of
+     *                            type \p T to be interpolated:
      *                            \code{.cpp}
-     *                            template<typename OctreeT>
-     *                            T get(const typename OctreeT::DataType& data);
+     *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+     *                            T get(const typename se::Data<FldT, ColB, IdB>& data);
      *                            \endcode
-     *                            Type `T` must implement the following operators:
+     *                            Type \p T must implement the following operators:
      *                            \code{.cpp}
      *                            T operator+(const T& a, const T& b);
      *                            T operator*(const T& a, const float b);
      *                            \endcode
-     * \param[out] returned_scale The scale the member was interpolated at. Not modified if
-     *                            `std::nullopt` is returned.
-     * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
+     * \param[in]  desired_scale  The finest scale the data should be interpolated at. Ignored for
+     *                            se::Res:Single maps.
+     * \param[out] returned_scale The actual scale the data was interpolated at will be stored into
+     *                            \p *returned_scale if \p returned_scale is non-null. \p
+     *                            *returned_scale is not modified if \p std::nullopt is returned.
+     *                            The value of \p *returned_scale will not be less than \p
+     *                            desired_scale in se::Res::Multi maps.
+     * \return The interpolated data if valid, \p std::nullopt otherwise.
      */
-    template<typename ValidF, typename GetF, Safe SafeB = Safe::Off, Res ResTDummy = ResT>
-    typename std::enable_if_t<ResTDummy == Res::Multi,
-                              std::optional<std::invoke_result_t<GetF, DataType>>>
-    getInterp(const Eigen::Vector3f& point_W, ValidF valid, GetF get, int& returned_scale) const;
-
-    /** \overload
-     * \details This overload works for both single- and multi-resolution maps. In the case of a
-     * multi-resolution map the member is interpolated at the finest possible scale.
-     */
-    template<Safe SafeB = Safe::Off, typename ValidF, typename GetF>
+    template<typename ValidF, typename GetF, Safe SafeB = Safe::Off>
     std::optional<std::invoke_result_t<GetF, DataType>>
-    getInterp(const Eigen::Vector3f& point_W, ValidF valid, GetF get) const;
+    getInterp(const Eigen::Vector3f& point_W,
+              ValidF valid,
+              GetF get,
+              const Scale desired_scale = 0,
+              Scale* const returned_scale = nullptr) const;
 
     /**
      * \brief Get the interpolated field value at the provided coordinates.
