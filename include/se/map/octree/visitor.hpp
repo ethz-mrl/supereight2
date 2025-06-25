@@ -261,35 +261,15 @@ std::optional<field_t> getFieldInterp(const OctreeT& octree,
                                       const Scale desired_scale = 0,
                                       Scale* const returned_scale = nullptr);
 
-/** Interpolate the colour at the supplied voxel coordinates and desired scale. The scale the colour
- * is interpolated at may be coarser than \p desired_scale and is written in \p returned_scale.
- *
- * \param[in] octree          The multi-resolution octree containing the data.
- * \param[in] voxel_coord_f   The voxel coordinates the colour will be interpolated at. The
- *                            coordinates may have a fractional part.
- * \param[in]  desired_scale  The finest scale the colour should be interpolated at.
- * \param[out] returned_scale The actual scale the colour was interpolated at will be stored into
- *                            `*returned_scale` if `returned_scale` is non-null. `*returned_scale`
- *                            is not modified if `std::nullopt` is returned. The value of
- *                            `*returned_scale` will not be less than \p desired_scale.
- * \return The interpolated colour if the data is valid, `std::nullopt` otherwise.
+/** Interpolate the colour of \p octree at \p voxel_coord_f and \p desired_scale. See
+ * se::visitor::getInterp() for more detailed documentation.
  */
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi && OctreeT::col_ == Colour::On,
-                          std::optional<colour_t>>
+typename std::enable_if_t<OctreeT::col_ == Colour::On, std::optional<colour_t>>
 getColourInterp(const OctreeT& octree,
                 const Eigen::Vector3f& voxel_coord_f,
-                const int desired_scale = 0,
-                int* const returned_scale = nullptr);
-
-/** \overload
- * \details This overload works only for single-resolution octrees. The colour is interpolated at
- * scale 0, the finest and only scale.
- */
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Single && OctreeT::col_ == Colour::On,
-                          std::optional<colour_t>>
-getColourInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
+                const Scale desired_scale = 0,
+                Scale* const returned_scale = nullptr);
 
 
 

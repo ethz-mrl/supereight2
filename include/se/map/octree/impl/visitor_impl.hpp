@@ -1063,12 +1063,11 @@ std::optional<field_t> getFieldInterp(const OctreeT& octree,
 
 
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi && OctreeT::col_ == Colour::On,
-                          std::optional<colour_t>>
+typename std::enable_if_t<OctreeT::col_ == Colour::On, std::optional<colour_t>>
 getColourInterp(const OctreeT& octree,
                 const Eigen::Vector3f& voxel_coord_f,
-                const int desired_scale,
-                int* const returned_scale)
+                const Scale desired_scale,
+                Scale* const returned_scale)
 {
     return getInterp(
         octree,
@@ -1077,20 +1076,6 @@ getColourInterp(const OctreeT& octree,
         [](const typename OctreeT::DataType& d) { return d.colour.colour; },
         desired_scale,
         returned_scale);
-}
-
-
-
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Single && OctreeT::col_ == Colour::On,
-                          std::optional<colour_t>>
-getColourInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f)
-{
-    return getInterp(
-        octree,
-        voxel_coord_f,
-        [](const typename OctreeT::DataType& d) { return is_valid(d) && d.colour.weight > 0; },
-        [](const typename OctreeT::DataType& d) { return d.colour.colour; });
 }
 
 
