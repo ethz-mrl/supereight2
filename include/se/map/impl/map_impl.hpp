@@ -150,41 +150,20 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3
 
 
 template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
-template<Safe SafeB, Res ResTDummy, Colour ColourTDummy>
-typename std::enable_if_t<ResTDummy == Res::Multi && ColourTDummy == Colour::On,
-                          std::optional<colour_t>>
-Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getColourInterp(const Eigen::Vector3f& point_W,
-                                                             int& returned_scale) const
-{
-    Eigen::Vector3f voxel_coord_f;
-    if constexpr (SafeB == Safe::Off) {
-        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
-    }
-    else {
-        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
-            return std::nullopt;
-        }
-    }
-    return se::visitor::getColourInterp(octree_, voxel_coord_f, 0, &returned_scale);
-}
-
-
-
-template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
 template<Safe SafeB, Colour ColourTDummy>
 typename std::enable_if_t<ColourTDummy == Colour::On, std::optional<colour_t>>
-Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getColourInterp(const Eigen::Vector3f& point_W) const
+Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getColourInterp(const Eigen::Vector3f& point_W,
+                                                             const Scale desired_scale,
+                                                             Scale* const returned_scale) const
 {
     Eigen::Vector3f voxel_coord_f;
-    if constexpr (SafeB == Safe::Off) {
-        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
-    }
-    else {
-        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
             return std::nullopt;
         }
     }
-    return se::visitor::getColourInterp(octree_, voxel_coord_f);
+    return visitor::getColourInterp(octree_, voxel_coord_f, desired_scale, returned_scale);
 }
 
 

@@ -258,26 +258,14 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
                                           const Scale desired_scale = 0,
                                           Scale* const returned_scale = nullptr) const;
 
-    /** Interpolate the colour at the supplied coordinates and the finest possible scale.
-     *
-     * \param[in] point_W         The coordinates in metres of the point in the world frame W the
-     *                            colour will be interpolated at.
-     * \param[out] returned_scale The scale the colour was interpolated at. Not modified if
-     *                            `std::nullopt` is returned.
-     * \return The interpolated colour if the data is valid, `std::nullopt` otherwise.
-     */
-    template<Safe SafeB = Safe::Off, Res ResTDummy = ResT, Colour ColourTDummy = ColB>
-    typename std::enable_if_t<ResTDummy == Res::Multi && ColourTDummy == Colour::On,
-                              std::optional<colour_t>>
-    getColourInterp(const Eigen::Vector3f& point_W, int& returned_scale) const;
-
-    /** \overload
-     * \details This overload works for both single- and multi-resolution maps. In the case of a
-     * multi-resolution map the colour is interpolated at the finest possible scale.
+    /** Interpolate the colour at \p point_W and \p desired_scale. See #getInterp() for more
+     * detailed documentation.
      */
     template<Safe SafeB = Safe::Off, Colour ColourTDummy = ColB>
     typename std::enable_if_t<ColourTDummy == Colour::On, std::optional<colour_t>>
-    getColourInterp(const Eigen::Vector3f& point_W) const;
+    getColourInterp(const Eigen::Vector3f& point_W,
+                    const Scale desired_scale = 0,
+                    Scale* const returned_scale = nullptr) const;
 
     /**
      * \brief Get the field gradient at the provided coordinates.
