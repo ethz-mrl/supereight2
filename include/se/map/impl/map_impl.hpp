@@ -132,45 +132,19 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getInterp(const Eigen::Vector3f& po
 
 template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
 template<Safe SafeB>
-std::optional<se::field_t>
-Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_W) const
-{
-    Eigen::Vector3f voxel_coord_f;
-
-    if constexpr (SafeB == Safe::Off) // Evaluate at compile time
-    {
-        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
-    }
-    else {
-        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
-            return std::nullopt;
-        }
-    }
-
-    return se::visitor::getFieldInterp(octree_, voxel_coord_f);
-}
-
-
-
-template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
-template<Safe SafeB, Res ResTDummy>
-typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
+std::optional<field_t>
 Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldInterp(const Eigen::Vector3f& point_W,
-                                                            int& returned_scale) const
+                                                            const Scale desired_scale,
+                                                            Scale* const returned_scale) const
 {
     Eigen::Vector3f voxel_coord_f;
-
-    if constexpr (SafeB == Safe::Off) // Evaluate at compile time
-    {
-        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
-    }
-    else {
-        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
             return std::nullopt;
         }
     }
-
-    return se::visitor::getFieldInterp(octree_, voxel_coord_f, 0, &returned_scale);
+    return visitor::getFieldInterp(octree_, voxel_coord_f, desired_scale, returned_scale);
 }
 
 

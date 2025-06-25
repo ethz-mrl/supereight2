@@ -250,28 +250,13 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
               const Scale desired_scale = 0,
               Scale* const returned_scale = nullptr) const;
 
-    /**
-     * \brief Get the interpolated field value at the provided coordinates.
-     *
-     * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-     * \param[in] point_W     The coordinates of the point in world frame [meter] to accessed
-     * \return                The interpolated field value at the coordinates
+    /** Interpolate the field at \p point_W and \p desired_scale. See #getInterp() for more detailed
+     * documentation.
      */
     template<Safe SafeB = Safe::Off>
-    std::optional<se::field_t> getFieldInterp(const Eigen::Vector3f& point_W) const;
-
-    /**
-     * \brief Get the interpolated field value at the provided coordinates and the scale it is stored at.
-     *
-     * \tparam SafeB              The parameter turning "contains point" verification on and off (Off by default)
-     * \tparam ResTDummy          The dummy parameter disabling the function off for single res maps // TODO: Clean up with C++20 using required
-     * \param[in] point_W         The coordinates of the point in world frame [meter] to accessed
-     * \param[out] returned_scale The scale the data is stored at
-     * \return                    The interpolated field value at the coordinates
-     */
-    template<Safe SafeB = Safe::Off, Res ResTDummy = ResT>
-    typename std::enable_if_t<ResTDummy == Res::Multi, std::optional<se::field_t>>
-    getFieldInterp(const Eigen::Vector3f& point_W, int& returned_scale) const;
+    std::optional<field_t> getFieldInterp(const Eigen::Vector3f& point_W,
+                                          const Scale desired_scale = 0,
+                                          Scale* const returned_scale = nullptr) const;
 
     /** Interpolate the colour at the supplied coordinates and the finest possible scale.
      *
