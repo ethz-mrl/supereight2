@@ -210,55 +210,47 @@ getField(const OctreeT& octree,
 
 
 
-/** Interpolate a member of se::Octree::DataType at the supplied voxel coordinates and desired
- * scale. The scale the member is interpolated at may be coarser than \p desired_scale and is
- * written in \p returned_scale.
+/** Interpolate a member of se::Data of \p octree at \p voxel_coord_f in voxels and scale \p
+ * desired_scale. The scale the interpolation is performed at may be coarser than \p desired_scale
+ * and is written into \p returned_scale.
  *
- * \param[in] octree          The multi-resolution octree containing the data.
- * \param[in] voxel_coord_f   The voxel coordinates the member will be interpolated at. The
+ * \param[in] octree          The octree whose data will be interpolated.
+ * \param[in] voxel_coord_f   The voxel coordinates the data will be interpolated at. The
  *                            coordinates may have a fractional part.
- * \param[in] valid           A functor with the following prototype, returning whether the supplied
- *                            data is valid and should be used for interpolation:
+ * \param[in] valid           A functor with the following declaration, returning whether the
+ *                            supplied data is valid and should be used for interpolation:
  *                            \code{.cpp}
- *                            template<typename OctreeT>
- *                            bool valid(const typename OctreeT::DataType& data);
+ *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+ *                            bool valid(const typename se::Data<FldT, ColB, IdB>& data);
  *                            \endcode
- * \param[in] get             A functor with the following prototype, returning the member of type
- *                            `T` to be interpolated:
+ * \param[in] get             A functor with the following declaration, returning the data of type
+ *                            \p T to be interpolated:
  *                            \code{.cpp}
- *                            template<typename OctreeT>
- *                            T get(const typename OctreeT::DataType& data);
+ *                            template<se::Field FldT, se::Colour ColB, se::Id IdB>
+ *                            T get(const typename se::Data<FldT, ColB, IdB>& data);
  *                            \endcode
- *                            Type `T` must implement the following operators:
+ *                            Type \p T must implement the following operators:
  *                            \code{.cpp}
  *                            T operator+(const T& a, const T& b);
  *                            T operator*(const T& a, const float b);
  *                            \endcode
- * \param[in]  desired_scale  The finest scale the member should be interpolated at.
- * \param[out] returned_scale The actual scale the member was interpolated at will be stored into
- *                            `*returned_scale` if `returned_scale` is non-null. `*returned_scale`
- *                            is not modified if `std::nullopt` is returned. The value of
- *                            `*returned_scale` will not be less than \p desired_scale.
- * \return The interpolated member if the data is valid, `std::nullopt` otherwise.
+ * \param[in]  desired_scale  The finest scale the data should be interpolated at. Ignored for
+ *                            se::Res::Single octrees.
+ * \param[out] returned_scale The actual scale the data was interpolated at will be stored into \p
+ *                            *returned_scale if \p returned_scale is non-null. \p *returned_scale
+ *                            is not modified if \p std::nullopt is returned. The value of \p
+ *                            *returned_scale will not be less than \p desired_scale in
+ *                            se::Res::Multi octrees.
+ * \return The interpolated data if valid, \p std::nullopt otherwise.
  */
 template<typename OctreeT, typename ValidF, typename GetF>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi,
-                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
+std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
 getInterp(const OctreeT& octree,
           const Eigen::Vector3f& voxel_coord_f,
           ValidF valid,
           GetF get,
-          const int desired_scale = 0,
-          int* const returned_scale = nullptr);
-
-/** \overload
- * \details This overload works only for single-resolution octrees. The member is interpolated at
- * scale 0, the finest and only scale.
- */
-template<typename OctreeT, typename ValidF, typename GetF>
-typename std::enable_if_t<OctreeT::res_ == Res::Single,
-                          std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>>
-getInterp(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF valid, GetF get);
+          const Scale desired_scale = 0,
+          Scale* const returned_scale = nullptr);
 
 
 
