@@ -169,6 +169,36 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::interpColour(const Eigen::Vector3f&
 
 
 template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
+template<typename ValidF, typename GetF, Safe SafeB>
+std::optional<Eigen::Matrix<
+    std::invoke_result_t<GetF, typename Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::DataType>,
+    3,
+    1>>
+Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::grad(const Eigen::Vector3f& point_W,
+                                                  ValidF valid,
+                                                  GetF get,
+                                                  const Scale desired_scale,
+                                                  Scale* const returned_scale) const
+{
+    Eigen::Vector3f voxel_coord_f;
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
+            return std::nullopt;
+        }
+    }
+    auto gradient =
+        visitor::grad(octree_, voxel_coord_f, valid, get, desired_scale, returned_scale);
+    // Scale the gradient from voxels to metres.
+    if (gradient) {
+        *gradient /= resolution_;
+    }
+    return gradient;
+}
+
+
+
+template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
 template<Safe SafeB>
 std::optional<se::field_vec_t>
 Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_W) const
