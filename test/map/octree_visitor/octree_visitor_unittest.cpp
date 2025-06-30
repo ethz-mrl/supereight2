@@ -72,40 +72,39 @@ TEST(VisitorTSDFSingleRes, Interpolation)
     }
 
     auto interp_field_value =
-        se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 2.f));
+        se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3.5, *interp_field_value);
 
-    interp_field_value =
-        se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(16.f, 16.f, 16.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(16.f, 16.f, 16.f));
     EXPECT_FALSE(interp_field_value);
 }
 
@@ -164,39 +163,38 @@ TEST(VisitorTSDFMultiRes, Interpolation)
     }
 
     auto interp_field_value =
-        se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 2.f));
+        se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 2.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 2.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 2.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 2.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2.5, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(2.f, 8.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3, *interp_field_value);
 
-    interp_field_value = se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 8.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(8.f, 8.f, 8.f));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3.5, *interp_field_value);
 
-    interp_field_value =
-        se::visitor::getFieldInterp(*octree_ptr_0, Eigen::Vector3f(16.f, 16.f, 16.f));
+    interp_field_value = se::visitor::interpField(*octree_ptr_0, Eigen::Vector3f(16.f, 16.f, 16.f));
     EXPECT_FALSE(interp_field_value);
 }

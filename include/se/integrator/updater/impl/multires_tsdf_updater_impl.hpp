@@ -109,15 +109,15 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                     const Eigen::Vector3f child_sample_coord_f =
                         child_data_union.coord.template cast<float>()
                         + sample_offset_frac * child_size;
-                    const auto interp_field_value = visitor::getFieldInterp(
-                        octree, child_sample_coord_f, child_data_union.scale);
+                    const auto interp_field_value =
+                        visitor::interpField(octree, child_sample_coord_f, child_data_union.scale);
                     if (interp_field_value) {
                         child_data_union.data.field.tsdf = *interp_field_value;
                         child_data_union.data.field.weight = parent_data_union.data.field.weight;
                         child_data_union.past_data.field.tsdf = child_data_union.data.field.tsdf;
                         child_data_union.past_data.field.weight = 0;
                         if constexpr (ColB == Colour::On) {
-                            const auto interp_colour_value = visitor::getColourInterp(
+                            const auto interp_colour_value = visitor::interpColour(
                                 octree, child_sample_coord_f, child_data_union.scale);
                             // Colour interpolation may fail even if field interpolation succeeded
                             // as it requires both field and colour data to be valid.

@@ -244,28 +244,28 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
      */
     template<typename ValidF, typename GetF, Safe SafeB = Safe::Off>
     std::optional<std::invoke_result_t<GetF, DataType>>
-    getInterp(const Eigen::Vector3f& point_W,
-              ValidF valid,
-              GetF get,
-              const Scale desired_scale = 0,
-              Scale* const returned_scale = nullptr) const;
+    interp(const Eigen::Vector3f& point_W,
+           ValidF valid,
+           GetF get,
+           const Scale desired_scale = 0,
+           Scale* const returned_scale = nullptr) const;
 
-    /** Interpolate the field at \p point_W and \p desired_scale. See #getInterp() for more detailed
+    /** Interpolate the field at \p point_W and \p desired_scale. See #interp() for more detailed
      * documentation.
      */
     template<Safe SafeB = Safe::Off>
-    std::optional<field_t> getFieldInterp(const Eigen::Vector3f& point_W,
-                                          const Scale desired_scale = 0,
-                                          Scale* const returned_scale = nullptr) const;
+    std::optional<field_t> interpField(const Eigen::Vector3f& point_W,
+                                       const Scale desired_scale = 0,
+                                       Scale* const returned_scale = nullptr) const;
 
-    /** Interpolate the colour at \p point_W and \p desired_scale. See #getInterp() for more
-     * detailed documentation.
+    /** Interpolate the colour at \p point_W and \p desired_scale. See #interp() for more detailed
+     * documentation.
      */
     template<Safe SafeB = Safe::Off, Colour ColourTDummy = ColB>
     typename std::enable_if_t<ColourTDummy == Colour::On, std::optional<colour_t>>
-    getColourInterp(const Eigen::Vector3f& point_W,
-                    const Scale desired_scale = 0,
-                    Scale* const returned_scale = nullptr) const;
+    interpColour(const Eigen::Vector3f& point_W,
+                 const Scale desired_scale = 0,
+                 Scale* const returned_scale = nullptr) const;
 
     /**
      * \brief Get the field gradient at the provided coordinates.

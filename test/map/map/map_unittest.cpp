@@ -50,7 +50,7 @@ TEST(Map, Gradient)
         Eigen::Vector3f(0, 0, 4), Eigen::Vector3f(0, 0, 6), Eigen::Vector3f(0, 0, 8)};
     for (const auto& point : free_points) {
         // Check free space occupancy value
-        const std::optional<se::field_t> occupancy = map.getFieldInterp(point);
+        const std::optional<se::field_t> occupancy = map.interpField(point);
         ASSERT_TRUE(occupancy);
         EXPECT_FLOAT_EQ(*occupancy, data_config.field.log_odd_min);
         // Check for zero gradients
@@ -75,8 +75,8 @@ TEST(Map, Gradient)
         // Numeric field gradient using the central difference quotient
         for (int i = 0; i < gradient_numeric.size(); i++) {
             const Eigen::Vector3f dir = Eigen::Vector3f::Unit(i);
-            const std::optional<se::field_t> occupancy_m = map.getFieldInterp(point - delta * dir);
-            const std::optional<se::field_t> occupancy_p = map.getFieldInterp(point + delta * dir);
+            const std::optional<se::field_t> occupancy_m = map.interpField(point - delta * dir);
+            const std::optional<se::field_t> occupancy_p = map.interpField(point + delta * dir);
             if (!occupancy_p || !occupancy_m) {
                 gradient_numeric_valid = false;
                 break;
@@ -102,7 +102,7 @@ TEST(Map, Gradient)
     const std::array occupied_points{Eigen::Vector3f(0, 0, 15.35f)};
     for (const auto& point : occupied_points) {
         // Check free space occupancy value
-        const std::optional<se::field_t> occupancy = map.getFieldInterp(point);
+        const std::optional<se::field_t> occupancy = map.interpField(point);
         ASSERT_TRUE(occupancy);
         EXPECT_GT(*occupancy, 0.0f);
         // Check for zero gradients
@@ -171,39 +171,39 @@ TEST(Map, Interpolation)
         }
     }
 
-    auto interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -12, -12));
+    auto interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-12, -12, -12));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -12, -12));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-8, -12, -12));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(0.5, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -8, -12));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-12, -8, -12));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -8, -12));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-8, -8, -12));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(1.5, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -12, -8));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-12, -12, -8));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -12, -8));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-8, -12, -8));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(2.5, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-12, -8, -8));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-12, -8, -8));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(-8, -8, -8));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(-8, -8, -8));
     EXPECT_TRUE(interp_field_value);
     EXPECT_EQ(3.5, *interp_field_value);
 
-    interp_field_value = map_tsdf.getFieldInterp(Eigen::Vector3f(+2, +2, +2));
+    interp_field_value = map_tsdf.interpField(Eigen::Vector3f(+2, +2, +2));
     EXPECT_FALSE(interp_field_value);
 }
 

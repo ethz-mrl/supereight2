@@ -245,31 +245,31 @@ getField(const OctreeT& octree,
  */
 template<typename OctreeT, typename ValidF, typename GetF>
 std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
-getInterp(const OctreeT& octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          ValidF valid,
-          GetF get,
-          const Scale desired_scale = 0,
-          Scale* const returned_scale = nullptr);
+interp(const OctreeT& octree,
+       const Eigen::Vector3f& voxel_coord_f,
+       ValidF valid,
+       GetF get,
+       const Scale desired_scale = 0,
+       Scale* const returned_scale = nullptr);
 
 /** Interpolate the field of \p octree at \p voxel_coord_f and \p desired_scale. See
- * se::visitor::getInterp() for more detailed documentation.
+ * se::visitor::interp() for more detailed documentation.
  */
 template<typename OctreeT>
-std::optional<field_t> getFieldInterp(const OctreeT& octree,
-                                      const Eigen::Vector3f& voxel_coord_f,
-                                      const Scale desired_scale = 0,
-                                      Scale* const returned_scale = nullptr);
+std::optional<field_t> interpField(const OctreeT& octree,
+                                   const Eigen::Vector3f& voxel_coord_f,
+                                   const Scale desired_scale = 0,
+                                   Scale* const returned_scale = nullptr);
 
 /** Interpolate the colour of \p octree at \p voxel_coord_f and \p desired_scale. See
- * se::visitor::getInterp() for more detailed documentation.
+ * se::visitor::interp() for more detailed documentation.
  */
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::col_ == Colour::On, std::optional<colour_t>>
-getColourInterp(const OctreeT& octree,
-                const Eigen::Vector3f& voxel_coord_f,
-                const Scale desired_scale = 0,
-                Scale* const returned_scale = nullptr);
+interpColour(const OctreeT& octree,
+             const Eigen::Vector3f& voxel_coord_f,
+             const Scale desired_scale = 0,
+             Scale* const returned_scale = nullptr);
 
 
 

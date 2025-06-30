@@ -1024,12 +1024,12 @@ getField(const OctreeT& octree,
 
 template<typename OctreeT, typename ValidF, typename GetF>
 std::optional<std::invoke_result_t<GetF, typename OctreeT::DataType>>
-getInterp(const OctreeT& octree,
-          const Eigen::Vector3f& voxel_coord_f,
-          ValidF valid,
-          GetF get,
-          [[maybe_unused]] const Scale desired_scale,
-          Scale* const returned_scale)
+interp(const OctreeT& octree,
+       const Eigen::Vector3f& voxel_coord_f,
+       ValidF valid,
+       GetF get,
+       [[maybe_unused]] const Scale desired_scale,
+       Scale* const returned_scale)
 {
     if constexpr (OctreeT::res_ == Res::Single) {
         const auto result = detail::interpImpl(octree, voxel_coord_f, valid, get);
@@ -1046,12 +1046,12 @@ getInterp(const OctreeT& octree,
 
 
 template<typename OctreeT>
-std::optional<field_t> getFieldInterp(const OctreeT& octree,
-                                      const Eigen::Vector3f& voxel_coord_f,
-                                      const Scale desired_scale,
-                                      Scale* const returned_scale)
+std::optional<field_t> interpField(const OctreeT& octree,
+                                   const Eigen::Vector3f& voxel_coord_f,
+                                   const Scale desired_scale,
+                                   Scale* const returned_scale)
 {
-    return getInterp(
+    return interp(
         octree,
         voxel_coord_f,
         [](const typename OctreeT::DataType& d) { return is_valid(d); },
@@ -1064,12 +1064,12 @@ std::optional<field_t> getFieldInterp(const OctreeT& octree,
 
 template<typename OctreeT>
 typename std::enable_if_t<OctreeT::col_ == Colour::On, std::optional<colour_t>>
-getColourInterp(const OctreeT& octree,
-                const Eigen::Vector3f& voxel_coord_f,
-                const Scale desired_scale,
-                Scale* const returned_scale)
+interpColour(const OctreeT& octree,
+             const Eigen::Vector3f& voxel_coord_f,
+             const Scale desired_scale,
+             Scale* const returned_scale)
 {
-    return getInterp(
+    return interp(
         octree,
         voxel_coord_f,
         [](const typename OctreeT::DataType& d) { return is_valid(d) && d.colour.weight > 0; },

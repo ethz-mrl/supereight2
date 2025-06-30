@@ -863,8 +863,7 @@ marching_cube_kernel(const OctreeT& octree,
                             // expensive colour interpolation if one of the vertices is invalid and
                             // the whole face is skipped.
                             for (size_t v = 0; v < Face::num_vertexes; v++) {
-                                const auto colour =
-                                    visitor::getColourInterp(octree, face.vertexes[v]);
+                                const auto colour = visitor::interpColour(octree, face.vertexes[v]);
                                 if (colour) {
                                     face.colour.vertexes[v] = *colour;
                                 }
@@ -954,7 +953,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
                             // the whole face is skipped.
                             for (size_t v = 0; v < Face::num_vertexes; v++) {
                                 const auto colour =
-                                    visitor::getColourInterp(octree, face.vertexes[v], voxel_scale);
+                                    visitor::interpColour(octree, face.vertexes[v], voxel_scale);
                                 if (colour) {
                                     face.colour.vertexes[v] = *colour;
                                 }

@@ -45,7 +45,7 @@ inline std::optional<se::field_t> find_valid_point(const MapT& map,
     if (map.contains(ray_pos_W)) {
         peek_data = map.getData(ray_pos_W);
         if (is_valid(peek_data)) {
-            value = map.getFieldInterp(ray_pos_W);
+            value = map.interpField(ray_pos_W);
         }
     }
 
@@ -59,7 +59,7 @@ inline std::optional<se::field_t> find_valid_point(const MapT& map,
         if (map.contains(ray_pos_W)) {
             peek_data = map.getData(ray_pos_W);
             if (is_valid(peek_data)) {
-                value = map.getFieldInterp(ray_pos_W);
+                value = map.interpField(ray_pos_W);
             }
         }
     }
@@ -417,7 +417,7 @@ raycast(MapT& map,
             value_tt = std::optional<field_t>(get_field(data));
             point_W_tt = ray_pos_W;
             if (*value_tt > -0.2f) {
-                value_tt = map.getFieldInterp(ray_pos_W, scale_tt);
+                value_tt = map.interpField(ray_pos_W, scale_tt);
                 if (!value_tt) {
                     t += step_size;
                     value_t = find_valid_point(
@@ -501,10 +501,10 @@ raycast(MapT& map,
                 if (f_tt <= 0.1 && f_tt >= -0.5f) {
                     std::optional<se::field_t> field_value = [&]() -> std::optional<se::field_t> {
                         if constexpr (MapT::res_ == se::Res::Single) {
-                            return map.getFieldInterp(point_W);
+                            return map.interpField(point_W);
                         }
                         else {
-                            return map.getFieldInterp(point_W, scale_tt);
+                            return map.interpField(point_W, scale_tt);
                         }
                     }();
                     if (field_value) {
@@ -598,7 +598,7 @@ void raycast_volume(const MapT& map,
                 }
                 if constexpr (MapT::col_ == Colour::On) {
                     if (surface_colour) {
-                        const auto result = map.getColourInterp(surface_intersection_W->head<3>());
+                        const auto result = map.interpColour(surface_intersection_W->head<3>());
                         (*surface_colour)[idx] = result ? *result : colour_t();
                     }
                 }
