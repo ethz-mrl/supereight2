@@ -309,15 +309,13 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
          const Scale desired_scale = 0,
          Scale* const returned_scale = nullptr) const;
 
-    /**
-     * \brief Get the field gradient at the provided coordinates.
-     *
-     * \tparam SafeB          The parameter turning "contains point" verification on and off (Off by default)
-     * \param[in] point_W     The coordinates of the point in world frame [meter] to accessed
-     * \return                The filed gradient at the coordinates
+    /** Return the field gradient at \p point_W and \p desired_scale. See #grad() for more
+     * detailed documentation.
      */
     template<Safe SafeB = Safe::Off>
-    std::optional<se::field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W) const;
+    std::optional<field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W,
+                                            const Scale desired_scale = 0,
+                                            Scale* const returned_scale = nullptr) const;
 
     /**
      * \brief Save three slices of the field value, each perpendicular to one of the axes (x, y and

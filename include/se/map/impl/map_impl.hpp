@@ -200,33 +200,24 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::grad(const Eigen::Vector3f& point_W
 
 template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
 template<Safe SafeB>
-std::optional<se::field_vec_t>
-Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_W) const
+std::optional<field_vec_t>
+Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f& point_W,
+                                                          const Scale desired_scale,
+                                                          Scale* const returned_scale) const
 {
     Eigen::Vector3f voxel_coord_f;
-
-    if constexpr (SafeB == Safe::Off) // Evaluate at compile time
-    {
-        pointToVoxel<Safe::Off>(point_W, voxel_coord_f);
-    }
-    else {
-        if (!pointToVoxel<Safe::On>(point_W, voxel_coord_f)) {
+    const bool is_inside = pointToVoxel<SafeB>(point_W, voxel_coord_f);
+    if constexpr (SafeB == Safe::On) {
+        if (!is_inside) {
             return std::nullopt;
         }
     }
-
-    std::optional<se::field_vec_t> field_grad;
-    if constexpr (ResT == Res::Multi) {
-        int _;
-        field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f, 0, &_);
+    auto gradient = visitor::getFieldGrad(octree_, voxel_coord_f, desired_scale, returned_scale);
+    // Scale the gradient from voxels to metres.
+    if (gradient) {
+        *gradient /= resolution_;
     }
-    else {
-        field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f);
-    }
-    if (field_grad) {
-        *field_grad /= resolution_;
-    }
-    return field_grad;
+    return gradient;
 }
 
 
