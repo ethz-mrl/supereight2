@@ -54,7 +54,7 @@ TEST(Map, Gradient)
         ASSERT_TRUE(occupancy);
         EXPECT_FLOAT_EQ(*occupancy, data_config.field.log_odd_min);
         // Check for zero gradients
-        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        const std::optional<Eigen::Vector3f> gradient = map.gradField(point);
         ASSERT_TRUE(gradient);
         EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
     }
@@ -88,7 +88,7 @@ TEST(Map, Gradient)
         ASSERT_TRUE(gradient_numeric_valid);
 
         // Access Field Gradient
-        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        const std::optional<Eigen::Vector3f> gradient = map.gradField(point);
         ASSERT_TRUE(gradient);
 
         // The error between the supereight and numerical gradients can be rather big due to
@@ -106,7 +106,7 @@ TEST(Map, Gradient)
         ASSERT_TRUE(occupancy);
         EXPECT_GT(*occupancy, 0.0f);
         // Check for zero gradients
-        const std::optional<Eigen::Vector3f> gradient = map.getFieldGrad(point);
+        const std::optional<Eigen::Vector3f> gradient = map.gradField(point);
         ASSERT_TRUE(gradient);
         EXPECT_FLOAT_EQ(gradient->norm(), 0.0f);
     }

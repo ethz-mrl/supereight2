@@ -320,10 +320,10 @@ grad(const OctreeT& octree,
  * se::visitor::grad() for more detailed documentation.
  */
 template<typename OctreeT>
-std::optional<field_vec_t> getFieldGrad(const OctreeT& octree,
-                                        const Eigen::Vector3f& voxel_coord_f,
-                                        const Scale desired_scale = 0,
-                                        Scale* const returned_scale = nullptr);
+std::optional<field_vec_t> gradField(const OctreeT& octree,
+                                     const Eigen::Vector3f& voxel_coord_f,
+                                     const Scale desired_scale = 0,
+                                     Scale* const returned_scale = nullptr);
 
 } // namespace visitor
 } // namespace se

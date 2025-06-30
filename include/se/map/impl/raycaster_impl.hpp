@@ -584,7 +584,7 @@ void raycast_volume(const MapT& map,
                 surface_point_cloud_W[idx] = surface_intersection_W->head<3>();
                 // Compute surface normal from the field gradient.
                 const std::optional<Eigen::Vector3f> surface_normal_W =
-                    map.getFieldGrad(surface_intersection_W->head<3>());
+                    map.gradField(surface_intersection_W->head<3>());
                 if (surface_normal_W) {
                     if constexpr (MapT::DataType::normals_along_gradient) {
                         surface_normals_W[idx] = surface_normal_W->normalized();

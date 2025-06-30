@@ -1368,10 +1368,10 @@ grad(const OctreeT& octree,
 
 
 template<typename OctreeT>
-std::optional<field_vec_t> getFieldGrad(const OctreeT& octree,
-                                        const Eigen::Vector3f& voxel_coord_f,
-                                        const Scale desired_scale,
-                                        Scale* const returned_scale)
+std::optional<field_vec_t> gradField(const OctreeT& octree,
+                                     const Eigen::Vector3f& voxel_coord_f,
+                                     const Scale desired_scale,
+                                     Scale* const returned_scale)
 {
     return grad(
         octree,

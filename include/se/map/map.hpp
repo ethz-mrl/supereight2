@@ -313,9 +313,9 @@ class Map<se::Data<FldT, ColB, IdB>, ResT, BlockSize> {
      * detailed documentation.
      */
     template<Safe SafeB = Safe::Off>
-    std::optional<field_vec_t> getFieldGrad(const Eigen::Vector3f& point_W,
-                                            const Scale desired_scale = 0,
-                                            Scale* const returned_scale = nullptr) const;
+    std::optional<field_vec_t> gradField(const Eigen::Vector3f& point_W,
+                                         const Scale desired_scale = 0,
+                                         Scale* const returned_scale = nullptr) const;
 
     /**
      * \brief Save three slices of the field value, each perpendicular to one of the axes (x, y and
