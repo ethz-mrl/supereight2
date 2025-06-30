@@ -188,7 +188,7 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::getFieldGrad(const Eigen::Vector3f&
     std::optional<se::field_vec_t> field_grad;
     if constexpr (ResT == Res::Multi) {
         int _;
-        field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f, _);
+        field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f, 0, &_);
     }
     else {
         field_grad = se::visitor::getFieldGrad(octree_, voxel_coord_f);

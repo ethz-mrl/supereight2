@@ -316,75 +316,14 @@ grad(const OctreeT& octree,
      const Scale desired_scale = 0,
      Scale* const returned_scale = nullptr);
 
-
-
-/// Single-res get gradient functions
-
-/**
- * \brief Get the field gradient for a given coordinate [float voxel coordinates].
- *        The function returns {}/invalid if the gradient is invalid.
- *
- * \tparam OctreeT          The type of the octree used
- * \param[in] octree        The reference to the octree
- * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
- *
- * \return The field gradient if the gradient is valid, {}/invalid otherwise
+/** Return the field gradient of \p octree at \p voxel_coord_f and \p desired_scale. See
+ * se::visitor::grad() for more detailed documentation.
  */
 template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Single, std::optional<field_vec_t>>
-getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
-
-
-
-/// Multi-res get gradient functions
-
-/**
- * \brief Get the field gradient for a given coordinate [float voxel coordinates].
- *        The function returns {}/invalid if the gradient is invalid.
- *
- * \tparam OctreeT          The type of the octree used
- * \param[in] octree        The reference to the octree
- * \param[in] voxel_coord_f The voxel coordinates to be accessed [float voxel coordiantes]
- *
- * \return The field gradient if the gradient is valid, {}/invalid otherwise
- */
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
-getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f);
-
-/**
- * \brief Get the field gradient for a given coordinate [float voxel coordinates].
- *        The function returns {}/invalid if the gradient is invalid.
- *
- * \tparam OctreeT           The type of the octree used
- * \param[in] octree         The reference to the octree
- * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] scale_returned The scale the gradient has been computed at
- *
- * \return The field gradient if the gradient is valid, {}/invalid otherwise
- */
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
-getFieldGrad(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, int& scale_returned);
-
-/**
- * \brief Get the field gradient for a given coordinate [float voxel coordinates] and desired scale.
- *        The function returns {}/invalid if the gradient is invalid.
- *
- * \tparam OctreeT           The type of the octree used
- * \param[in] octree         The reference to the octree
- * \param[in] voxel_coord_f  The voxel coordinates to be accessed [float voxel coordiantes]
- * \param[in] scale_desired  The finest scale to compute the gradient at
- * \param[in] scale_returned The scale the gradient has been computed at (max (scale desired, finest common neighbour scale)
- *
- * \return The field gradient if the gradient is valid, {}/invalid otherwise
- */
-template<typename OctreeT>
-typename std::enable_if_t<OctreeT::res_ == Res::Multi, std::optional<field_vec_t>>
-getFieldGrad(const OctreeT& octree,
-             const Eigen::Vector3f& voxel_coord_f,
-             const int scale_desired,
-             int& scale_returned);
+std::optional<field_vec_t> getFieldGrad(const OctreeT& octree,
+                                        const Eigen::Vector3f& voxel_coord_f,
+                                        const Scale desired_scale = 0,
+                                        Scale* const returned_scale = nullptr);
 
 } // namespace visitor
 } // namespace se
