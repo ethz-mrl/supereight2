@@ -24,10 +24,7 @@ inline constexpr id_t g_not_mapped = -1;
 
 
 
-/** Function that generates a unique color based on the id received
- * \param[in] id The segment id
- * \param[out] The RGB color
- */
+/** Return a (probably) unique colour for visualising \p id. */
 RGB id_colour(const id_t id);
 
 } // namespace se
