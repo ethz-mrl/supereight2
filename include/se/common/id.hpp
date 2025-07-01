@@ -7,6 +7,7 @@
 #ifndef SE_COMMON_ID_HPP
 #define SE_COMMON_ID_HPP
 
+#include <limits>
 #include <se/common/rgb.hpp>
 
 namespace se {
@@ -18,9 +19,8 @@ typedef uint16_t id_t;
 /** Indicates the absence of an identifier. */
 inline constexpr id_t g_no_id = 0;
 
-/** Indicates an unmapped region, which is distinct from a region without an identifier. Underflow
- * is well-defined for unsigned integers. */
-inline constexpr id_t g_not_mapped = -1;
+/** Indicates an unmapped region, which is distinct from a region without an identifier. */
+inline constexpr id_t g_not_mapped = std::numeric_limits<id_t>::max();
 
 
 
