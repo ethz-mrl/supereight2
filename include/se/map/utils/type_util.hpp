@@ -9,7 +9,7 @@
 #define SE_TYPE_UTIL_HPP
 
 #include <Eigen/StdVector>
-#include <se/common/rgb.hpp>
+#include <se/common/id.hpp>
 
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector2f)
 EIGEN_DEFINE_STL_VECTOR_SPECIALIZATION(Eigen::Vector3f)
@@ -55,37 +55,6 @@ typedef se::field_t weight_t; ///< The type of the field type weight
 typedef int timestamp_t; ///< The type of the time stamp
 
 typedef RGB colour_t; ///< The type of the colour
-
-/** The type used to represent identifiers. */
-typedef uint16_t id_t;
-/** Indicates the absence of an identifier. */
-inline constexpr id_t g_no_id = 0;
-/** Used to distinguish a region that's unmapped from a region without an identifier. Underflow is
- * well-defined for unsigned integers. */
-inline constexpr id_t g_not_mapped = -1;
-
-
-/** Function that generates a unique color based on the id received
- * \param[in] id The segment id
- * \param[out] The RGB color
- */
-static inline RGB id_colour(const id_t id)
-{
-    switch (id) {
-    case g_not_mapped:
-        return {0x00, 0x00, 0x00};
-    case g_no_id:
-        return {0xFF, 0xFF, 0xFF};
-    default: {
-        // Inspired from the following and naively modified for 16-bit integers.
-        // https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key/12996028#12996028
-        const uint8_t r = ((id >> 8) ^ id) * 0x45d9f3b;
-        const uint8_t g = ((id >> 8) ^ r) * 0x45d9f3b;
-        const uint8_t b = ((id >> 8) ^ g) * 0x45d9f3b;
-        return {r, g, b};
-    }
-    }
-}
 
 } // namespace se
 
