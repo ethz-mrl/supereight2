@@ -22,8 +22,8 @@ struct Data {
     typedef IdData<IdB> IdType;
 
     FieldType field;
-    ColourType colour;
-    IdType id;
+    [[no_unique_address]] ColourType colour;
+    [[no_unique_address]] IdType id;
 
     struct Config {
         typename FieldType::Config field;
