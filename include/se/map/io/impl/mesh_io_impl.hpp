@@ -98,7 +98,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     file << "COLOR_SCALARS scale_colour 3\n";
     for (const auto& face : mesh_M) {
         RGB rgb;
-        if constexpr (FaceT::col_ == Colour::On) {
+        if constexpr (FaceT::col_ == Colour::On && FaceT::id_ == Id::On) {
             rgb = face.colour.face.value_or(se::RGB());
         }
         else {
@@ -178,7 +178,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         }
         // Write the face colour.
         RGB rgb;
-        if constexpr (FaceT::col_ == Colour::On) {
+        if constexpr (FaceT::col_ == Colour::On && FaceT::id_ == Id::On) {
             rgb = mesh_M[f].colour.face.value_or(se::RGB());
         }
         else {
