@@ -417,7 +417,7 @@ raycast(MapT& map,
             value_tt = std::optional<field_t>(get_field(data));
             point_W_tt = ray_pos_W;
             if (*value_tt > -0.2f) {
-                value_tt = map.interpField(ray_pos_W, scale_tt);
+                value_tt = map.interpField(ray_pos_W, 0, &scale_tt);
                 if (!value_tt) {
                     t += step_size;
                     value_t = find_valid_point(
@@ -504,7 +504,7 @@ raycast(MapT& map,
                             return map.interpField(point_W);
                         }
                         else {
-                            return map.interpField(point_W, scale_tt);
+                            return map.interpField(point_W, 0, &scale_tt);
                         }
                     }();
                     if (field_value) {
