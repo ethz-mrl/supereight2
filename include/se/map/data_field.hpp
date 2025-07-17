@@ -73,16 +73,6 @@ std::ostream& operator<<(std::ostream& os, const FieldData<Field::Occupancy>::Co
 
 template<>
 struct FieldData<Field::TSDF> {
-    struct Config {
-        field_t truncation_boundary_factor = 8;
-        weight_t max_weight = 100;
-
-        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
-         * YAML file aren't modified.
-         */
-        void readYaml(const std::string& yaml_file);
-    };
-
     field_t tsdf = 1;
     weight_t weight = 0;
 
@@ -101,6 +91,16 @@ struct FieldData<Field::TSDF> {
      * the data was updated. Data isn't updated if \p sdf is less than \p -truncation_boundary.
      */
     bool update(const field_t sdf, const field_t truncation_boundary, const weight_t max_weight);
+
+    struct Config {
+        field_t truncation_boundary_factor = 8;
+        weight_t max_weight = 100;
+
+        /** Reads the struct members from the "data" node of a YAML file. Members not present in the
+         * YAML file aren't modified.
+         */
+        void readYaml(const std::string& yaml_file);
+    };
 };
 
 std::ostream& operator<<(std::ostream& os, const FieldData<Field::TSDF>::Config& c);
