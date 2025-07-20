@@ -419,25 +419,17 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** The number of observed voxels in the buffer. */
     size_t buffer_observed_count_;
 
-    /** Return a reference to the data of \p data corresponding to voxel coordinates \p voxel_coord
-     * and scale \p scale.
+    /** Return a const reference to the data of \p data corresponding to voxel coordinates \p
+     * voxel_coord and scale \p scale.
      */
-    DataType&
-    data(const std::vector<DataType*> data, const Eigen::Vector3i& voxel_coord, const int scale);
-    /** \constoverload */
     const DataType& data(const std::vector<DataType*> data,
                          const Eigen::Vector3i& voxel_coord,
                          const int scale) const;
 
-    /** Return a reference to the data of \p data corresponding to voxel coordinates \p voxel_coord
-     * and scale \p scale_desired. The actual scale of the data is written to \p scale_returned and
-     * is no finer than current_scale.
+    /** Return a const reference to the data of \p data corresponding to voxel coordinates \p
+     * voxel_coord and scale \p scale_desired. The actual scale of the data is written to \p
+     * scale_returned and is no finer than current_scale.
      */
-    DataType& data(const std::vector<DataType*> data,
-                   const Eigen::Vector3i& voxel_coord,
-                   const int scale_desired,
-                   int& scale_returned);
-    /** \constoverload */
     const DataType& data(const std::vector<DataType*> data,
                          const Eigen::Vector3i& voxel_coord,
                          const int scale_desired,

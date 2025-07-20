@@ -797,20 +797,6 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::~BlockData(
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
-typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
-    const std::vector<
-        typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
-        data,
-    const Eigen::Vector3i& voxel_coord,
-    const int scale)
-{
-    return const_cast<DataType&>(
-        const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->data(data, voxel_coord, scale));
-}
-
-template<Colour ColB, Id IdB, int BlockSize>
 const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
 BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const std::vector<
@@ -832,21 +818,6 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
         return data[max_scale - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
                                        + voxel_offset.z() * math::sq(size_at_scale)];
     }
-}
-
-template<Colour ColB, Id IdB, int BlockSize>
-typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
-    const std::vector<
-        typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
-        data,
-    const Eigen::Vector3i& voxel_coord,
-    const int scale_desired,
-    int& scale_returned)
-{
-    return const_cast<DataType&>(
-        const_cast<const BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>*>(this)
-            ->data(data, voxel_coord, scale_desired, scale_returned));
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
