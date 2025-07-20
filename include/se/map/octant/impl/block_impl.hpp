@@ -211,7 +211,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord) const
 {
     int _;
-    return data(data_, voxel_coord, current_scale, _);
+    return dataImpl(data_, voxel_coord, current_scale, _);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -231,7 +231,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return data(data_, voxel_coord, scale);
+    return dataImpl(data_, voxel_coord, scale);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -253,7 +253,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const int scale_desired,
     int& scale_returned) const
 {
-    return data(data_, voxel_coord, scale_desired, scale_returned);
+    return dataImpl(data_, voxel_coord, scale_desired, scale_returned);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -296,7 +296,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const Eigen::Vector3i& voxel_coord) const
 {
     int _;
-    return data(min_data_, voxel_coord, current_scale, _);
+    return dataImpl(min_data_, voxel_coord, current_scale, _);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -316,7 +316,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return data(min_data_, voxel_coord, scale);
+    return dataImpl(min_data_, voxel_coord, scale);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -338,7 +338,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const int scale_desired,
     int& scale_returned) const
 {
-    return data(min_data_, voxel_coord, scale_desired, scale_returned);
+    return dataImpl(min_data_, voxel_coord, scale_desired, scale_returned);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -381,7 +381,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const Eigen::Vector3i& voxel_coord) const
 {
     int _;
-    return data(max_data_, voxel_coord, current_scale, _);
+    return dataImpl(max_data_, voxel_coord, current_scale, _);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -401,7 +401,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return data(max_data_, voxel_coord, scale);
+    return dataImpl(max_data_, voxel_coord, scale);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -423,7 +423,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const int scale_desired,
     int& scale_returned) const
 {
-    return data(max_data_, voxel_coord, scale_desired, scale_returned);
+    return dataImpl(max_data_, voxel_coord, scale_desired, scale_returned);
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -798,7 +798,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::~BlockData(
 
 template<Colour ColB, Id IdB, int BlockSize>
 const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
+BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataImpl(
     const std::vector<
         typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
         data,
@@ -822,7 +822,7 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
 
 template<Colour ColB, Id IdB, int BlockSize>
 const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
+BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataImpl(
     const std::vector<
         typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
         data,
