@@ -805,19 +805,11 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataImpl(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    // XXX: Investigate why this works differently than the other overload (used for queries at the
-    // current scale and with returned scale). If code relying on the specific behavior of this
-    // overload can be made to not rely on it, it would allow keeping only the other overload.
     if (max_scale - (data.size() - 1) > static_cast<size_t>(scale)) {
+        // A scale finer than the finest allocated was requested.
         return init_data;
     }
-    else {
-        Eigen::Vector3i voxel_offset = voxel_coord - derived()->coord;
-        voxel_offset = voxel_offset / (1 << scale);
-        const int size_at_scale = BlockSize >> scale;
-        return data[max_scale - scale][voxel_offset.x() + voxel_offset.y() * size_at_scale
-                                       + voxel_offset.z() * math::sq(size_at_scale)];
-    }
+    return data[max_scale - scale][voxelIdx(voxel_coord, scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
