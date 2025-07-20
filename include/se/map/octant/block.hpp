@@ -195,14 +195,15 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord) const;
 
-    /** Return a reference to the data at scale \p scale at voxel coordinates \p voxel_coord. */
+    /** Return a reference to the data at scale \p scale at voxel coordinates \p voxel_coord. Return
+     * #init_data if \p scale is smaller than #current_scale. */
     DataType& data(const Eigen::Vector3i& voxel_coord, const int scale);
     /** \constoverload */
     const DataType& data(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /** Return a reference to the data at scale \p scale_desired or coarser at voxel coordinates \p
      * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
-     * than current_scale.
+     * than #current_scale.
      */
     DataType&
     data(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
@@ -230,7 +231,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
     const DataType& minData(const Eigen::Vector3i& voxel_coord) const;
 
     /** Return a reference to the minimum data at scale \p scale at voxel coordinates \p
-     * voxel_coord.
+     * voxel_coord. Return #init_data if \p scale is smaller than #current_scale.
      */
     DataType& minData(const Eigen::Vector3i& voxel_coord, const int scale);
     /** \constoverload */
@@ -238,7 +239,7 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
 
     /** Return a reference to the minimum data at scale \p scale or coarser at voxel coordinates \p
      * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
-     * than current_scale.
+     * than #current_scale.
      */
     DataType&
     minData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
@@ -258,17 +259,23 @@ struct BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize> {
 
     /** \name Maximum data access */
     /**@{*/
+    /** Return a reference to the maximum data at the current scale at voxel coordinates \p
+     * voxel_coord.
+     */
     DataType& maxData(const Eigen::Vector3i& voxel_coord);
     /** \constoverload */
     const DataType& maxData(const Eigen::Vector3i& voxel_coord) const;
 
+    /** Return a reference to the maximum data at scale \p scale at voxel coordinates \p
+     * voxel_coord. Return #init_data if \p scale is smaller than #current_scale.
+     */
     DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale);
     /** \constoverload */
     const DataType& maxData(const Eigen::Vector3i& voxel_coord, const int scale) const;
 
     /** Return a reference to the maximum data at scale \p scale or coarser at voxel coordinates \p
      * voxel_coord. The actual scale of the data is written to \p scale_returned and is no smaller
-     * than current_scale.
+     * than #current_scale.
      */
     DataType&
     maxData(const Eigen::Vector3i& voxel_coord, const int scale_desired, int& scale_returned);
