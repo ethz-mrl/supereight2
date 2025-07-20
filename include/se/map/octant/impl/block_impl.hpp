@@ -210,8 +210,7 @@ const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSiz
 BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord) const
 {
-    int _;
-    return dataImpl(data_, voxel_coord, current_scale, _);
+    return data_[max_scale - current_scale][voxelIdx(voxel_coord, current_scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -231,7 +230,11 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return dataImpl(data_, voxel_coord, scale);
+    if (max_scale - (data_.size() - 1) > static_cast<size_t>(scale)) {
+        // A scale finer than the finest allocated was requested.
+        return init_data;
+    }
+    return data_[max_scale - scale][voxelIdx(voxel_coord, scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -253,7 +256,8 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::data(
     const int scale_desired,
     int& scale_returned) const
 {
-    return dataImpl(data_, voxel_coord, scale_desired, scale_returned);
+    scale_returned = std::max(scale_desired, current_scale);
+    return data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -295,8 +299,7 @@ const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSiz
 BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const Eigen::Vector3i& voxel_coord) const
 {
-    int _;
-    return dataImpl(min_data_, voxel_coord, current_scale, _);
+    return min_data_[max_scale - current_scale][voxelIdx(voxel_coord, current_scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -316,7 +319,11 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return dataImpl(min_data_, voxel_coord, scale);
+    if (max_scale - (min_data_.size() - 1) > static_cast<size_t>(scale)) {
+        // A scale finer than the finest allocated was requested.
+        return init_data;
+    }
+    return min_data_[max_scale - scale][voxelIdx(voxel_coord, scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -338,7 +345,8 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::minData(
     const int scale_desired,
     int& scale_returned) const
 {
-    return dataImpl(min_data_, voxel_coord, scale_desired, scale_returned);
+    scale_returned = std::max(scale_desired, current_scale);
+    return min_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -380,8 +388,7 @@ const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSiz
 BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const Eigen::Vector3i& voxel_coord) const
 {
-    int _;
-    return dataImpl(max_data_, voxel_coord, current_scale, _);
+    return max_data_[max_scale - current_scale][voxelIdx(voxel_coord, current_scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -401,7 +408,11 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const Eigen::Vector3i& voxel_coord,
     const int scale) const
 {
-    return dataImpl(max_data_, voxel_coord, scale);
+    if (max_scale - (max_data_.size() - 1) > static_cast<size_t>(scale)) {
+        // A scale finer than the finest allocated was requested.
+        return init_data;
+    }
+    return max_data_[max_scale - scale][voxelIdx(voxel_coord, scale)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -423,7 +434,8 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::maxData(
     const int scale_desired,
     int& scale_returned) const
 {
-    return dataImpl(max_data_, voxel_coord, scale_desired, scale_returned);
+    scale_returned = std::max(scale_desired, current_scale);
+    return max_data_[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
@@ -794,36 +806,6 @@ BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::~BlockData(
     if (buffer_data_ && buffer_scale_ < min_scale) {
         delete[] buffer_data_;
     }
-}
-
-template<Colour ColB, Id IdB, int BlockSize>
-const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataImpl(
-    const std::vector<
-        typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
-        data,
-    const Eigen::Vector3i& voxel_coord,
-    const int scale) const
-{
-    if (max_scale - (data.size() - 1) > static_cast<size_t>(scale)) {
-        // A scale finer than the finest allocated was requested.
-        return init_data;
-    }
-    return data[max_scale - scale][voxelIdx(voxel_coord, scale)];
-}
-
-template<Colour ColB, Id IdB, int BlockSize>
-const typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType&
-BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::dataImpl(
-    const std::vector<
-        typename BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::DataType*>
-        data,
-    const Eigen::Vector3i& voxel_coord,
-    const int scale_desired,
-    int& scale_returned) const
-{
-    scale_returned = std::max(scale_desired, current_scale);
-    return data[max_scale - scale_returned][voxelIdx(voxel_coord, scale_returned)];
 }
 
 template<Colour ColB, Id IdB, int BlockSize>
