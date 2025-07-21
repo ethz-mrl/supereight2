@@ -131,6 +131,13 @@ changed its size. See also
 
 ## Known issues
 
+### supereight2 is slower than expected
+
+If you have a CPU with a large number of threads, consider limiting them to
+around 10 or so by setting the `OMP_NUM_THREADS` environment variable. You can
+also run `./scripts/supereight2-optimal-num-threads.sh PROGRAM CONFIG` to find
+the optimal number of OpenMP threads for running supereight2 on your computer.
+
 ### Building in debug mode fails with GCC 9
 
 The following build error (and similar ones for `LeicaLidar` and `OusterLidar`)
