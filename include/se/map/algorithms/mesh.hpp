@@ -47,8 +47,8 @@ struct MeshFaceIdData<NumVertexes, Id::On> {
 template<size_t NumVertexes, Colour ColB = Colour::Off, Id IdB = Id::Off>
 struct MeshFace {
     std::array<Eigen::Vector3f, NumVertexes> vertexes;
-    MeshFaceColourData<NumVertexes, ColB> colour;
-    MeshFaceIdData<NumVertexes, IdB> id;
+    [[no_unique_address]] MeshFaceColourData<NumVertexes, ColB> colour;
+    [[no_unique_address]] MeshFaceIdData<NumVertexes, IdB> id;
     std::int8_t scale = 0;
 
     static constexpr size_t num_vertexes = NumVertexes;
