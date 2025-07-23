@@ -862,11 +862,14 @@ marching_cube_kernel(const OctreeT& octree,
                             // Using a separate loop than the vertex computation to avoid the
                             // expensive colour interpolation if one of the vertices is invalid and
                             // the whole face is skipped.
+                            face.colour.vertexes.emplace();
                             for (size_t v = 0; v < Face::num_vertexes; v++) {
                                 const auto colour = visitor::interpColour(octree, face.vertexes[v]);
-                                if (colour) {
-                                    face.colour.vertexes[v] = *colour;
+                                if (!colour) {
+                                    face.colour.vertexes = std::nullopt;
+                                    break;
                                 }
+                                (*face.colour.vertexes)[v] = *colour;
                             }
                         }
                         if constexpr (Face::id_ == Id::On) {
@@ -951,12 +954,15 @@ dual_marching_cube_kernel(const OctreeT& octree,
                             // Using a separate loop than the vertex computation to avoid the
                             // expensive colour interpolation if one of the vertices is invalid and
                             // the whole face is skipped.
+                            face.colour.vertexes.emplace();
                             for (size_t v = 0; v < Face::num_vertexes; v++) {
                                 const auto colour =
                                     visitor::interpColour(octree, face.vertexes[v], voxel_scale);
-                                if (colour) {
-                                    face.colour.vertexes[v] = *colour;
+                                if (!colour) {
+                                    face.colour.vertexes = std::nullopt;
+                                    break;
                                 }
+                                (*face.colour.vertexes)[v] = *colour;
                             }
                         }
                         if constexpr (Face::id_ == Id::On) {

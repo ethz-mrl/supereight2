@@ -28,8 +28,8 @@ struct MeshFaceColourData {};
 
 template<size_t NumVertexes>
 struct MeshFaceColourData<NumVertexes, Colour::On> {
-    std::array<RGB, NumVertexes> vertexes;
-    RGB face;
+    std::optional<std::array<RGB, NumVertexes>> vertexes;
+    std::optional<RGB> face;
 };
 
 

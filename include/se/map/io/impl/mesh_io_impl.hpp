@@ -75,7 +75,9 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
         file << "POINT_DATA " << num_vertices << "\n\n";
         file << "COLOR_SCALARS color 3\n";
         for (const auto& face : mesh_M) {
-            for (const auto colour : face.colour.vertexes) {
+            const auto vertex_colours =
+                face.colour.vertexes.value_or(std::array<se::RGB, FaceT::num_vertexes>());
+            for (const auto colour : vertex_colours) {
                 file << colour.r / 255.0f << " " << colour.g / 255.0f << " " << colour.b / 255.0f
                      << "\n";
             }
@@ -97,7 +99,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
     for (const auto& face : mesh_M) {
         RGB rgb;
         if constexpr (FaceT::col_ == Colour::On) {
-            rgb = face.colour.face;
+            rgb = face.colour.face.value_or(se::RGB());
         }
         else {
             rgb = scale_colour(face.scale);
@@ -155,7 +157,9 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
             const Eigen::Vector3f vertex_W = T_OM * face.vertexes[v];
             file << vertex_W.x() << " " << vertex_W.y() << " " << vertex_W.z();
             if constexpr (FaceT::col_ == Colour::On) {
-                const auto colour = face.colour.vertexes[v];
+                const auto vertex_colours =
+                    face.colour.vertexes.value_or(std::array<se::RGB, FaceT::num_vertexes>());
+                const auto colour = vertex_colours[v];
                 file << " " << int(colour.r) << " " << int(colour.g) << " " << int(colour.b);
             }
             if constexpr (FaceT::id_ == Id::On) {
@@ -175,7 +179,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
         // Write the face colour.
         RGB rgb;
         if constexpr (FaceT::col_ == Colour::On) {
-            rgb = mesh_M[f].colour.face;
+            rgb = mesh_M[f].colour.face.value_or(se::RGB());
         }
         else {
             rgb = scale_colour(mesh_M[f].scale);

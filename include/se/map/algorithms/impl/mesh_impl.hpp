@@ -22,12 +22,17 @@ TriangleMesh<ColB, IdB> quad_to_triangle_mesh(const QuadMesh<ColB, IdB>& quad_me
             auto& triangle = triangle_mesh.emplace_back();
             triangle.scale = quad.scale;
             if constexpr (ColB == Colour::On) {
+                if (quad.colour.vertexes) {
+                    triangle.colour.vertexes.emplace();
+                }
                 triangle.colour.face = quad.colour.face;
             }
             for (size_t i = 0; i < indices.size(); i++) {
                 triangle.vertexes[i] = quad.vertexes[indices[i]];
                 if constexpr (ColB == Colour::On) {
-                    triangle.colour.vertexes[i] = quad.colour.vertexes[indices[i]];
+                    if (quad.colour.vertexes) {
+                        (*triangle.colour.vertexes)[i] = (*quad.colour.vertexes)[indices[i]];
+                    }
                     triangle.colour.face = quad.colour.face;
                 }
                 if constexpr (IdB == Id::On) {
@@ -102,15 +107,15 @@ void colour_mesh_by_id(Mesh<FaceT>& mesh,
         face.colour.face = id_colour(face.id.id);
         if (enable_shading) {
             const Eigen::Vector3f diffuse_colour(
-                face.colour.face.r, face.colour.face.g, face.colour.face.b);
+                (*face.colour.face).r, (*face.colour.face).g, (*face.colour.face).b);
             const Eigen::Vector3f surface_normal_W =
                 math::plane_normal(face.vertexes[0], face.vertexes[1], face.vertexes[2]);
             const float intensity = std::max(surface_normal_W.dot(light_dir_W), 0.0f);
             Eigen::Vector3f col = intensity * diffuse_colour + ambient_light_f;
             se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
-            face.colour.face.r = col.x();
-            face.colour.face.g = col.y();
-            face.colour.face.b = col.z();
+            (*face.colour.face).r = col.x();
+            (*face.colour.face).g = col.y();
+            (*face.colour.face).b = col.z();
         }
     }
 }
