@@ -85,7 +85,7 @@ struct BaseIterator {
     // Pointers to the Nodes that haven't been checked yet.
     std::stack<OctantBase*> octant_stack_;
 
-    OctantBase* octant_;
+    OctantBase* octant_ = nullptr;
 
     OctreeType* octree_ptr_ = nullptr;
 };
