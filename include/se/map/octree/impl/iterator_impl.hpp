@@ -22,6 +22,10 @@ BaseIterator<DerivedT>::BaseIterator()
 template<typename DerivedT>
 BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octree_ptr)
 {
+    if (octree_ptr_) {
+        assert(octree_ptr_->getRoot());
+        octant_stack_.push(octree_ptr_->getRoot());
+    }
 }
 
 
@@ -75,11 +79,7 @@ OctantBase* BaseIterator<DerivedT>::operator*() const
 template<typename DerivedT>
 void BaseIterator<DerivedT>::init()
 {
-    if (octree_ptr_) {
-        assert(octree_ptr_->getRoot());
-        octant_stack_.push(octree_ptr_->getRoot());
-        nextData();
-    }
+    nextData();
 }
 
 
