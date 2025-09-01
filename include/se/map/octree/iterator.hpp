@@ -58,9 +58,7 @@ struct BaseIterator {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     protected:
-    BaseIterator();
-
-    BaseIterator(OctreeType* const octree_ptr);
+    BaseIterator(OctreeType* const octree_ptr = nullptr);
 
     // Find the next Volume with valid data.
     void nextData();
@@ -75,11 +73,8 @@ struct BaseIterator {
 
 template<typename OctreeT>
 struct OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
-    OctreeIterator() : BaseIterator<OctreeIterator<OctreeT>>()
-    {
-    }
-
-    OctreeIterator(OctreeT* octree_ptr) : BaseIterator<OctreeIterator<OctreeT>>(octree_ptr)
+    OctreeIterator(OctreeT* const octree_ptr = nullptr) :
+            BaseIterator<OctreeIterator<OctreeT>>(octree_ptr)
     {
         this->nextData();
     }
@@ -96,11 +91,8 @@ struct OctreeIterator : public BaseIterator<OctreeIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
-    NodesIterator() : BaseIterator<NodesIterator<OctreeT>>()
-    {
-    }
-
-    NodesIterator(OctreeT* octree_ptr) : BaseIterator<NodesIterator<OctreeT>>(octree_ptr)
+    NodesIterator(OctreeT* const octree_ptr = nullptr) :
+            BaseIterator<NodesIterator<OctreeT>>(octree_ptr)
     {
         this->nextData();
     }
@@ -117,11 +109,8 @@ struct NodesIterator : public BaseIterator<NodesIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
-    BlocksIterator() : BaseIterator<BlocksIterator<OctreeT>>()
-    {
-    }
-
-    BlocksIterator(OctreeT* octree_ptr) : BaseIterator<BlocksIterator<OctreeT>>(octree_ptr)
+    BlocksIterator(OctreeT* const octree_ptr = nullptr) :
+            BaseIterator<BlocksIterator<OctreeT>>(octree_ptr)
     {
         this->nextData();
     }
@@ -138,11 +127,8 @@ struct BlocksIterator : public BaseIterator<BlocksIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
-    LeavesIterator() : BaseIterator<LeavesIterator<OctreeT>>()
-    {
-    }
-
-    LeavesIterator(OctreeT* octree_ptr) : BaseIterator<LeavesIterator<OctreeT>>(octree_ptr)
+    LeavesIterator(OctreeT* const octree_ptr = nullptr) :
+            BaseIterator<LeavesIterator<OctreeT>>(octree_ptr)
     {
         this->nextData();
     }
@@ -159,11 +145,7 @@ struct LeavesIterator : public BaseIterator<LeavesIterator<OctreeT>> {
 
 template<typename OctreeT>
 struct UpdateIterator : public BaseIterator<UpdateIterator<OctreeT>> {
-    UpdateIterator() : BaseIterator<UpdateIterator<OctreeT>>(), time_stamp_(0)
-    {
-    }
-
-    UpdateIterator(OctreeT* octree_ptr, timestamp_t time_stamp) :
+    UpdateIterator(OctreeT* const octree_ptr = nullptr, const timestamp_t time_stamp = 0) :
             BaseIterator<UpdateIterator<OctreeT>>(octree_ptr), time_stamp_(time_stamp)
     {
         this->nextData();

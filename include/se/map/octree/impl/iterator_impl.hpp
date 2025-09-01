@@ -13,13 +13,6 @@ namespace se {
 
 
 template<typename DerivedT>
-BaseIterator<DerivedT>::BaseIterator()
-{
-}
-
-
-
-template<typename DerivedT>
 BaseIterator<DerivedT>::BaseIterator(OctreeType* const octree_ptr) : octree_ptr_(octree_ptr)
 {
     if (octree_ptr_) {
