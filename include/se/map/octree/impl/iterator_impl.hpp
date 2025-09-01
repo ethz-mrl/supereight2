@@ -20,7 +20,7 @@ BaseIterator<DerivedT>::BaseIterator()
 
 
 template<typename DerivedT>
-BaseIterator<DerivedT>::BaseIterator(OctreeType* octree_ptr) : octree_ptr_(octree_ptr)
+BaseIterator<DerivedT>::BaseIterator(OctreeType* const octree_ptr) : octree_ptr_(octree_ptr)
 {
     if (octree_ptr_) {
         assert(octree_ptr_->getRoot());
@@ -81,7 +81,7 @@ void BaseIterator<DerivedT>::nextData()
 {
     while (!octant_stack_.empty()) {
         // Get the data from the top of the stacks
-        OctantBase* octant = octant_stack_.top();
+        OctantBase* const octant = octant_stack_.top();
         // Pop the node since we'll be done with it after this call
         octant_stack_.pop();
 
@@ -94,7 +94,7 @@ void BaseIterator<DerivedT>::nextData()
         if (octant != nullptr && !octant->is_block) {
             // Non-leaf Node, push all children to the stack
             for (int child_idx = 0; child_idx < 8; child_idx++) {
-                OctantBase* child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);
+                OctantBase* const child_ptr = static_cast<NodeType*>(octant)->getChild(child_idx);
                 if (child_ptr) {
                     octant_stack_.push(child_ptr);
                 }

@@ -60,7 +60,7 @@ struct BaseIterator {
     protected:
     BaseIterator();
 
-    BaseIterator(OctreeType* octree_ptr);
+    BaseIterator(OctreeType* const octree_ptr);
 
     // Find the next Volume with valid data.
     void nextData();
