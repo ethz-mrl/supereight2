@@ -183,17 +183,6 @@ class Reader {
      */
     ReaderStatus nextData(Image<float>& depth_image, Image<RGB>& colour_image);
 
-
-    /** Read the next ray and ground truth pose.
-    *
-    * \note The frame number is incremented when calling this function.
-    *
-    * \param[out] ray_measurement The next ray (LiDAR) measurement.
-    * \param[out] T_WB        The next ground truth pose.
-    * \return An appropriate status code.
-    */
-    ReaderStatus nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB);
-
     /** Read the next batch of rays and ground truth poses.
     *
     * \note The frame number is incremented when calling this function.
@@ -371,13 +360,6 @@ class Reader {
      * more, so that the value of Reader::drop_frames_ is respected.
      */
     void nextFrame();
-
-    /** Read next ray measurement.
-     *
-     * \param[out] ray_measurement The next (lidar) ray measurement.
-     * \return An appropriate status code.
-     */
-    virtual ReaderStatus nextRay(Eigen::Vector3f& ray_measurement);
 
     /** Read next batch of ray measurements.
      *

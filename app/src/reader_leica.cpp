@@ -235,23 +235,6 @@ se::ReaderStatus se::LeicaReader::nextDepth(se::Image<float>& /*depth_image*/)
     return se::ReaderStatus::error;
 }
 
-se::ReaderStatus se::LeicaReader::nextRay(Eigen::Vector3f& ray_measurement)
-{
-    std::string line;
-    // Get 1 Line of LiDAR measurements = 1 ray
-    std::getline(lidar_stream_, line);
-    if (!lidar_stream_.good()) // Reached end of file
-        return se::ReaderStatus::eof;
-
-    LeicaLiDAREntry ray;
-    ray = LeicaLiDAREntry(line);
-
-    ray_measurement = ray.position;
-    ray_timestamp_ = ray.timestamp;
-
-    return se::ReaderStatus::ok;
-}
-
 se::ReaderStatus se::LeicaReader::nextPose(Eigen::Isometry3f& T_WB)
 {
     std::string line;

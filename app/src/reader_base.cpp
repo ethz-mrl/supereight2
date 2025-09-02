@@ -246,31 +246,6 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     return nextDataImpl(depth_image, &colour_image, &T_WB);
 }
 
-se::ReaderStatus se::Reader::nextData(Eigen::Vector3f& ray_measurement, Eigen::Isometry3f& T_WB)
-{
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    nextFrame();
-    status_ = nextRay(ray_measurement);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextRay() status: " << status_ << "\n";
-        }
-        return status_;
-    }
-    status_ = mergeStatus(nextPose(T_WB), status_);
-    if (!good()) {
-        if (verbose_ >= 1) {
-            std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
-        }
-    }
-    return status_;
-}
-
 se::ReaderStatus se::Reader::nextData(
     const float batch_interval,
     std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
@@ -516,11 +491,6 @@ void se::Reader::nextFrame()
     // std::this_thread::sleep_for it might be drastically different than
     // curr_frame_timestamp.
     prev_frame_timestamp_ = chr::steady_clock::now();
-}
-
-se::ReaderStatus se::Reader::nextRay(Eigen::Vector3f& /*ray_measurement*/)
-{
-    return se::ReaderStatus::error;
 }
 
 se::ReaderStatus se::Reader::nextRayBatch(

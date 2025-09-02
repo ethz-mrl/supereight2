@@ -50,8 +50,6 @@ class LeicaReader : public Reader {
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
-    ReaderStatus nextRay(Eigen::Vector3f& ray_measurement);
-
     ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
     ReaderStatus nextRayBatch(
