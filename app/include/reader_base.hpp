@@ -228,7 +228,7 @@ class Reader {
      *       Reader::restart() (this default implementation) should be called
      *       at the very beginning of any implementation of restart().
      */
-    virtual void restart() = 0;
+    virtual void restart();
 
     /** The name of the reader.
      *
