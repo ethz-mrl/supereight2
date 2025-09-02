@@ -342,6 +342,13 @@ class Reader {
      */
     virtual ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
+    /** Read the next depth image.
+     *
+     * \param[out] depth_image The next depth image.
+     * \return An appropriate status code.
+     */
+    virtual ReaderStatus nextDepth(Image<float>& depth_image);
+
     /** Read the next colour image into \p colour_image. Sets \p colour_image to opaque black if no
      * colour data is available.
      */
@@ -371,13 +378,6 @@ class Reader {
      * more, so that the value of Reader::drop_frames_ is respected.
      */
     void nextFrame();
-
-    /** Read the next depth image.
-     *
-     * \param[out] depth_image The next depth image.
-     * \return An appropriate status code.
-     */
-    virtual ReaderStatus nextDepth(Image<float>& depth_image) = 0;
 
     ReaderStatus
     nextDataImpl(Image<float>& depth_image, Image<RGB>* colour_image, Eigen::Isometry3f* T_WB);

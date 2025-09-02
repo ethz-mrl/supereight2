@@ -349,6 +349,13 @@ se::ReaderStatus se::Reader::nextPose(Eigen::Isometry3f& T_WB)
 
 
 
+se::ReaderStatus se::Reader::nextDepth(Image<float>& /* depth_image */)
+{
+    return se::ReaderStatus::error;
+}
+
+
+
 se::ReaderStatus se::Reader::nextColour(se::Image<se::RGB>& colour_image)
 {
     // Set to a default-initialized (opaque black) image.
