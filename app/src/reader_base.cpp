@@ -38,6 +38,9 @@ se::ReaderType se::string_to_reader_type(const std::string& s)
     else if (s_lowered == "leica") {
         return se::ReaderType::LEICA;
     }
+    else if (s_lowered == "kitti") {
+        return se::ReaderType::KITTI;
+    }
     else {
         return se::ReaderType::UNKNOWN;
     }

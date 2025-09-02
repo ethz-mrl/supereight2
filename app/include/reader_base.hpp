@@ -32,6 +32,8 @@ enum class ReaderType {
     NEWERCOLLEGE,
     /** Use the se::LeicaReader. */
     LEICA,
+    /** Use the se::KITTIReader. */
+    KITTI,
     UNKNOWN
 };
 

@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <reader_interiornet.hpp>
+#include <reader_kitti.hpp>
 #include <reader_leica.hpp>
 #include <reader_newercollege.hpp>
 #include <reader_openni.hpp>
@@ -40,6 +41,9 @@ se::Reader* se::create_reader(const se::Reader::Config& config)
         break;
     case se::ReaderType::LEICA:
         reader = new se::LeicaReader(config);
+        break;
+    case se::ReaderType::KITTI:
+        reader = new se::KITTIReader(config);
         break;
     default:
         std::cerr << "Error: Unrecognised file format, file not loaded\n";

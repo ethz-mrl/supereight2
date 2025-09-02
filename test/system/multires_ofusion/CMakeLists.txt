@@ -8,6 +8,7 @@ set(READER_SRC
   ../../../app/src/reader.cpp
   ../../../app/src/reader_base.cpp
   ../../../app/src/reader_interiornet.cpp
+  ../../../app/src/reader_kitti.cpp
   ../../../app/src/reader_leica.cpp
   ../../../app/src/reader_newercollege.cpp
   ../../../app/src/reader_openni.cpp

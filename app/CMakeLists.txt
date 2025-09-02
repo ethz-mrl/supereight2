@@ -20,6 +20,7 @@ add_library(${LIB_NAME} STATIC
   "src/reader.cpp"
   "src/reader_base.cpp"
   "src/reader_interiornet.cpp"
+  "src/reader_kitti.cpp"
   "src/reader_leica.cpp"
   "src/reader_newercollege.cpp"
   "src/reader_openni.cpp"

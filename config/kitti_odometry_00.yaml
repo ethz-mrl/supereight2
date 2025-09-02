@@ -1,0 +1,70 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2025 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+map:
+  dim:                        [102.4, 102.4, 102.4]
+  res:                        0.05
+
+data:
+  # tsdf
+  truncation_boundary_factor: 8
+  max_weight:                 100
+
+  # occupancy
+  log_odd_min:                -5.015
+  log_odd_max:                 5.015
+  fs_integr_scale:            1
+  uncertainty_model:          linear
+  tau_min_factor:             3
+  tau_max_factor:             12
+  k_tau:                      0.05
+  sigma_min_factor:           1         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:           3         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                    0.05
+
+# Parameters for cam2 (rectified left color camera)
+sensor:
+  width:                      1241
+  height:                     376
+  fx:                         718.856
+  fy:                         718.856
+  cx:                         607.193
+  cy:                         185.216
+  near_plane:                 0.1
+  far_plane:                  60.0
+  # T_C0L: The LiDAR frame L expressed in the cam0 (left grayscale) frame C0
+  T_BS: [ 0.0004276802385584, -0.9999672484946,   -0.008084491683471, -0.01198459927713,
+         -0.007210626507497,   0.008081198471645, -0.9999413164504,   -0.05403984729748,
+          0.9999738645903,     0.000485948581039, -0.007206933692422, -0.2921968648686,
+          0,                   0,                  0,                  1]
+
+tracker:
+  iterations:                 [10, 5, 4]
+  dist_threshold:             0.1
+  normal_threshold:           0.8
+  track_threshold:            0.15
+  icp_threshold:              0.00001
+
+reader:
+  reader_type:                "kitti"
+  sequence_path:              ""
+  ground_truth_file:          "poses.txt"
+  fps:                        0.0
+  drop_frames:                false
+  verbose:                    0
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  mesh_path:                  "meshes"
+  slice_path:                 "meshes"
+  structure_path:             "meshes"
+  sensor_downsampling_factor: 1
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             1
+  meshing_rate:               0
+  max_frames:                 -1
+  log_file:                   "log.tsv"
