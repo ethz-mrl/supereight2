@@ -358,6 +358,17 @@ se::ReaderStatus se::Reader::nextColour(se::Image<se::RGB>& colour_image)
 
 
 
+se::ReaderStatus se::Reader::nextRayBatch(
+    const float /*batch_interval*/,
+    std::vector<
+        std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+        Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
+{
+    return se::ReaderStatus::error;
+}
+
+
+
 se::ReaderStatus se::Reader::getPose(Eigen::Isometry3f& T_WB, const size_t frame)
 {
     // Store and reset current ground truth frame
@@ -491,15 +502,6 @@ void se::Reader::nextFrame()
     // std::this_thread::sleep_for it might be drastically different than
     // curr_frame_timestamp.
     prev_frame_timestamp_ = chr::steady_clock::now();
-}
-
-se::ReaderStatus se::Reader::nextRayBatch(
-    const float /*batch_interval*/,
-    std::vector<
-        std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-        Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>& /*rayPoseBatch*/)
-{
-    return se::ReaderStatus::error;
 }
 
 

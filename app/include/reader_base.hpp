@@ -347,6 +347,17 @@ class Reader {
      */
     virtual ReaderStatus nextColour(Image<RGB>& colour_image);
 
+    /** Read next batch of ray measurements.
+     *
+     * \param[in]  batch_interval (Time) Interval over which measurements are aggregated
+     * \param[out] rayPoseBatch   The batch of (lidar) ray measurements.
+     * \return An appropriate status code.
+     */
+    virtual ReaderStatus nextRayBatch(
+        const float batch_interval,
+        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
+                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+            rayPoseBatch);
 
     private:
     size_t ground_truth_frame_;
@@ -361,17 +372,6 @@ class Reader {
      */
     void nextFrame();
 
-    /** Read next batch of ray measurements.
-     *
-     * \param[in]  batch_interval (Time) Interval over which measurements are aggregated
-     * \param[out] rayPoseBatch   The batch of (lidar) ray measurements.
-     * \return An appropriate status code.
-     */
-    virtual ReaderStatus nextRayBatch(
-        const float batch_interval,
-        std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                    Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch);
     /** Read the next depth image.
      *
      * \param[out] depth_image The next depth image.
