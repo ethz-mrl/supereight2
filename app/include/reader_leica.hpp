@@ -48,8 +48,6 @@ class LeicaReader : public Reader {
     float elevation_angular_resolution_;
 
 
-    ReaderStatus nextDepth(Image<float>& depth_image);
-
     ReaderStatus nextPose(Eigen::Isometry3f& T_WB);
 
     ReaderStatus nextRayBatch(

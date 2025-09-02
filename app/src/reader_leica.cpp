@@ -229,12 +229,6 @@ std::string se::LeicaReader::name() const
 
 
 
-se::ReaderStatus se::LeicaReader::nextDepth(se::Image<float>& /*depth_image*/)
-{
-    std::clog << "nextDepth() not supported for LeicaReader\n";
-    return se::ReaderStatus::error;
-}
-
 se::ReaderStatus se::LeicaReader::nextPose(Eigen::Isometry3f& T_WB)
 {
     std::string line;
