@@ -295,6 +295,7 @@ class Reader {
     std::string sequence_path_;
     std::string ground_truth_file_;
     std::ifstream ground_truth_fs_;
+    size_t ground_truth_frame_;
     Eigen::Vector2i depth_image_res_;
     Eigen::Vector2i colour_image_res_;
     float fps_;
@@ -367,7 +368,6 @@ class Reader {
             rayPoseBatch);
 
     private:
-    size_t ground_truth_frame_;
     char ground_truth_delimiter_;
     std::chrono::steady_clock::time_point prev_frame_timestamp_;
 

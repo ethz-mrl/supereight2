@@ -174,6 +174,7 @@ std::ostream& se::operator<<(std::ostream& os, const se::Reader::Config& c)
 se::Reader::Reader(const se::Reader::Config& c) :
         sequence_path_(c.sequence_path),
         ground_truth_file_(c.ground_truth_file),
+        ground_truth_frame_(SIZE_MAX),
         depth_image_res_(1, 1),
         colour_image_res_(1, 1),
         fps_(c.fps),
@@ -185,7 +186,6 @@ se::Reader::Reader(const se::Reader::Config& c) :
         frame_(SIZE_MAX),
         num_frames_(0),
         has_colour_(false),
-        ground_truth_frame_(SIZE_MAX),
         ground_truth_delimiter_(' ')
 {
     // Trim trailing slashes from sequence_path_
