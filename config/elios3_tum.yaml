@@ -1,0 +1,70 @@
+%YAML:1.2
+# SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
+# SPDX-License-Identifier: CC0-1.0
+
+map:
+  dim:                        [81.92, 81.92, 81.92]
+  res:                        0.02
+
+data:
+  # tsdf
+  truncation_boundary_factor: 8
+  max_weight:                 100
+
+  # occupancy
+  log_odd_min:                -5.015
+  log_odd_max:                 5.015
+  fs_integr_scale:            1
+  uncertainty_model:          linear
+  tau_min_factor:             3
+  tau_max_factor:             12
+  k_tau:                      0.05
+  sigma_min_factor:           1         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  sigma_max_factor:           3         # minimum/maximum uncertainty := 3 x sigma_min_factor/sigma_max_factor * voxel_dim
+  k_sigma:                    0.05
+
+sensor:
+  width:                      360
+  height:                     180
+  elevation_angles:           []
+  azimuth_angles:             []
+  near_plane:                 0.6
+  far_plane:                  30.0
+  T_BS: [0.541675238972641,   0.454519493779112,  -0.707106756620746,  -0.02325,
+        -0.642787562291873,   0.766044482887820,   0.000000062453599,   0.0,
+         0.541675258108401,   0.454519394538794,   0.707106805752345,   0.0404,
+         0.0,                 0.0,                 0.0,                 1.0] # Flight 02: Body - to - sensor (LiDAR) for only mapping
+  elevation_resolution_angle: 2.871761290322581 # only used for ray-based integration [degree]
+  azimuth_resolution_angle:   0.3515625 # only used for ray-based integration [degree]
+
+tracker:
+  iterations:                 [10, 5, 4]
+  dist_threshold:             0.1
+  normal_threshold:           0.8
+  track_threshold:            0.15
+  icp_threshold:              0.00001
+
+reader:
+  reader_type:                "leica"
+  sequence_path:              "/storage/group/srl/slamAndMapping/Autoassess/elios3-tum/E300L122060007_01584_391_1flight/se2"
+  ground_truth_file:          ""
+  fps:                        0.0
+  drop_frames:                false
+  verbose:                    1
+  # following parameters are only used for Leica BLK LiDAR sensor
+  scan_time_interval:         1.0 # size of interval that lidar measurements are clustered together
+
+app:
+  enable_ground_truth:        true
+  enable_rendering:           true
+  enable_gui:                 true
+  mesh_path:                  "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
+  slice_path:                 "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
+  structure_path:             "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
+  sensor_downsampling_factor: 1
+  tracking_rate:              1
+  integration_rate:           1
+  rendering_rate:             1
+  meshing_rate:               100
+  max_frames:                 -1
+  log_file:                   "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap/log.tsv"
