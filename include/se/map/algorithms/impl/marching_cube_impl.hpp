@@ -783,7 +783,7 @@ void compute_dual_index(const OctreeT& octree,
     //     }
     // }
 
-    const unsigned int block_size = block_ptr->getSize();
+    const unsigned int block_size = block_ptr->size;
     // The local case is independent of the scale.
     // lower or upper x boundary (block_coord.x() +0 or +block size) -> (binary) 100 -> local += 4
     // lower or upper y boundary (block_coord.y() +0 or +block size) -> (binary) 010 -> local += 2

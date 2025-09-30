@@ -316,9 +316,9 @@ int main(int argc, char** argv)
                 while (!blocks.empty()) {
                     const BlockType* block = blocks.front();
                     blocks.pop();
-                    const int scale = block->getCurrentScale();
+                    const int scale = block->current_scale;
                     if (scale != 0) continue;
-                    const int block_size = block->getSize();
+                    const int block_size = block->size;
                     const Eigen::Vector3i& block_coord = block->coord; // the smallest coordinate in the block.
                     const Eigen::Vector3i block_upper_coord =
                         block_coord + Eigen::Vector3i::Constant(block_size);
@@ -329,7 +329,7 @@ int main(int argc, char** argv)
                         for (int y = 0; y < block_size; y += size) {
                             for (int x = 0; x < block_size; x += size) {
                                 const Eigen::Vector3i coord = block_coord + Eigen::Vector3i(x,y,z); // global coord.
-                                const DataType block_data = block->getData(coord);
+                                const DataType block_data = block->data(coord);
                                 // 3D edge test for all voxels.
                                 if (block_data.field.valid() && !is_free(block_data)) { // observed & occupied
                                     // TMP: Save all tested voxels.
@@ -347,7 +347,7 @@ int main(int argc, char** argv)
                                             && (neighbour_coord.array() < block_upper_coord.array()).all();
                                         if (neighbour_in_block) {
                                             // If free
-                                            if (is_free(block->getData(neighbour_coord))) {
+                                            if (is_free(block->data(neighbour_coord))) {
                                                 num_free ++;
                                             }
                                             else {
@@ -380,7 +380,7 @@ int main(int argc, char** argv)
 
             se::perfstats.sample("memory usage",
                                  se::system::memory_usage_self() / (1024.0 * 1024.0),
-                                 PerfStats::MEMORY);
+                                 se::PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
         }
 
