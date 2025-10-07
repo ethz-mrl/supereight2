@@ -128,9 +128,10 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     * \param[in] voxel_coord    The voxel coordinates of the current sample along the ray
     * \param[in] rayState       The state along the ray (is it free space?)
     * \param[in] octant_ptr     Starting point for tree traversal
+    * \return False if ray-casting can be terminated (e.g. in case a large free-space leaf node is traversed). True otherwise.
     */
     template<class SensorTDummy = SensorT>
-    typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, void>
+    typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, bool>
     operator()(const Eigen::Vector3f& ray_sample,
                const Eigen::Vector3i& voxel_coord,
                se::RayState rayState,

@@ -84,49 +84,52 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
 
     /// (1) Allocate all 8 children first level (if not yet allocated)
     octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
-    /// Check validity of measured value (sensor near plane)
+    
+    /// (2) Check validity of measured value (sensor near plane)
     if (ray_dist_ < sensor_.near_plane) {
         return;
     }
-
-    /// (3) Compute surface thickness tau and extend ray with surface thickness
-    //Eigen::Vector3f extended_ray = (ray_dist_ + tau_) * ray_.normalized();
-    //Eigen::Vector3f extended_ray_direction = extended_ray.normalized();
-
-    /// Cut ray-sampling to max. of sensor range (sensor far plane)
-    //float extended_ray_dist = (extended_ray.norm() > sensor_.far_plane) ? sensor_.far_plane : extended_ray.norm();
 
     /// (3) Determine maximum update distance along the ray, cut to maximum of sensor range (far plane)
     const Eigen::Vector3f ray_dir_S = ray_.normalized();
     const float max_update_dist = std::min(ray_dist_ + tau_, sensor_.far_plane);
 
-    /// (4) Raycasting
-    float safe_boundary = sensor_.near_plane;
-    Eigen::Vector3f starting_point = safe_boundary * ray_dir_S;
-    Eigen::Vector3f r_i_S = starting_point;
+    /// (4) "Inverted" Ray-Casting. Starting from extended ray measurement towards the sensor
+    Eigen::Vector3f r_i_S = max_update_dist * ray_dir_S;
     Eigen::Vector3f r_i_W;
     Eigen::Isometry3f T_WS = T_SW_.inverse();
 
-    while (r_i_S.norm() < max_update_dist) {
+    while (r_i_S.norm() > sensor_.near_plane) {
         // Compute if in free space
         se::RayState ray_state = computeVariance(r_i_S.norm());
 
+        // Convert from sensor to Map World Frame
         r_i_W = T_WS * r_i_S;
         Eigen::Vector3i voxel_coord;
         if (!map_.template pointToVoxel<se::Safe::On>(r_i_W, voxel_coord)) {
-            break;
+            // Outside Map, before we had a break, now we have to check when we are getting into the map
+            r_i_S -=
+                0.5 * map_res_ * octantops::scale_to_size(free_space_scale_) * ray_dir_S;
+            continue;
+            // ToDo: Find a faster way to find intersection point where ray leaves cube!
+            // break;
         }
 
         if (voxel_coord == last_visited_voxel_) {
             // can jump to next sample
-            r_i_S +=
+            r_i_S -=
                 0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
             continue;
         }
         last_visited_voxel_ = voxel_coord;
 
-        (*this)(r_i_S, voxel_coord, ray_state, root_ptr);
-        r_i_S += 0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
+        if ((*this)(r_i_S, voxel_coord, ray_state, root_ptr)) {
+            r_i_S -= 0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
+            // Nothing else to do...
+        }
+        else {
+            break; // We hit a free space Block / voxel that was already updated, continue
+        }
     }
 }
 
@@ -166,7 +169,7 @@ se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::M
 
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 template<class SensorTDummy>
-typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, void>
+typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, bool>
 RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
               SensorT>::operator()(const Eigen::Vector3f& ray_sample,
                                    const Eigen::Vector3i& voxel_coord,
@@ -230,7 +233,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         return (*this)(ray_sample, voxel_coord, rayState, finest_octant_ptr);
     }
 
-    return;
+    return true;
 }
 
 
