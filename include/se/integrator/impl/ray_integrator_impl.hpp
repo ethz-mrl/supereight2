@@ -196,19 +196,19 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
         const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
 
-        // The recommended integration scale
-        int computed_integration_scale = sensor_.blockIntegrationScale(
-            block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
-        if (rayState == se::RayState::FreeSpace
-            && (computed_integration_scale < free_space_scale_)) {
-            // Avoid updating block data as free at a scale coarser than the block's current scale.
-            // Doing so could overwrite previous updates from the same batch, resulting in missing
-            // surfaces, especially at coarser resolutions like 20 cm.
-            if (block_ptr->min_scale == -1) {
-                computed_integration_scale = free_space_scale_;
-            }
-            else {
-                computed_integration_scale = std::min(free_space_scale_, block_ptr->current_scale);
+        // Determine Integration Scale
+        int computed_integration_scale;
+        if (rayState == se::RayState::FreeSpace && block_ptr->min_scale != -1) {
+            // The block has been already updated, do the free space update at its
+            // current scale.
+            computed_integration_scale = block_ptr->current_scale;
+        } else {
+            computed_integration_scale = sensor_.blockIntegrationScale(
+                block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
+            if (rayState == se::RayState::FreeSpace) {
+                // The block hasn't been updated before, update as free at a
+                // scale no finer than free_space_scale_.
+                computed_integration_scale = std::max(free_space_scale_, computed_integration_scale);
             }
         }
 
