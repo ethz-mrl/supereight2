@@ -229,7 +229,11 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         }
     }
     else {
-        octree_.allocateChildren(static_cast<NodeType*>(finest_octant_ptr));
+        auto* node_ptr = static_cast<NodeType*>(finest_octant_ptr);
+        if (rayState == se::RayState::FreeSpace && node_ptr->max_data.field.observed) {
+            return false;
+        }
+        octree_.allocateChildren(node_ptr);
         return (*this)(ray_sample, voxel_coord, rayState, finest_octant_ptr);
     }
 
