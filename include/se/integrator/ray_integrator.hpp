@@ -154,7 +154,6 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     std::vector<std::set<se::OctantBase*>> node_set_;
     std::vector<se::OctantBase*> updated_blocks_vector_;
     std::unordered_set<se::OctantBase*> updated_blocks_set_; // This set is to keep track of blocks that need to be up-propagated
-    // ToDo: check if it can be merged with an unordered set version of `updated_octants_`
     std::unordered_set<const se::OctantBase*>* updated_octants_ = nullptr;
     RayIntegratorConfig config_;
 

@@ -261,12 +261,12 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         computed_integration_scale_ = computed_integration_scale;
 
         /// (2.c) Save block for later up-propagation (only save once)
-        if (updated_blocks_set_.count(finest_octant_ptr) == 0) {
-            updated_blocks_set_.insert(finest_octant_ptr);
+        auto [it, inserted] = updated_blocks_set_.insert(finest_octant_ptr);
+        if (inserted) {
             updated_blocks_vector_.push_back(finest_octant_ptr);
-        }
-        if (updated_octants_) {
-            updated_octants_->insert(finest_octant_ptr);
+            if (updated_octants_) {
+                updated_octants_->insert(finest_octant_ptr);
+            }
         }
     }
     else {
@@ -374,7 +374,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
                     octant_ptr, timestamp_);
                 node_set_[d - 1].insert(octant_ptr->parent());
                 if (updated_octants_) {
-                    updated_blocks_set_.insert(octant_ptr);
                     updated_octants_->insert(octant_ptr);
                 }
 
@@ -386,7 +385,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
                         for (int i = 0; i < 8; i++) {
                             OctantBase* const child_ptr = node_ptr->getChild(i);
                             if (child_ptr) {
-                                updated_blocks_set_.erase(child_ptr);
                                 updated_octants_->erase(octant_ptr);
                             }
                         }
