@@ -56,7 +56,7 @@ Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>:
 template<Colour ColB, Id IdB, int BlockSize, typename SensorT>
 void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::operator()(
     VolumeCarverAllocation& allocation_list,
-    std::set<const OctantBase*>* const updated_octants)
+    std::unordered_set<const OctantBase*>* const updated_octants)
 {
     TICK("fusion-total")
 

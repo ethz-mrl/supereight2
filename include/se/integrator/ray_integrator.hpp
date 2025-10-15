@@ -23,7 +23,7 @@ class RayIntegrator {
                   const Eigen::Vector3f& /*ray*/,
                   const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
                   const timestamp_t /* timestamp */,
-                  std::set<const OctantBase*>* const /*updated_octants = nullptr*/) {};
+                  std::unordered_set<const OctantBase*>* const /*updated_octants = nullptr*/) {};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -73,7 +73,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
                   const Eigen::Vector3f& ray,
                   const Eigen::Isometry3f& T_WS,
                   const timestamp_t timestamp,
-                  std::set<const OctantBase*>* const updated_octants = nullptr);
+                  std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
     /**
      * \brief Reset ray, pose and timestamp for the integrator
@@ -154,7 +154,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     std::vector<se::OctantBase*> updated_blocks_vector_;
     std::unordered_set<se::OctantBase*> updated_blocks_set_; // This set is to keep track of blocks that need to be up-propagated
     // ToDo: check if it can be merged with an unordered set version of `updated_octants_`
-    std::set<const se::OctantBase*>* updated_octants_ = nullptr;
+    std::unordered_set<const se::OctantBase*>* updated_octants_ = nullptr;
     RayIntegratorConfig config_;
 
     Eigen::Isometry3f T_SW_;

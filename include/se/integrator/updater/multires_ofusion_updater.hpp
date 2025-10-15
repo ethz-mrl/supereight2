@@ -9,7 +9,7 @@
 #define SE_MULTIRES_OFUSION_UPDATER_HPP
 
 #include <se/integrator/updater/multires_ofusion_core.hpp>
-#include <set>
+#include <unordered_set>
 
 namespace se {
 
@@ -51,7 +51,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sen
     Updater(MapType& map, const timestamp_t timestamp, const Measurements<SensorT>& measurements);
 
     void operator()(VolumeCarverAllocation& allocation_list,
-                    std::set<const OctantBase*>* const updated_octants = nullptr);
+                    std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -110,7 +110,7 @@ class Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sen
     const UpdaterConfig config_;
     std::vector<std::set<OctantBase*>> node_set_;
     std::vector<OctantBase*> freed_block_list_;
-    std::set<const OctantBase*>* updated_octants_ = nullptr;
+    std::unordered_set<const OctantBase*>* updated_octants_ = nullptr;
 };
 
 

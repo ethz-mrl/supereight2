@@ -78,7 +78,7 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateDepth(const timestamp_t timestamp,
                         const Measurements<SensorT>& measurements,
-                        std::set<const OctantBase*>* const updated_octants = nullptr);
+                        std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
     /**
      * \brief Integrate a batch of ray images into the maps field representation.
@@ -97,7 +97,7 @@ class MapIntegrator {
                           Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
             rayPoseBatch,
         const SensorT& sensor,
-        std::set<const OctantBase*>* const updated_octants = nullptr);
+        std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 

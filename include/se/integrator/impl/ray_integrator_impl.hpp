@@ -18,7 +18,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
                                       const Eigen::Vector3f& ray,
                                       const Eigen::Isometry3f& T_WS,
                                       const timestamp_t timestamp,
-                                      std::set<const OctantBase*>* const updated_octants) :
+                                      std::unordered_set<const OctantBase*>* const updated_octants) :
         map_(map),
         octree_(map.getOctree()),
         sensor_(sensor),
