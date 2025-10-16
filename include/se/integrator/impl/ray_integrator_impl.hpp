@@ -92,14 +92,56 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
 
     /// (3) Determine maximum update distance along the ray, cut to maximum of sensor range (far plane)
     const Eigen::Vector3f ray_dir_S = ray_.normalized();
-    const float max_update_dist = std::min(ray_dist_ + tau_, sensor_.far_plane);
+    float max_update_dist = std::min(ray_dist_ + tau_, sensor_.far_plane);
+    float min_update_dist = sensor_.near_plane;
 
-    /// (4) "Inverted" Ray-Casting. Starting from extended ray measurement towards the sensor
+    /// (4) Check if ray crosses map boundaries (Origin or measurement or both) are outside of the map
+    const Eigen::Isometry3f T_WS = T_SW_.inverse();
+    const Eigen::Vector3f ray_origin_in_W = T_WS.translation();
+    const Eigen::Vector3f ray_dir_in_W = T_WS.rotation() * ray_.normalized();
+    const Eigen::Vector3f ray_end_in_W = T_WS * ray_;
+
+    const bool origin_in_map = map_.contains(ray_origin_in_W);
+    const bool measurement_in_map = map_.contains(ray_end_in_W);
+
+    if(!origin_in_map || (origin_in_map && !measurement_in_map)){
+        // The ray is crossing a map boundary, determine crossing points
+        se::VoxelBlockRayIterator<MapType> rayIterator(map_, ray_origin_in_W, ray_dir_in_W, sensor_.near_plane, sensor_.far_plane);
+        const float tmax = rayIterator.tmax();
+        const float tmin = rayIterator.tmin();
+        if (tmax < tmin) {
+            // No valid intersections of the map with map boundaries.
+            return;
+        }
+
+        // tmax: Exit point of ray
+        if (tmax == sensor_.far_plane) {
+            // Map boundary where ray exits is further than far plane
+            max_update_dist = sensor_.far_plane; // this should be already implicitly handled
+        }
+        else if (tmax < sensor_.far_plane) {
+            // Map boundary between near and far plane, restrict update distance to tmax
+            max_update_dist = tmax;
+        }
+
+        // Handle Cases with origin outside of map -> tmin: entrance point
+        if (!origin_in_map) {
+            if (tmin > sensor_.near_plane) {
+                // Ray enteres cube at distance tmin
+                min_update_dist = tmin;
+            }
+            else if (tmin == sensor_.near_plane) {
+                // Origin closer to map than near plane: "entry point" will be inside map
+                min_update_dist = sensor_.near_plane; // this should be already implicitly handled
+            }
+        }
+    }
+
+    /// (5) "Inverted" Ray-Casting. Starting from extended ray measurement towards the sensor
     Eigen::Vector3f r_i_S = max_update_dist * ray_dir_S;
     Eigen::Vector3f r_i_W;
-    Eigen::Isometry3f T_WS = T_SW_.inverse();
 
-    while (r_i_S.norm() > sensor_.near_plane) {
+    while (r_i_S.norm() > min_update_dist) {
         // Compute if in free space
         se::RayState ray_state = computeVariance(r_i_S.norm());
 
@@ -111,7 +153,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
             r_i_S -=
                 0.5 * map_res_ * octantops::scale_to_size(free_space_scale_) * ray_dir_S;
             continue;
-            // ToDo: Find a faster way to find intersection point where ray leaves cube!
             // break;
         }
 
@@ -219,7 +260,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
                     ray_sample.norm());
         computed_integration_scale_ = computed_integration_scale;
 
-        /// (2.c) Save block for later up-propagation (only save once
+        /// (2.c) Save block for later up-propagation (only save once)
         if (updated_blocks_set_.count(finest_octant_ptr) == 0) {
             updated_blocks_set_.insert(finest_octant_ptr);
             updated_blocks_vector_.push_back(finest_octant_ptr);
