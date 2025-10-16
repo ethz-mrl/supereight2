@@ -17,7 +17,7 @@ namespace se {
 
 
 template<typename MapT>
-VoxelBlockRayIterator<MapT>::VoxelBlockRayIterator(const MapT& map,
+VoxelBlockRayIterator<MapT>::VoxelBlockRayIterator(MapT& map,
                                                    const Eigen::Vector3f& ray_origin_M,
                                                    const Eigen::Vector3f& ray_dir_M,
                                                    const float near_plane,
