@@ -385,7 +385,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
                         for (int i = 0; i < 8; i++) {
                             OctantBase* const child_ptr = node_ptr->getChild(i);
                             if (child_ptr) {
-                                updated_octants_->erase(octant_ptr);
+                                updated_octants_->erase(child_ptr);
                             }
                         }
                     }
