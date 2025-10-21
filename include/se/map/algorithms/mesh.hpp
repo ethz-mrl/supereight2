@@ -118,7 +118,8 @@ template<typename FaceT, typename ExtractIdF, typename = std::enable_if_t<FaceT:
 std::map<id_t, Mesh<FaceT>> extract_id_meshes(const Mesh<FaceT>& mesh, ExtractIdF extract_id);
 
 /** Colour the faces of \p mesh by their ID. */
-template<typename FaceT, typename = std::enable_if_t<FaceT::id_ == Id::On>>
+template<typename FaceT,
+         typename = std::enable_if_t<FaceT::col_ == Colour::On && FaceT::id_ == Id::On>>
 void colour_mesh_by_id(Mesh<FaceT>& mesh,
                        const bool enable_shading = true,
                        const Eigen::Vector3f& light_dir_W = Eigen::Vector3f(-1, 0, -1),
