@@ -57,7 +57,7 @@ se::LeicaLidar::LeicaLidar(const Config& c) :
     assert(c.near_plane > 0.f);
     assert(c.far_plane > c.near_plane);
 
-    min_ray_angle = std::min(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
+    max_ray_angle = std::max(c.azimuth_resolution_angle_, c.elevation_resolution_angle_);
     horizontal_fov = 2.0f * M_PI;
 
     constexpr float deg_to_rad = M_PI / 180.0f;
@@ -69,7 +69,7 @@ se::LeicaLidar::LeicaLidar(const Config& c) :
     vertical_fov =
         deg_to_rad * (max_elevation - min_elevation); // should be 180 degree respectively PI
 
-    pixel_dim_tan = 2.0f * std::tan(min_ray_angle * 0.5f * deg_to_rad);
+    pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
 }
 
 
@@ -85,7 +85,7 @@ se::LeicaLidar::LeicaLidar(const LeicaLidar& ll, const float dsf) :
         se::SensorBase<se::LeicaLidar>(ll),
         model(ll.model.imageWidth() / dsf,
               ll.model.imageHeight() / dsf), // TODO: Does the beam need to be scaled too?
-        min_ray_angle(ll.min_ray_angle),
+        max_ray_angle(ll.max_ray_angle),
         min_elevation_rad(ll.min_elevation_rad),
         max_elevation_rad(ll.max_elevation_rad),
         horizontal_fov(ll.horizontal_fov),

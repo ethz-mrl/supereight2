@@ -62,8 +62,8 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
     static std::string typeImpl();
 
     srl::projection::LeicaLidar model;
-    /** \brief the minimum ray angle between subsequent measurements*/
-    float min_ray_angle;
+    /** \brief the maximum ray angle between subsequent measurements*/
+    float max_ray_angle;
     float min_elevation_rad;
     float max_elevation_rad;
     /** \brief The horizontal field of view in radians. */
