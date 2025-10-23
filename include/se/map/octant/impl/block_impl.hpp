@@ -706,13 +706,11 @@ bool BlockData<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>::switch
         const int size_at_buffer_scale = BlockSize >> buffer_scale_;
         const int num_voxels_at_buffer_scale = math::cu(size_at_buffer_scale);
 
-        int missed_observed_count = 0;
         for (int voxel_idx = 0; voxel_idx < num_voxels_at_buffer_scale; voxel_idx++) {
             DataType& data = buffer_data_[voxel_idx];
             if (data.field.weight > 0 && !data.field.observed) {
                 data.field.observed = true;
                 buffer_observed_count_++;
-                missed_observed_count++;
             }
         }
 
