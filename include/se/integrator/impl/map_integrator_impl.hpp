@@ -150,17 +150,12 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
             map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, timestamp, updated_octants);
 
         // do downsampling
-        int skip_count = 0;
-
         for (size_t i = 0; i < rayPoseBatch.size(); i++) {
             TICK("Ray Integration")
             TICK("allocation-integration")
             if (rayIntegrator.resetIntegrator(
                     rayPoseBatch[i].second, rayPoseBatch[i].first, timestamp)) {
                 rayIntegrator();
-            }
-            else {
-                skip_count++;
             }
             TOCK("allocation-integration")
             TOCK("Ray Integration")
