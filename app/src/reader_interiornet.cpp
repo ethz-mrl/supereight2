@@ -169,7 +169,6 @@ std::vector<InteriorNetPoseEntry> read_interiornet_ground_truth(const std::strin
         return poses;
     }
     // Read all data lines
-    size_t i = 0;
     for (std::string line; std::getline(fs, line);) {
         // Ignore comment lines
         if (line[0] == '#') {
@@ -202,7 +201,6 @@ std::vector<InteriorNetPoseEntry> read_interiornet_ground_truth(const std::strin
         }
         // Add the pose
         poses.emplace_back(line);
-        i++;
     }
     if (poses.empty()) {
         std::cerr << "Error: Empty ground truth file " << filename << "\n";
