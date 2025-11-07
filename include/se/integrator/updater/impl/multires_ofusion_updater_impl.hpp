@@ -439,7 +439,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
         (T_CW_.linear()
          * (map_res_ * (Eigen::Matrix3f() << stride, 0, 0, 0, stride, 0, 0, 0, stride).finished()));
 
-    // Convert block centre to measurement >> PinholeCamera -> .z() | OusterLidar -> .norm()
+    // Convert block centre to measurement >> PinholeCamera -> .z() | RangeImageLidar -> .norm()
     const float block_point_C_m = sensor_.measurementFromPoint(block_centre_C);
     // Compute the surface thickness value (tau) for the block.
     const float tau =

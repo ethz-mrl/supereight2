@@ -140,7 +140,7 @@ the optimal number of OpenMP threads for running supereight2 on your computer.
 
 ### Building in debug mode fails with GCC 9
 
-The following build error (and similar ones for `LeicaLidar` and `OusterLidar`)
+The following build error (and similar ones for `Lidar` and `RangeImageLidar`)
 is due to the GCC 9 bug described
 [here](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94903). It's fixed in GCC
 10.

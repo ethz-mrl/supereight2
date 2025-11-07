@@ -53,9 +53,9 @@ endif()
 set(SE_APP_CONFIG
   "TSDFCol Single PinholeCamera"
   "TSDFCol Multi PinholeCamera"
-  "TSDF Multi OusterLidar"
+  "TSDF Multi RangeImageLidar"
   "OccupancyCol Multi PinholeCamera"
-  "Occupancy Multi OusterLidar"
+  "Occupancy Multi RangeImageLidar"
 )
 foreach(APP_CONFIG ${SE_APP_CONFIG})
   # Replace spaces with semicolons to convert the string to a CMake list.
@@ -109,12 +109,12 @@ foreach(APP_CONFIG ${SE_APP_CONFIG})
 endforeach()
 
 # build ray interface
-add_executable(supereight_occupancy_multi_leicalidar_ray src/main_leica_lidar.cpp)
-target_compile_options(supereight_occupancy_multi_leicalidar_ray PRIVATE ${SE_PRIVATE_CXX_FLAGS})
-target_include_directories(supereight_occupancy_multi_leicalidar_ray BEFORE PRIVATE include)
-target_link_libraries(supereight_occupancy_multi_leicalidar_ray PRIVATE SRL::Supereight2 ${LIB_NAME})
+add_executable(supereight_occupancy_multi_lidar src/main_lidar.cpp)
+target_compile_options(supereight_occupancy_multi_lidar PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+target_include_directories(supereight_occupancy_multi_lidar BEFORE PRIVATE include)
+target_link_libraries(supereight_occupancy_multi_lidar PRIVATE SRL::Supereight2 ${LIB_NAME})
 # Allow handling large files in 32-bit systems
-target_compile_definitions(supereight_occupancy_multi_leicalidar_ray PRIVATE _FILE_OFFSET_BITS=64)
+target_compile_definitions(supereight_occupancy_multi_lidar PRIVATE _FILE_OFFSET_BITS=64)
 
 add_executable(supereight2_sizes src/supereight2_sizes.cpp)
 target_compile_options(supereight2_sizes PRIVATE ${SE_PRIVATE_CXX_FLAGS})

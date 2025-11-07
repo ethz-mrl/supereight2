@@ -1,29 +1,24 @@
 /*
- * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2020-2022 Nils Funk
- * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2022-2024 Simon Boche
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SE_OUSTER_LIDAR_HPP
-#define SE_OUSTER_LIDAR_HPP
+#ifndef SE_LIDAR_HPP
+#define SE_LIDAR_HPP
 
 
 
 namespace se {
 
-class OusterLidar : public SensorBase<OusterLidar> {
+class Lidar : public SensorBase<Lidar> {
     public:
-    struct Config : public SensorBase<OusterLidar>::Config {
-        /** The elevation offset for each Lidar beam in degrees. The number of offsets should be the
-         * same as se::SensorBase<OusterLidar>::Config::height.
+    struct Config : public SensorBase<Lidar>::Config {
+        /** \brief The actual sensor resolution in angular directions (in degrees).
+         *  It is needed for ray based integration to decide the integration scale.
          */
-        Eigen::VectorXf beam_elevation_angles = Eigen::VectorXf(1);
-
-        /** The azimuth offset for each Lidar beam in degrees. The number of offsets should be the same
-         * as se::SensorBase<OusterLidar>::Config::height.
-         */
-        Eigen::VectorXf beam_azimuth_angles = Eigen::VectorXf(1);
+        float elevation_resolution_angle_ = 1.0f;
+        float azimuth_resolution_angle_ = 1.0f;
 
         /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
          * YAML file aren't modified.
@@ -38,16 +33,11 @@ class OusterLidar : public SensorBase<OusterLidar> {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
-    OusterLidar(const Config& config);
+    Lidar(const Config& config);
 
-    OusterLidar(const Config& config, const float downsampling_factor);
+    Lidar(const Config& config, const float downsampling_factor);
 
-    OusterLidar(const OusterLidar& ouster_lidar, const float downsampling_factor);
-
-    Eigen::Matrix3f K() const
-    {
-        return Eigen::Matrix3f::Zero();
-    }
+    Lidar(const Lidar& lidar, const float downsampling_factor);
 
     int blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
                                   const float map_res,
@@ -71,24 +61,29 @@ class OusterLidar : public SensorBase<OusterLidar> {
 
     static std::string typeImpl();
 
-    srl::projection::OusterLidar model;
-    float min_ray_angle;
-
+    srl::projection::Lidar model;
+    /** \brief the maximum ray angle between subsequent measurements*/
+    float max_ray_angle;
     float min_elevation_rad;
     float max_elevation_rad;
-
     /** \brief The horizontal field of view in radians. */
     float horizontal_fov;
     /** \brief The vertical field of view in radians. */
     float vertical_fov;
 
+    /** \brief Angular resolution for ray Integration */
+    float azimuth_resolution_angle;
+    float elevation_resolution_angle;
+
+    float pixel_dim_tan = 0.0f;
+
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-std::ostream& operator<<(std::ostream& os, const OusterLidar::Config& c);
+std::ostream& operator<<(std::ostream& os, const Lidar::Config& c);
 
 } // namespace se
 
-#include "impl/ouster_lidar_impl.hpp"
+#include "impl/lidar_impl.hpp"
 
-#endif // SE_OUSTER_LIDAR_HPP
+#endif // SE_LIDAR_HPP

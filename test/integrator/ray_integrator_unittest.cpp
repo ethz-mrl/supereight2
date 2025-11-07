@@ -79,7 +79,7 @@ TEST(RayIntegrator, SingleRay)
     se::OccupancyMap<se::Res::Multi> map(Eigen::Vector3f::Constant(dim), res);
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidar::Config sensorConfig;
+    se::Lidar::Config sensorConfig;
     sensorConfig.width = 360;
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.2f;
@@ -87,7 +87,7 @@ TEST(RayIntegrator, SingleRay)
     sensorConfig.T_BS = Eigen::Isometry3f::Identity();
     sensorConfig.elevation_resolution_angle_ = 1.0f;
     sensorConfig.azimuth_resolution_angle_ = 1.0f;
-    const se::LeicaLidar sensor(sensorConfig);
+    const se::Lidar sensor(sensorConfig);
 
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);
@@ -199,7 +199,7 @@ TEST(RayIntegrator, Propagation)
 
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidar::Config sensorConfig;
+    se::Lidar::Config sensorConfig;
     sensorConfig.width = 360;
     sensorConfig.height = 180;
     sensorConfig.near_plane = 0.6f;
@@ -208,8 +208,8 @@ TEST(RayIntegrator, Propagation)
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
-    //se::LeicaLidar::Config sensorConfig(se_config.sensor);
-    const se::LeicaLidar sensor(sensorConfig);
+    //se::Lidar::Config sensorConfig(se_config.sensor);
+    const se::Lidar sensor(sensorConfig);
 
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);

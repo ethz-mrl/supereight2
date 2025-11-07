@@ -138,7 +138,7 @@ TEST(Map, aabb_ray_batch)
 
 
     // ========= Sensor INITIALIZATION  =========
-    se::LeicaLidar::Config sensorConfig;
+    se::Lidar::Config sensorConfig;
     sensorConfig.width = 1;  // To satisfy assert
     sensorConfig.height = 1; // To satisfy assert
     sensorConfig.near_plane = 0.6f;
@@ -147,8 +147,8 @@ TEST(Map, aabb_ray_batch)
     sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
     sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
 
-    //se::LeicaLidar::Config sensorConfig(se_config.sensor);
-    const se::LeicaLidar sensor(sensorConfig);
+    //se::Lidar::Config sensorConfig(se_config.sensor);
+    const se::Lidar sensor(sensorConfig);
 
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);

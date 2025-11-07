@@ -210,7 +210,7 @@ se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::M
 
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 template<class SensorTDummy>
-typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, bool>
+typename std::enable_if_t<std::is_same<SensorTDummy, se::Lidar>::value, bool>
 RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
               SensorT>::operator()(const Eigen::Vector3f& ray_sample,
                                    const Eigen::Vector3i& voxel_coord,

@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 
         // ========= Config & I/O INITIALIZATION  =========
         const std::string config_filename = argv[1];
-        const se::Config<MapType, se::LeicaLidar> config(config_filename);
+        const se::Config<MapType, se::Lidar> config(config_filename);
         std::cout << config;
 
         // Setup log stream
@@ -47,9 +47,9 @@ int main(int argc, char** argv)
         MapType map(config.map, config.data);
 
         // ========= Sensor INITIALIZATION  =========
-        // Create a pinhole camera and downsample the intrinsics
-        // Supported sensor models {se::PinholeCamera, se::OusterLidar}
-        const se::LeicaLidar sensor(config.sensor, config.app.sensor_downsampling_factor);
+        // Create a lidar sensor for generic 3D point clouds
+        // Supported sensor model {se::Lidar}
+        const se::Lidar sensor(config.sensor, config.app.sensor_downsampling_factor);
 
         // ========= READER INITIALIZATION  =========
         std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));

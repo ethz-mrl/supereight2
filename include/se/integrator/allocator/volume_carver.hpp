@@ -165,7 +165,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
     /**
      * \brief Recursively decide if to allocate or terminate a node.
      *
-     * \note se::OusterLidar implementation
+     * \note se::RangeImageLidar implementation
      *
      * \tparam SensorTDummy
      * \param[in] node_coord      The coordinates of the octant corner (front, left, bottom) to be evaluated
@@ -174,7 +174,7 @@ class VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
      * \param[in] parent_ptr      The pointer to the octant
      */
     template<class SensorTDummy = SensorT>
-    typename std::enable_if_t<std::is_same<SensorTDummy, se::OusterLidar>::value, void>
+    typename std::enable_if_t<std::is_same<SensorTDummy, se::RangeImageLidar>::value, void>
     operator()(const Eigen::Vector3i& octant_coord,
                const int octant_size,
                const int octant_depth,

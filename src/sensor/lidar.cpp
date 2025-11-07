@@ -6,10 +6,10 @@
 
 #include "se/sensor/sensor.hpp"
 
-void se::LeicaLidar::Config::readYaml(const std::string& filename)
+void se::Lidar::Config::readYaml(const std::string& filename)
 {
     // Read the base class members.
-    SensorBase<LeicaLidar>::Config::readYaml(filename);
+    SensorBase<Lidar>::Config::readYaml(filename);
 
     // Open the file for reading.
     cv::FileStorage fs;
@@ -22,10 +22,10 @@ void se::LeicaLidar::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_float(node, "azimuth_resolution_angle", azimuth_resolution_angle_);
 }
 
-se::LeicaLidar::Config se::LeicaLidar::Config::operator/(const float downsampling_factor) const
+se::Lidar::Config se::Lidar::Config::operator/(const float downsampling_factor) const
 {
-    return se::LeicaLidar::Config{
-        se::SensorBase<se::LeicaLidar>::Config::operator/(downsampling_factor),
+    return se::Lidar::Config{
+        se::SensorBase<se::Lidar>::Config::operator/(downsampling_factor),
         elevation_resolution_angle_,
         azimuth_resolution_angle_,
     };
@@ -33,9 +33,9 @@ se::LeicaLidar::Config se::LeicaLidar::Config::operator/(const float downsamplin
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidar::Config& c)
+std::ostream& se::operator<<(std::ostream& os, const se::Lidar::Config& c)
 {
-    os << static_cast<const SensorBase<LeicaLidar>::Config&>(c);
+    os << static_cast<const SensorBase<Lidar>::Config&>(c);
     os << str_utils::value_to_pretty_str(c.elevation_resolution_angle_,
                                          "elevation_resolution_angle")
        << " degrees\n";
@@ -46,8 +46,8 @@ std::ostream& se::operator<<(std::ostream& os, const se::LeicaLidar::Config& c)
 
 
 
-se::LeicaLidar::LeicaLidar(const Config& c) :
-        se::SensorBase<se::LeicaLidar>(c),
+se::Lidar::Lidar(const Config& c) :
+        se::SensorBase<se::Lidar>(c),
         model(c.width, c.height),
         azimuth_resolution_angle(c.azimuth_resolution_angle_),
         elevation_resolution_angle(c.elevation_resolution_angle_)
@@ -74,15 +74,15 @@ se::LeicaLidar::LeicaLidar(const Config& c) :
 
 
 
-se::LeicaLidar::LeicaLidar(const Config& c, const float downsampling_factor) :
-        se::LeicaLidar(c / downsampling_factor)
+se::Lidar::Lidar(const Config& c, const float downsampling_factor) :
+        se::Lidar(c / downsampling_factor)
 {
 }
 
 
 
-se::LeicaLidar::LeicaLidar(const LeicaLidar& ll, const float dsf) :
-        se::SensorBase<se::LeicaLidar>(ll),
+se::Lidar::Lidar(const Lidar& ll, const float dsf) :
+        se::SensorBase<se::Lidar>(ll),
         model(ll.model.imageWidth() / dsf,
               ll.model.imageHeight() / dsf), // TODO: Does the beam need to be scaled too?
         max_ray_angle(ll.max_ray_angle),
@@ -97,7 +97,7 @@ se::LeicaLidar::LeicaLidar(const LeicaLidar& ll, const float dsf) :
 
 
 
-int se::LeicaLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
+int se::Lidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
                                               const float map_res,
                                               const int last_scale,
                                               const int min_scale,
@@ -142,7 +142,7 @@ int se::LeicaLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centr
 
 
 
-bool se::LeicaLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
+bool se::Lidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
     if (point_S.norm() > far_plane) {
         return false;
@@ -163,7 +163,7 @@ bool se::LeicaLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 
 
 
-bool se::LeicaLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
+bool se::Lidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
 {
     if (point_S.norm() < near_plane) {
         return false;
@@ -180,7 +180,7 @@ bool se::LeicaLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
 
 
 
-bool se::LeicaLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const float radius) const
+bool se::Lidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const float radius) const
 {
     if (centre_S.norm() - radius > far_plane) {
         return false;
@@ -213,7 +213,7 @@ bool se::LeicaLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const 
 
 
 
-bool se::LeicaLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
+bool se::Lidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
                                             const float radius) const
 {
     if (centre_S.norm() + radius < near_plane) {

@@ -126,18 +126,18 @@ se::OccupancyMap<se::Res::Multi> map(config.map, config.data) occupacny_multi_ma
 
 The following sensor types are currently supported:
 
-| Sensor Type   |
-|---------------|
-| PinholeCamera |
-| OusterLidar   |
-| LeicaLidar    |
+| Sensor Type     | Description     |
+|-----------------|-----------------|
+| PinholeCamera   | 2D depth images |
+| RangeImageLidar | 2D range images |
+| Lidar           | 3D point clouds |
 
 Example snippet
 
 ``` cpp
 // Setup a sensor
 const se::PinholeCamera pinhole_camera(config.sensor, config.app.sensor_downsampling_factor);
-const se::OusterLidar   ouster_lidar(config.sensor, config.app.sensor_downsampling_factor);
+const se::RangeImageLidar range_image_lidar(config.sensor, config.app.sensor_downsampling_factor);
 ```
 
 ### 3. Setting up a reader

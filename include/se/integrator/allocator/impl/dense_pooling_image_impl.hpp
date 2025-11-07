@@ -392,9 +392,9 @@ DensePoolingImage<PinholeCamera>::conservativeQuery(const Eigen::Vector2i& bb_mi
 
 
 
-/// Ouster LiDAR implementation
+/// Range image LiDAR implementation
 template<>
-inline DensePoolingImage<OusterLidar>::DensePoolingImage(const se::Image<float>& depth_map) :
+inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<float>& depth_map) :
         image_width_(depth_map.width()), image_height_(depth_map.height())
 {
     const int image_max_dim = std::min(image_width_, image_height_);
@@ -437,7 +437,7 @@ inline DensePoolingImage<OusterLidar>::DensePoolingImage(const se::Image<float>&
                 pixel.status_crossing = Pixel::statusCrossing::inside; // inside (0)
             }
 
-            /// Adapted Ouster LiDAR boundaries due to 360deg view.
+            /// Adapted range image LiDAR boundaries due to 360deg view.
             int left = (x > 0) ? x - 1 : image_width_ - 1;  ///< Enter the right image boundary.
             int right = (x < image_width_ - 1 ? x + 1 : 0); ///< Enter the left image boundary.
 
@@ -596,7 +596,7 @@ inline DensePoolingImage<OusterLidar>::DensePoolingImage(const se::Image<float>&
 }
 
 template<>
-inline bool DensePoolingImage<OusterLidar>::inImage(const int /* u */, const int v) const
+inline bool DensePoolingImage<RangeImageLidar>::inImage(const int /* u */, const int v) const
 {
     if (v >= 0 && v < static_cast<Value>(image_height_)) {
         return true;
@@ -606,7 +606,7 @@ inline bool DensePoolingImage<OusterLidar>::inImage(const int /* u */, const int
 
 template<>
 inline Pixel
-DensePoolingImage<OusterLidar>::poolBoundingBox(int u_min, int u_max, int v_min, int v_max) const
+DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_min, int v_max) const
 {
     bool u_wrap = false; ///< Pixel batch width is entirely contained within the image
 
@@ -731,7 +731,7 @@ DensePoolingImage<OusterLidar>::poolBoundingBox(int u_min, int u_max, int v_min,
 
 
 template<>
-inline Pixel DensePoolingImage<OusterLidar>::conservativeQuery(const Eigen::Vector2i& bb_min,
+inline Pixel DensePoolingImage<RangeImageLidar>::conservativeQuery(const Eigen::Vector2i& bb_min,
                                                                const Eigen::Vector2i& bb_max) const
 {
     int u_min = bb_min.x();

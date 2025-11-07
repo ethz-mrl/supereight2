@@ -121,7 +121,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     /**
     * \brief Recursively decide if to allocate or terminate a node.
     *
-    * \note se::LeicaLidar implementation
+    * \note se::Lidar implementation
     *
     * \tparam SensorTDummy
     * \param[in] ray_sample     The current sample point along the ray
@@ -131,7 +131,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     * \return False if ray-casting can be terminated (e.g. in case a large free-space leaf node is traversed). True otherwise.
     */
     template<class SensorTDummy = SensorT>
-    typename std::enable_if_t<std::is_same<SensorTDummy, se::LeicaLidar>::value, bool>
+    typename std::enable_if_t<std::is_same<SensorTDummy, se::Lidar>::value, bool>
     operator()(const Eigen::Vector3f& ray_sample,
                const Eigen::Vector3i& voxel_coord,
                se::RayState rayState,

@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 
         // ========= Sensor INITIALIZATION  =========
         // Create a pinhole camera and downsample the intrinsics
-        // Supported sensor models {se::PinholeCamera, se::OusterLidar}
+        // Supported sensor models {se::PinholeCamera, se::RangeImageLidar}
         const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
         const se::PinholeCamera colour_sensor(config.sensor);
 

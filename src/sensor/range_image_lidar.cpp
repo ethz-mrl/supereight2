@@ -7,10 +7,10 @@
 
 #include "se/sensor/sensor.hpp"
 
-void se::OusterLidar::Config::readYaml(const std::string& filename)
+void se::RangeImageLidar::Config::readYaml(const std::string& filename)
 {
     // Read the base class members.
-    SensorBase<OusterLidar>::Config::readYaml(filename);
+    SensorBase<RangeImageLidar>::Config::readYaml(filename);
 
     // Open the file for reading.
     cv::FileStorage fs;
@@ -33,10 +33,10 @@ void se::OusterLidar::Config::readYaml(const std::string& filename)
     }
 }
 
-se::OusterLidar::Config se::OusterLidar::Config::operator/(const float downsampling_factor) const
+se::RangeImageLidar::Config se::RangeImageLidar::Config::operator/(const float downsampling_factor) const
 {
-    return se::OusterLidar::Config{
-        se::SensorBase<se::OusterLidar>::Config::operator/(downsampling_factor),
+    return se::RangeImageLidar::Config{
+        se::SensorBase<se::RangeImageLidar>::Config::operator/(downsampling_factor),
         beam_elevation_angles,
         beam_azimuth_angles,
     };
@@ -44,9 +44,9 @@ se::OusterLidar::Config se::OusterLidar::Config::operator/(const float downsampl
 
 
 
-std::ostream& se::operator<<(std::ostream& os, const se::OusterLidar::Config& c)
+std::ostream& se::operator<<(std::ostream& os, const se::RangeImageLidar::Config& c)
 {
-    os << static_cast<const SensorBase<OusterLidar>::Config&>(c);
+    os << static_cast<const SensorBase<RangeImageLidar>::Config&>(c);
     os << str_utils::eigen_vector_to_pretty_str(c.beam_azimuth_angles, "beam_azimuth_angles")
        << " degrees\n";
     os << str_utils::eigen_vector_to_pretty_str(c.beam_elevation_angles, "beam_elevation_angles")
@@ -56,8 +56,8 @@ std::ostream& se::operator<<(std::ostream& os, const se::OusterLidar::Config& c)
 
 
 
-se::OusterLidar::OusterLidar(const Config& c) :
-        se::SensorBase<se::OusterLidar>(c),
+se::RangeImageLidar::RangeImageLidar(const Config& c) :
+        se::SensorBase<se::RangeImageLidar>(c),
         model(c.width, c.height, c.beam_azimuth_angles, c.beam_elevation_angles)
 {
     assert(c.width > 0);
@@ -86,15 +86,15 @@ se::OusterLidar::OusterLidar(const Config& c) :
 
 
 
-se::OusterLidar::OusterLidar(const Config& c, const float downsampling_factor) :
-        se::OusterLidar(c / downsampling_factor)
+se::RangeImageLidar::RangeImageLidar(const Config& c, const float downsampling_factor) :
+        se::RangeImageLidar(c / downsampling_factor)
 {
 }
 
 
 
-se::OusterLidar::OusterLidar(const OusterLidar& ol, const float dsf) :
-        se::SensorBase<se::OusterLidar>(ol),
+se::RangeImageLidar::RangeImageLidar(const RangeImageLidar& ol, const float dsf) :
+        se::SensorBase<se::RangeImageLidar>(ol),
         model(ol.model.imageWidth() / dsf,
               ol.model.imageHeight() / dsf,
               ol.model.beamAzimuthAngles(),
@@ -109,7 +109,7 @@ se::OusterLidar::OusterLidar(const OusterLidar& ol, const float dsf) :
 
 
 
-int se::OusterLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
+int se::RangeImageLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
                                                const float map_res,
                                                const int last_scale,
                                                const int min_scale,
@@ -154,7 +154,7 @@ int se::OusterLidar::blockIntegrationScaleImpl(const Eigen::Vector3f& block_cent
 
 
 
-bool se::OusterLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
+bool se::RangeImageLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 {
     if (point_S.norm() > far_plane) {
         return false;
@@ -175,7 +175,7 @@ bool se::OusterLidar::pointInFrustumImpl(const Eigen::Vector3f& point_S) const
 
 
 
-bool se::OusterLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
+bool se::RangeImageLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) const
 {
     if (point_S.norm() < near_plane) {
         return false;
@@ -192,7 +192,7 @@ bool se::OusterLidar::pointInFrustumInfImpl(const Eigen::Vector3f& point_S) cons
 
 
 
-bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const float radius) const
+bool se::RangeImageLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const float radius) const
 {
     if (centre_S.norm() - radius > far_plane) {
         return false;
@@ -225,7 +225,7 @@ bool se::OusterLidar::sphereInFrustumImpl(const Eigen::Vector3f& centre_S, const
 
 
 
-bool se::OusterLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
+bool se::RangeImageLidar::sphereInFrustumInfImpl(const Eigen::Vector3f& centre_S,
                                              const float radius) const
 {
     if (centre_S.norm() + radius < near_plane) {

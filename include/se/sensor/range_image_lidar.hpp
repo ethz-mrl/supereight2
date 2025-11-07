@@ -1,24 +1,29 @@
 /*
- * SPDX-FileCopyrightText: 2020-2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
- * SPDX-FileCopyrightText: 2022-2024 Simon Boche
+ * SPDX-FileCopyrightText: 2020-2022 Smart Robotics Lab, Imperial College London, Technical University of Munich
+ * SPDX-FileCopyrightText: 2020-2022 Nils Funk
+ * SPDX-FileCopyrightText: 2020-2022 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SE_LEICA_LIDAR_HPP
-#define SE_LEICA_LIDAR_HPP
+#ifndef SE_RANGEIMAGE_LIDAR_HPP
+#define SE_RANGEIMAGE_LIDAR_HPP
 
 
 
 namespace se {
 
-class LeicaLidar : public SensorBase<LeicaLidar> {
+class RangeImageLidar : public SensorBase<RangeImageLidar> {
     public:
-    struct Config : public SensorBase<LeicaLidar>::Config {
-        /** \brief The actual sensor resolution in angular directions (in degrees).
-         *  It is needed for ray based integration to decide the integration scale.
+    struct Config : public SensorBase<RangeImageLidar>::Config {
+        /** The elevation offset for each Lidar beam in degrees. The number of offsets should be the
+         * same as se::SensorBase<RangeImageLidar>::Config::height.
          */
-        float elevation_resolution_angle_ = 1.0f;
-        float azimuth_resolution_angle_ = 1.0f;
+        Eigen::VectorXf beam_elevation_angles = Eigen::VectorXf(1);
+
+        /** The azimuth offset for each Lidar beam in degrees. The number of offsets should be the same
+         * as se::SensorBase<RangeImageLidar>::Config::height.
+         */
+        Eigen::VectorXf beam_azimuth_angles = Eigen::VectorXf(1);
 
         /** Reads the struct members from the "sensor" node of a YAML file. Members not present in the
          * YAML file aren't modified.
@@ -33,11 +38,16 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     };
 
-    LeicaLidar(const Config& config);
+    RangeImageLidar(const Config& config);
 
-    LeicaLidar(const Config& config, const float downsampling_factor);
+    RangeImageLidar(const Config& config, const float downsampling_factor);
 
-    LeicaLidar(const LeicaLidar& leica_lidar, const float downsampling_factor);
+    RangeImageLidar(const RangeImageLidar& range_image_lidar, const float downsampling_factor);
+
+    Eigen::Matrix3f K() const
+    {
+        return Eigen::Matrix3f::Zero();
+    }
 
     int blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
                                   const float map_res,
@@ -61,29 +71,24 @@ class LeicaLidar : public SensorBase<LeicaLidar> {
 
     static std::string typeImpl();
 
-    srl::projection::LeicaLidar model;
-    /** \brief the maximum ray angle between subsequent measurements*/
-    float max_ray_angle;
+    srl::projection::RangeImageLidar model;
+    float min_ray_angle;
+
     float min_elevation_rad;
     float max_elevation_rad;
+
     /** \brief The horizontal field of view in radians. */
     float horizontal_fov;
     /** \brief The vertical field of view in radians. */
     float vertical_fov;
 
-    /** \brief Angular resolution for ray Integration */
-    float azimuth_resolution_angle;
-    float elevation_resolution_angle;
-
-    float pixel_dim_tan = 0.0f;
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-std::ostream& operator<<(std::ostream& os, const LeicaLidar::Config& c);
+std::ostream& operator<<(std::ostream& os, const RangeImageLidar::Config& c);
 
 } // namespace se
 
-#include "impl/leica_lidar_impl.hpp"
+#include "impl/range_image_lidar_impl.hpp"
 
-#endif // SE_LEICA_LIDAR_HPP
+#endif // SE_RANGEIMAGE_LIDAR_HPP

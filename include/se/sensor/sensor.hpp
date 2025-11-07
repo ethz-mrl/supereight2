@@ -174,8 +174,8 @@ class SensorBase {
 } // namespace se
 
 #include "impl/sensor_impl.hpp"
-#include "leica_lidar.hpp"
-#include "ouster_lidar.hpp"
+#include "lidar.hpp"
+#include "range_image_lidar.hpp"
 #include "pinhole_camera.hpp"
 
 #endif // SE_SENSOR_HPP
