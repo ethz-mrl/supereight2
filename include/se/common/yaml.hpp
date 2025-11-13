@@ -46,6 +46,17 @@ void subnode_as_bool(const cv::FileNode& base_node, const std::string& subnode_n
 void subnode_as_int(const cv::FileNode& base_node, const std::string& subnode_name, int& i);
 
 /**
+ * \brief   Interprets the data in the subnode of base_node named subnode_name as an size_t and saves it in i.
+ *          Shows a warning message on standard error and doesn't modify i if the YAML data is not an
+ *          integer or doesn't exist.
+ *
+ * \param[in]  base_node    The reference to the base node
+ * \param[in]  subnode_name The name of the sub node
+ * \param[out] i            The size_t value of the sub node
+ */
+void subnode_as_size_t(const cv::FileNode& base_node, const std::string& subnode_name, size_t& i);
+
+/**
  * \brief   Interprets the data in the subnode of base_node named subnode_name as a float and saves it in f.
  *          Shows a warning message on standard error and doesn't modify f if the YAML data is not
  *          a float or doesn't exist.

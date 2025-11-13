@@ -50,6 +50,19 @@ void subnode_as_int(const cv::FileNode& base_node, const std::string& subnode_na
     }
 }
 
+void subnode_as_size_t(const cv::FileNode& base_node, const std::string& subnode_name, size_t& i)
+{
+    const cv::FileNode subnode = base_node[subnode_name];
+    if (subnode.isInt()) {
+        int j = static_cast<int>(subnode);
+        i = static_cast<size_t>(j);
+    }
+    else if (!subnode.empty()) {
+        std::cerr << "Warning: ignoring non-int data in " << subnode_name
+                  << ", using default value \"" << i << "\"\n";
+    }
+}
+
 
 
 void subnode_as_float(const cv::FileNode& base_node, const std::string& subnode_name, float& f)
