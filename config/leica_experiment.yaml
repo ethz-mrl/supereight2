@@ -24,8 +24,6 @@ data:
   k_sigma:                    0.05
 
 sensor:
-  width:                      360
-  height:                     180
   elevation_angles:           []
   azimuth_angles:             []
   near_plane:                 0.2

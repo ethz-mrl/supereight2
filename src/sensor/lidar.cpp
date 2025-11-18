@@ -22,15 +22,6 @@ void se::Lidar::Config::readYaml(const std::string& filename)
     se::yaml::subnode_as_float(node, "azimuth_resolution_angle", azimuth_resolution_angle_);
 }
 
-se::Lidar::Config se::Lidar::Config::operator/(const float downsampling_factor) const
-{
-    return se::Lidar::Config{
-        se::SensorBase<se::Lidar>::Config::operator/(downsampling_factor),
-        elevation_resolution_angle_,
-        azimuth_resolution_angle_,
-    };
-}
-
 
 
 std::ostream& se::operator<<(std::ostream& os, const se::Lidar::Config& c)
@@ -48,12 +39,9 @@ std::ostream& se::operator<<(std::ostream& os, const se::Lidar::Config& c)
 
 se::Lidar::Lidar(const Config& c) :
         se::SensorBase<se::Lidar>(c),
-        model(c.width, c.height),
         azimuth_resolution_angle(c.azimuth_resolution_angle_),
         elevation_resolution_angle(c.elevation_resolution_angle_)
 {
-    assert(c.width > 0);
-    assert(c.height > 0);
     assert(c.near_plane > 0.f);
     assert(c.far_plane > c.near_plane);
 
@@ -72,28 +60,6 @@ se::Lidar::Lidar(const Config& c) :
     pixel_dim_tan = 2.0f * std::tan(max_ray_angle * 0.5f * deg_to_rad);
 }
 
-
-
-se::Lidar::Lidar(const Config& c, const float downsampling_factor) :
-        se::Lidar(c / downsampling_factor)
-{
-}
-
-
-
-se::Lidar::Lidar(const Lidar& ll, const float dsf) :
-        se::SensorBase<se::Lidar>(ll),
-        model(ll.model.imageWidth() / dsf,
-              ll.model.imageHeight() / dsf), // TODO: Does the beam need to be scaled too?
-        max_ray_angle(ll.max_ray_angle),
-        min_elevation_rad(ll.min_elevation_rad),
-        max_elevation_rad(ll.max_elevation_rad),
-        horizontal_fov(ll.horizontal_fov),
-        vertical_fov(ll.vertical_fov),
-        azimuth_resolution_angle(ll.azimuth_resolution_angle),
-        elevation_resolution_angle(ll.elevation_resolution_angle)
-{
-}
 
 
 

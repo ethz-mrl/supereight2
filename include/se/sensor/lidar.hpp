@@ -35,10 +35,6 @@ class Lidar : public SensorBase<Lidar> {
 
     Lidar(const Config& config);
 
-    Lidar(const Config& config, const float downsampling_factor);
-
-    Lidar(const Lidar& lidar, const float downsampling_factor);
-
     int blockIntegrationScaleImpl(const Eigen::Vector3f& block_centre,
                                   const float map_res,
                                   const int last_scale,
@@ -61,7 +57,6 @@ class Lidar : public SensorBase<Lidar> {
 
     static std::string typeImpl();
 
-    srl::projection::Lidar model;
     /** \brief the maximum ray angle between subsequent measurements*/
     float max_ray_angle;
     float min_elevation_rad;
