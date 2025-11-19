@@ -49,7 +49,7 @@ int main(int argc, char** argv)
         // ========= Sensor INITIALIZATION  =========
         // Create a lidar sensor for generic 3D point clouds
         // Supported sensor model {se::Lidar}
-        const se::Lidar sensor(config.sensor, config.app.sensor_downsampling_factor);
+        const se::Lidar sensor(config.sensor);
 
         // ========= READER INITIALIZATION  =========
         std::unique_ptr<se::Reader> reader(se::create_reader(config.reader));
@@ -61,9 +61,6 @@ int main(int argc, char** argv)
         Eigen::Isometry3f T_WB = Eigen::Isometry3f::Identity(); //< Body to world transformation
         Eigen::Isometry3f T_BS = sensor.T_BS;                   //< Sensor to body transformation
         Eigen::Isometry3f T_WS = T_WB * T_BS;                   //< Sensor to world transformation
-
-        // ========= Tracker & Pose INITIALIZATION  =========
-        se::Tracker tracker(map, sensor, config.tracker);
 
         // ========= Integrator INITIALIZATION  =========
         // The integrator uses a field dependent allocation (TSDF: ray-casting; occupancy: volume-carving)
