@@ -70,8 +70,13 @@ static const auto point_in_offset_frustum = [](const Eigen::Vector3f& point_S,
     // dot products are non-negative, then the point is inside the frustum. Comparing the dot
     // products against some value other than zero is equivalent to translating the frustum faces
     // along their normals.
+    //
+    // We slightly increase offset because it helps ensure points on the frustum boundaries are
+    // considered to be inside, even in the presence of numerical errors. It also makes it possible
+    // to have a near plane of 0. It might result in some small amount of false positives but those
+    // are preferable to false negatives.
     return ((frustum_normals_S.array().colwise() * point_S.homogeneous().array()).colwise().sum()
-            >= -offset)
+            >= -(offset + 1e-6f))
         .all();
 };
 
@@ -89,8 +94,8 @@ se::PinholeCamera::PinholeCamera(const Config& c) :
 
     assert(c.width > 0);
     assert(c.height > 0);
-    assert(c.near_plane > 0.0f);
     assert(c.far_plane > c.near_plane);
+    assert(std::isfinite(c.far_plane));
     assert(!std::isnan(c.fx));
     assert(!std::isnan(c.fy));
     assert(!std::isnan(c.cx));
