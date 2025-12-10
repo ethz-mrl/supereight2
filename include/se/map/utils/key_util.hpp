@@ -169,14 +169,6 @@ inline void decode_key(const se::key_t key, Eigen::Vector3i& coord, scale_t& sca
 inline void encode_code(const Eigen::Vector3i& coord, se::code_t& code);
 
 /**
- * \brief Compute the Morton code for given x,y,z coordinates.
- *
- * \param[in]  coord    The coordinates to be encoded
- * \param[out] code     The Morten code representing the coordinates
- */
-inline se::code_t encode_code(const Eigen::Vector3i& coord);
-
-/**
  * \brief Compute the x,y,z coordinates for a given Morton code.
  *
  * \param[in]  code     The code to be encoded

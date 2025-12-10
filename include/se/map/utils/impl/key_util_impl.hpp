@@ -151,18 +151,6 @@ inline void encode_code(const Eigen::Vector3i& coord, se::code_t& code)
 
 
 
-inline se::code_t encode_code(const Eigen::Vector3i& coord)
-{
-    assert(is_valid(coord)); // Verify doesn't surpass max coordinates
-
-    se::key_t x = expand(coord.x());
-    se::key_t y = expand(coord.y()) << 1;
-    se::key_t z = expand(coord.z()) << 2;
-    return x | y | z;
-}
-
-
-
 inline void decode_code(const se::code_t code, Eigen::Vector3i& coord)
 {
     coord = Eigen::Vector3i(compact(code >> 0ull), compact(code >> 1ull), compact(code >> 2ull));
