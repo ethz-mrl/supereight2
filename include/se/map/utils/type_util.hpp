@@ -1,7 +1,7 @@
 /*
  * SPDX-FileCopyrightText: 2021 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2025 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -13,36 +13,82 @@
 
 namespace se {
 
-/**
- * \brief key = 1 bit buffer + 57 bits of morton code + 6 bits of scale information
- *        The maxium scale is limited by 57 / 3 = 19 scales
- *
- *
- * \note uint64_t has 64 bits
- *       We'll use the key to store both, the Morton code and scale information
- *       In 3D three bits are required to encode the Morton code at each scale.
- *       21 scales -> 3 bits * 21 = 63 bits; 64 bits - 63 bits = 1 bit  to encode unsigned int up to 21 [not possible]
- *       20 scales -> 3 bits * 20 = 60 bits; 64 bits - 60 bits = 4 bits to encode unsigned int up to 20 [not possible]
- *       19 scales -> 3 bits * 19 = 57 bits; 64 bits - 57 bits = 7 bits to encode unsigend int up to 19 [possible]
- *
- *       The tree cannot allocate any depth further than 19 allowing a map size = 524288 * map resolution
- *       That is a maximum map size of 1 x 1 x 1 km^3 at 2 mm resolution
+/** \defgroup OctreeKey
+ * Types used for compact encoding of octant coordinates and size. se::key_t is the main type, while
+ * se::code_t and se::scale_t describe components of se::key_t. There's usually no reason to work
+ * with anything other than se::key_t unless you're modifying the internals of supereight2.
+ * @{
  */
-typedef uint64_t key_t;   ///< The type of the Key i.e. code | scale
-typedef uint64_t code_t;  ///< The type of the Morton code
-typedef uint64_t scale_t; ///< The type of the scale in the morton code
 
-typedef unsigned int idx_t; ///< Child or voxel index type
+/** Compactly encodes the 3D coordinates and size of an se::OctantBase.
+ *
+ * The 3D coordinates and scale are stored in the 64 bits like this:
+ * \code{text}
+ *      MSB                                                          LSB
+ * Bit 63 61                                                      54   0
+ *      ↓ ↓                                                       ↓↓   ↓
+ *      --zyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxsssss
+ *      ├┘└───────────────────────────┬───────────────────────────┘└─┬─┘
+ *      Unused                 3D coordinates                      Scale
+ *                            (code_t 57 LSBs)                (scale_t 5 LSBs)
+ * \endcode
+ *
+ * See se::code_t and se::scale_t for details on the individual components.
+ *
+ * \note This is how the number of bits allocated for coordinates and scale were computed. Given
+ * that each scale requires 3 bits to represent in a Morton code and we've got 64 bits available:
+ * 1. `floor(64 / 3) = 21`, we can store up to 21 scales. `64 - (3 * 21) = 1`, 1 bit is not enough
+ *    to represent 21 numbers.
+ * 2. If we store 20 scales, `64 - (3 * 20) = 4`, 4 bits are not enough to represent 20 numbers.
+ * 3. If we store 19 scales, `64 - (3 * 19) = 7`, 7 bits are enough to represent 19 numbers.
+ */
+typedef uint64_t key_t;
 
-typedef float field_t; ///< The type of the stored field (e.g. TSDF, ESDF or occupancy)
+/** 3D coordinates encoded as a 57-bit Morton code. Each coordinate can take values in the range
+ * [0, 524287], since 19 bits (57/3) are used for each coordinate. For e.g. a 2 mm voxel resolution
+ * this allows mapping a 1×1×1 km region.
+ *
+ * The 3D coordinates are stored interleaved in the 64 bits like this:
+ * \code{text}
+ *     MSB                                                          LSB
+ * Bit 63     56                                                      0
+ *     ↓      ↓                                                       ↓
+ *     -------zyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyxzyx
+ *     └──┬──┘└┬┘                                                   └┬┘
+ *     Unused  x,y,z coordinate MSBs             x,y,z coordinate LSBs
+ * \endcode
+ *
+ * For more on Morton codes see here: https://en.wikipedia.org/wiki/Z-order_curve
+ */
+typedef uint64_t code_t;
 
+/** The 5-bit scale stored in an se::key_t. See se::Scale for an explanation of scale. Can take
+ * values in the range [0, 31] but only values in the range [0, 18] are used. It is stored in the 5
+ * LSBs of the uint64_t.
+ */
+typedef uint64_t scale_t;
+
+/** @} */
+
+
+
+/** A linear voxel or child index. */
+typedef unsigned int idx_t;
+
+/** The field stored in the octree. E.g. TSDF or occupancy. */
+typedef float field_t;
+
+/** A 3D field gradient. */
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
-typedef se::field_t weight_t; ///< The type of the field type weight
+/** The weight associated with the field. */
+typedef se::field_t weight_t;
 
-typedef int timestamp_t; ///< The type of the time stamp
+/** A timestamp. Currently stores a frame number. -1 indicates an uninitialized/invalid timestamp. */
+typedef int timestamp_t;
 
-typedef RGB colour_t; ///< The type of the colour
+/** The color stored in the octree. */
+typedef RGB colour_t;
 
 } // namespace se
 
