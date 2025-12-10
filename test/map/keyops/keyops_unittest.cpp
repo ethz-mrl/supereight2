@@ -158,25 +158,6 @@ TEST(KeyOps, KeyAtScale)
     }
 }
 
-TEST(KeyOps, CodeAtScale)
-{
-    Eigen::Vector3i coord(170, 204, 240);
-    se::key_t base_key;
-    se::keyops::encode_key(coord, 0, base_key);
-
-    se::key_t parent_key;
-    se::keyops::parent_key(base_key, parent_key);
-
-    for (se::scale_t s = 1; s < 8; ++s) {
-        se::code_t code_at_scale;
-        se::keyops::code_at_scale(base_key, s, code_at_scale);
-
-        EXPECT_EQ(se::keyops::key_to_code(parent_key), code_at_scale);
-
-        se::keyops::parent_key(parent_key, parent_key);
-    }
-}
-
 TEST(KeyOps, ParentKey)
 {
     Eigen::Vector3i coord(170, 204, 240);
@@ -204,20 +185,6 @@ TEST(KeyOps, BlockKey)
     for (se::scale_t s = 0; s <= 3; ++s) {
         se::key_t key_is = se::keyops::block_key(base_key, s);
         EXPECT_EQ(keys_ought[s], key_is);
-    }
-}
-
-TEST(KeyOps, BlockCode)
-{
-    se::key_t base_key = 0x1FFFFFFFFFFFFE0;
-    std::array<se::code_t, 4> codes_ought = {0x1FFFFFFFFFFFFE0 >> SCALE_OFFSET,
-                                             0x1FFFFFFFFFFFF00 >> SCALE_OFFSET,
-                                             0x1FFFFFFFFFFF800 >> SCALE_OFFSET,
-                                             0x1FFFFFFFFFFC000 >> SCALE_OFFSET};
-
-    for (se::scale_t s = 0; s <= 3; ++s) {
-        se::code_t code_is = se::keyops::block_code(base_key, s);
-        EXPECT_EQ(codes_ought[s], code_is);
     }
 }
 
@@ -312,60 +279,6 @@ TEST(KeyOps, UniqueKeys)
     for (se::idx_t i = 1; i < unique_keys.size(); ++i) {
         EXPECT_TRUE(unique_keys[i - 1] != unique_keys[i]);
     }
-}
-
-TEST(KeyOps, UniqueCodes)
-{
-    std::vector<se::key_t> keys;
-    keys.reserve(10);
-    const std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i>> coords = {
-        {56, 12, 12},
-        {56, 12, 12},
-        {128, 128, 128},
-        {128, 132, 130},
-        {128, 132, 130},
-        {300, 21, 829},
-        {628, 36, 227},
-        {436, 18, 436},
-        {128, 241, 136},
-        {128, 241, 136}};
-    const std::vector<se::scale_t> scales = {
-        0,
-        0, // duplicate
-        1,
-        0,
-        1, // duplicate at different scale
-        3,
-        4,
-        2,
-        3,
-        3 // duplicate
-    };
-    for (se::idx_t i = 0; i < coords.size(); ++i) {
-        se::key_t key_tmp;
-        se::keyops::encode_key(coords[i], scales[i], key_tmp);
-        keys.push_back(key_tmp);
-    }
-
-    se::keyops::sort_keys(keys);
-    std::vector<se::key_t> unique_keys;
-    se::keyops::unique_codes(keys, unique_keys);
-
-    EXPECT_EQ(7u, unique_keys.size());
-    for (se::idx_t i = 1; i < unique_keys.size(); ++i) {
-        EXPECT_TRUE(unique_keys[i - 1] != unique_keys[i]);
-    }
-
-    bool contains = false;
-    se::key_t key_ought;
-    se::keyops::encode_key({128, 132, 130}, 0, key_ought);
-    for (se::idx_t i = 0; i < unique_keys.size(); ++i) {
-        if (unique_keys[i] == key_ought) {
-            contains = true;
-            break;
-        }
-    }
-    EXPECT_TRUE(contains); // Ought to contain the finer scaled node of the code duplicate
 }
 
 TEST(KeyOps, UniqueAllocation)

@@ -208,17 +208,6 @@ inline bool key_at_scale(const se::key_t key, const se::scale_t scale, se::key_t
 
 
 
-inline bool code_at_scale(const se::key_t key, const se::scale_t scale, se::code_t& code_at_scale)
-{
-    assert(is_valid(key));
-
-    code_at_scale = se::keyops::key_to_code(key) & CODE_MASK[scale];
-
-    return (se::keyops::key_to_scale(key) <= scale);
-}
-
-
-
 inline void parent_key(const se::key_t child_key, se::key_t& parent_key)
 {
     assert(is_valid(child_key, KEY_SCALE_LIMIT - 1)); // Verify key is valid
@@ -232,14 +221,6 @@ inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scal
 {
     assert(is_valid(key)); // Verify key is valid
     return (key & (CODE_MASK[max_block_scale] << SCALE_OFFSET | SCALE_MASK));
-}
-
-
-
-inline se::code_t block_code(const se::key_t key, const se::scale_t max_block_scale)
-{
-    assert(is_valid(key)); // Verify key is valid
-    return se::keyops::key_to_code(key) & CODE_MASK[max_block_scale];
 }
 
 
@@ -330,31 +311,6 @@ inline void unique_keys(std::vector<se::key_t>& keys, std::vector<se::key_t>& un
     for (auto const& key : keys) {
         if (unique_keys.back() != key) {
             unique_keys.push_back(key);
-        }
-    }
-}
-
-
-
-template<se::Safe SafeB = se::Safe::On>
-inline void unique_codes(std::vector<se::key_t>& keys, std::vector<se::key_t>& unique_keys)
-{
-    if (keys.size() == 0) {
-        return;
-    }
-
-    if constexpr (SafeB == se::Safe::On) {
-        // Sort keys smallest to largest
-        SE_PARALLEL_SORT(keys);
-    }
-
-    unique_keys.push_back(keys.front());
-    for (auto const& key : keys) {
-        if (se::keyops::key_to_code(unique_keys.back()) != se::keyops::key_to_code(key)) {
-            unique_keys.push_back(key);
-        }
-        else if (se::keyops::key_to_scale(unique_keys.back()) > se::keyops::key_to_scale(key)) {
-            unique_keys.back() = key;
         }
     }
 }

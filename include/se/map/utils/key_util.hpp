@@ -227,17 +227,6 @@ inline scale_t key_to_scale(const se::key_t key);
 inline bool key_at_scale(const se::key_t key, const se::scale_t scale, se::key_t& key_at_scale);
 
 /**
- * \brief For a given key, reduce detail from Morton code up to given a scale.
- *
- * \param[in]  key           The key containing the code to be modified
- * \param[in]  scale         The scale the code should be reduced to
- * \param[out] code_at_scale The modified code
- *
- * \return True if the code can be reduced to the given scale, False otherwise
- */
-inline bool code_at_scale(const se::key_t key, const se::scale_t scale, se::code_t& code_at_scale);
-
-/**
  * \brief Compute the direct parent key for a given key.
  *
  * \param[in] key           The key to compute the direct parent from
@@ -256,18 +245,6 @@ inline void parent_key(const se::key_t key, se::key_t& parent_key);
  * \return The filtered block key
  */
 inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scale);
-
-/**
- * \brief Removes the voxel position detail within a block from a code
- *
- * \note  The code will not be modified if a node key is handed to it.
- *
- * \param[in]  key              The key to be filtered
- * \param[in]  max_block_scale  The maximum scale of a block
- *
- * \return The filtered block code
- */
-inline se::code_t block_code(const se::key_t key, const se::scale_t max_block_scale);
 
 /**
  * \brief Compute the child key for a given parent key and child index
@@ -339,15 +316,6 @@ inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys);
  */
 template<se::Safe SafeB>
 inline void unique_keys(const std::vector<se::key_t>& keys, std::vector<se::key_t>& unique_keys);
-
-/**
- * \brief Filter keys based on their code and keep the key with the smallest scale.
- *
- * \param[in]  keys          The keys to be filtered
- * \param[out] unique_keys   The filtered unique keys
- */
-template<se::Safe SafeB>
-inline void unique_codes(const std::vector<se::key_t>& keys, std::vector<se::key_t>& unique_keys);
 
 /**
  * \brief Filter keys based on unique allocation.
