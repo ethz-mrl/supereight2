@@ -5,8 +5,8 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef SE_TYPE_UTIL_HPP
-#define SE_TYPE_UTIL_HPP
+#ifndef SE_MAP_UTILS_TYPE_UTIL_HPP
+#define SE_MAP_UTILS_TYPE_UTIL_HPP
 
 #include <Eigen/Dense>
 #include <se/common/id.hpp>
@@ -82,7 +82,7 @@ typedef float field_t;
 typedef Eigen::Matrix<field_t, 3, 1> field_vec_t;
 
 /** The weight associated with the field. */
-typedef se::field_t weight_t;
+typedef field_t weight_t;
 
 /** A timestamp. Currently stores a frame number. -1 indicates an uninitialized/invalid timestamp. */
 typedef int timestamp_t;
@@ -92,4 +92,4 @@ typedef RGB colour_t;
 
 } // namespace se
 
-#endif // SE_TYPE_UTIL_HPP
+#endif // SE_MAP_UTILS_TYPE_UTIL_HPP
