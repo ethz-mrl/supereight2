@@ -21,11 +21,7 @@ enum class Id { Off, On };
 
 // Other enums
 enum class Res { Single, Multi };
-enum class Integ { Simple, LiDAR, PinholeCamera };
 enum class Safe { On = true, Off = false }; // Switch between Safe and Sorry
-
-enum class AllocMeth { Raycasting, VoxelCarving }; // Allocation method
-enum class Rep { Surface, Freespace };             // Map representation
 
 /**
  *  \brief The enum classes to define the sorting templates
