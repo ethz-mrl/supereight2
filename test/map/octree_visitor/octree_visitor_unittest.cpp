@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 #include <se/map/octree/octree.hpp>
 #include <se/map/octree/visitor.hpp>

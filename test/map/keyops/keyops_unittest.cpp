@@ -6,6 +6,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <Eigen/StdVector>
 #include <gtest/gtest.h>
 #include <se/common/math_util.hpp>
 #include <se/map/utils/key_util.hpp>

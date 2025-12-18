@@ -12,6 +12,7 @@
 #define __READER_BASE_HPP
 
 #include <Eigen/Geometry>
+#include <Eigen/StdVector>
 #include <chrono>
 #include <fstream>
 #include <se/common/str_utils.hpp>

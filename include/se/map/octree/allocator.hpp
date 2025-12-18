@@ -9,6 +9,7 @@
 #ifndef SE_ALLOCATOR_HPP
 #define SE_ALLOCATOR_HPP
 
+#include <Eigen/StdVector>
 #include <se/map/utils/octant_util.hpp>
 #include <set>
 

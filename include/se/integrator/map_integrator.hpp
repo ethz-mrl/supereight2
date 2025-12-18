@@ -9,6 +9,7 @@
 #ifndef SE_MAP_INTEGRATOR_HPP
 #define SE_MAP_INTEGRATOR_HPP
 
+#include <Eigen/StdVector>
 #include <se/integrator/allocator/raycast_carver.hpp>
 #include <se/integrator/allocator/volume_carver.hpp>
 #include <se/integrator/ray_integrator.hpp>
