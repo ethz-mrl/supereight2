@@ -9,7 +9,6 @@
 
 #include "se/map/preprocessor.hpp"
 
-#include <Eigen/StdVector>
 #include <se/common/eigen_utils.hpp>
 #include <se/common/math_util.hpp>
 
