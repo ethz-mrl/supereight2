@@ -5,8 +5,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#include "se/image/image.hpp"
+#include "se/image/util.hpp"
 
+#include <cassert>
 #include <se/external/tinycolormap.hpp>
 
 namespace se {

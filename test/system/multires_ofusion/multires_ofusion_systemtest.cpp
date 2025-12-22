@@ -12,6 +12,7 @@
 #include <opencv2/imgproc.hpp>
 #include <reader.hpp>
 #include <se/common/filesystem.hpp>
+#include <se/image/util.hpp>
 #include <se/supereight.hpp>
 
 extern int my_argc;

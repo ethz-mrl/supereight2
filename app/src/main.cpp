@@ -7,6 +7,7 @@
 
 #include <se/common/filesystem.hpp>
 #include <se/common/system_utils.hpp>
+#include <se/image/util.hpp>
 #include <se/supereight.hpp>
 
 #include "config.hpp"
