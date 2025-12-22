@@ -11,6 +11,7 @@
 #include <Eigen/Core>
 #include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
+#include <se/common/scale.hpp>
 #include <vector>
 
 
@@ -73,7 +74,7 @@ void depth_to_rgba(RGBA* depth_RGBA_image_data,
  * If the scale is greater or equal to the number of colours in se::colours::scale then the last
  * colour will be returned.
  */
-static inline RGB scale_colour(const int scale);
+static inline RGB scale_colour(const Scale scale);
 
 } // namespace se
 
