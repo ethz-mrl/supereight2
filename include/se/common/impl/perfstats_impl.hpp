@@ -487,7 +487,6 @@ inline void PerfStats::writeSummaryToOStream(std::ostream& ostream, bool include
     }
 
     free(res_ptr);
-    return;
 }
 
 
