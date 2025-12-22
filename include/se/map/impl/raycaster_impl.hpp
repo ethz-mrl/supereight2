@@ -330,7 +330,6 @@ inline void advance_ray(const MapT& map,
     }
 
     is_valid = false;
-    return;
 }
 
 
