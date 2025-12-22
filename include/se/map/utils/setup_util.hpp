@@ -12,6 +12,9 @@
 
 namespace se {
 
+/** The coordinates of the field sample in each voxel. Relative to the voxel's vertex that's closest
+ * to the origin. All coordinates must be in the interval [0, 1).
+ */
 static inline const Eigen::Vector3f g_sample_offset = Eigen::Vector3f::Constant(0.5f);
 
 // Representation enums
