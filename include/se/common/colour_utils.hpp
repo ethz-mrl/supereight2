@@ -20,14 +20,16 @@ namespace colours {
 /**
  * The colours used for the various integration scales.
  */
-static const std::vector<RGB> scale = {{102, 194, 165},
-                                       {252, 141, 98},
-                                       {141, 160, 203},
-                                       {231, 138, 195},
-                                       {166, 216, 84},
-                                       {255, 217, 47},
-                                       {229, 196, 148},
-                                       {179, 179, 179}};
+static const std::vector<RGB> scale = {
+    {102, 194, 165},
+    {252, 141, 98},
+    {141, 160, 203},
+    {231, 138, 195},
+    {166, 216, 84},
+    {255, 217, 47},
+    {229, 196, 148},
+    {179, 179, 179},
+};
 } // namespace colours
 
 
