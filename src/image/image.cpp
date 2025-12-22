@@ -41,6 +41,10 @@ void depth_to_rgba(const Image<float>& depth,
                    const float min_depth,
                    const float max_depth)
 {
+    assert(depth.width() == rgba.width());
+    assert(depth.height() == rgba.height());
+    assert(min_depth >= 0.0f);
+    assert(max_depth > min_depth);
     const float inv_depth_range = 1.0f / (max_depth - min_depth);
 #pragma omp parallel for
     for (size_t i = 0; i < depth.size(); i++) {
