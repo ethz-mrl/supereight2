@@ -112,32 +112,6 @@ class Image {
 
 
 
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               RGBA* output_depth_img_data)
-{
-    depth_to_rgba(output_depth_img_data,
-                  input_depth_img.data(),
-                  Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
-                  0,
-                  std::numeric_limits<float>::max());
-}
-
-
-
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               const float min_depth,
-                                               const float max_depth,
-                                               RGBA* output_depth_img_data)
-{
-    depth_to_rgba(output_depth_img_data,
-                  input_depth_img.data(),
-                  Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
-                  min_depth,
-                  max_depth);
-}
-
-
-
 namespace image {
 
 /** Remap \p input to \p output by using a \p map which contains and index into \p input for each
@@ -150,7 +124,49 @@ void rgb_to_rgba(const Image<RGB>& rgb, Image<RGBA>& rgba);
 
 void rgba_to_rgb(const Image<RGBA>& rgba, Image<RGB>& rgb);
 
+/**
+ * Convert a depth image to an RGBA image to allow visualizing it.
+ * The depth image is scaled using the minimum and maximum depth values to
+ * increase contrast.
+ *
+ * \param[in] depth_RGBA_image_data Pointer to the ouput RGBA image data.
+ * \param[in] depth_image_data      Pointer to the input depth image data.
+ * \param[in] depth_image_res       Resolution of the depth image in pixels
+ *                                  (width and height).
+ * \param[in] min_depth             The minimum possible depth value.
+ * \param[in] max_depth             The maximum possible depth value.
+ */
+void depth_to_rgba(RGBA* depth_RGBA_image_data,
+                   const float* depth_image_data,
+                   const Eigen::Vector2i& depth_image_res,
+                   const float min_depth,
+                   const float max_depth);
+
 } // namespace image
+
+
+
+static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
+                                               RGBA* output_depth_img_data)
+{
+    image::depth_to_rgba(output_depth_img_data,
+                         input_depth_img.data(),
+                         Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
+                         0,
+                         std::numeric_limits<float>::max());
+}
+
+static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
+                                               const float min_depth,
+                                               const float max_depth,
+                                               RGBA* output_depth_img_data)
+{
+    image::depth_to_rgba(output_depth_img_data,
+                         input_depth_img.data(),
+                         Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
+                         min_depth,
+                         max_depth);
+}
 
 } // end namespace se
 

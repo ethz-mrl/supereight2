@@ -29,7 +29,6 @@ add_subdirectory(third_party)
 # Compile the supereight library
 set(LIB_NAME "supereight2")
 add_library(${LIB_NAME} STATIC
-    "src/common/colour_utils.cpp"
     "src/common/system_utils.cpp"
     "src/common/id.cpp"
     "src/common/image_utils.cpp"

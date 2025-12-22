@@ -68,24 +68,6 @@ static inline RGBA blend(const RGBA a, const RGBA b, const float alpha);
 
 
 
-/**
- * Convert a depth image to an RGBA image to allow visualizing it.
- * The depth image is scaled using the minimum and maximum depth values to
- * increase contrast.
- *
- * \param[in] depth_RGBA_image_data Pointer to the ouput RGBA image data.
- * \param[in] depth_image_data      Pointer to the input depth image data.
- * \param[in] depth_image_res       Resolution of the depth image in pixels
- *                                  (width and height).
- * \param[in] min_depth             The minimum possible depth value.
- * \param[in] max_depth             The maximum possible depth value.
- */
-void depth_to_rgba(RGBA* depth_RGBA_image_data,
-                   const float* depth_image_data,
-                   const Eigen::Vector2i& depth_image_res,
-                   const float min_depth,
-                   const float max_depth);
-
 /** Return the color from se::colours::scale that should be used to visualize the supplied \p scale.
  * If the scale is greater or equal to the number of colours in se::colours::scale then the last
  * colour will be returned.
