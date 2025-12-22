@@ -112,6 +112,7 @@ class Image {
 
 
 
+/** Functions for converting and processing images of type se::Image. */
 namespace image {
 
 /** Remap \p input to \p output by using a \p map which contains and index into \p input for each
@@ -120,8 +121,10 @@ namespace image {
 template<typename T>
 void remap(const Image<T>& input, Image<T>& output, const Image<size_t>& map);
 
+/** Convert an RGB image to RGBA, adding a fully opaque alpha channel. */
 void rgb_to_rgba(const Image<RGB>& rgb, Image<RGBA>& rgba);
 
+/** Convert an RGBA image to RGB, discarding the alpha channel. */
 void rgba_to_rgb(const Image<RGBA>& rgba, Image<RGB>& rgb);
 
 /** Write a colour visualization of the depth image \p depth into \p rgba. The depth image is scaled
