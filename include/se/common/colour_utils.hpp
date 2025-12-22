@@ -17,6 +17,7 @@
 
 
 namespace se {
+/** Colours used for visualization. */
 namespace colours {
 /**
  * The colours used for the various integration scales.
@@ -35,6 +36,7 @@ static const std::vector<RGB> scale = {
 
 
 
+/** Functions for processing colours. */
 namespace colour {
 
 /** Blend colors \p a and \p b based on the value of \p alpha. Returns per-channel
