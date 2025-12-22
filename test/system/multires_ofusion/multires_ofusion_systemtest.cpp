@@ -417,7 +417,7 @@ TEST(MultiResOFusionSystemTest, Raycasting)
         map, sensor, T_WS, surface_point_cloud_W, surface_normals_W, surface_scale);
 
     se::image::rgb_to_rgba(processed_colour_img, output_colour_img);
-    convert_to_output_depth_img(processed_depth_img, output_depth_img.data());
+    se::image::depth_to_rgba(processed_depth_img, output_depth_img);
     se::raycaster::render_volume_scale(output_volume_img,
                                        surface_point_cloud_W,
                                        surface_normals_W,

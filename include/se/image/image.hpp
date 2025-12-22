@@ -2,7 +2,7 @@
  * SPDX-FileCopyrightText: 2016-2019 Emanuele Vespa
  * SPDX-FileCopyrightText: 2021-2023 Smart Robotics Lab, Imperial College London, Technical University of Munich
  * SPDX-FileCopyrightText: 2021 Nils Funk
- * SPDX-FileCopyrightText: 2021-2023 Sotiris Papatheodorou
+ * SPDX-FileCopyrightText: 2021-2025 Sotiris Papatheodorou
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
@@ -124,49 +124,17 @@ void rgb_to_rgba(const Image<RGB>& rgb, Image<RGBA>& rgba);
 
 void rgba_to_rgb(const Image<RGBA>& rgba, Image<RGB>& rgb);
 
-/**
- * Convert a depth image to an RGBA image to allow visualizing it.
- * The depth image is scaled using the minimum and maximum depth values to
- * increase contrast.
- *
- * \param[in] depth_RGBA_image_data Pointer to the ouput RGBA image data.
- * \param[in] depth_image_data      Pointer to the input depth image data.
- * \param[in] depth_image_res       Resolution of the depth image in pixels
- *                                  (width and height).
- * \param[in] min_depth             The minimum possible depth value.
- * \param[in] max_depth             The maximum possible depth value.
+/** Write a colour visualization of the depth image \p depth into \p rgba. The depth image is scaled
+ * using \p min_depth and \p max_depth to increase contrast before mapping it to colours. Invalid
+ * depth values are shown in black, values smaller than \p min_depth in gray, values greater than \p
+ * max_depth in white and all other values using tinycolormap::ColormapType::Heat.
  */
-void depth_to_rgba(RGBA* depth_RGBA_image_data,
-                   const float* depth_image_data,
-                   const Eigen::Vector2i& depth_image_res,
-                   const float min_depth,
-                   const float max_depth);
+void depth_to_rgba(const Image<float>& depth,
+                   Image<RGBA>& rgba,
+                   const float min_depth = 0.0f,
+                   const float max_depth = std::numeric_limits<float>::max());
 
 } // namespace image
-
-
-
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               RGBA* output_depth_img_data)
-{
-    image::depth_to_rgba(output_depth_img_data,
-                         input_depth_img.data(),
-                         Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
-                         0,
-                         std::numeric_limits<float>::max());
-}
-
-static inline void convert_to_output_depth_img(const se::Image<float>& input_depth_img,
-                                               const float min_depth,
-                                               const float max_depth,
-                                               RGBA* output_depth_img_data)
-{
-    image::depth_to_rgba(output_depth_img_data,
-                         input_depth_img.data(),
-                         Eigen::Vector2i(input_depth_img.width(), input_depth_img.height()),
-                         min_depth,
-                         max_depth);
-}
 
 } // end namespace se
 
