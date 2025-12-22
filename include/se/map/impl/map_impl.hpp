@@ -448,7 +448,7 @@ template<Field FldT, Colour ColB, Id IdB, Res ResT, int BlockSize>
 void Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vector3i& voxel_coord,
                                                                Eigen::Vector3f& point_W) const
 {
-    point_W = T_WM_ * ((voxel_coord.cast<float>() + sample_offset_frac) * resolution_);
+    point_W = T_WM_ * ((voxel_coord.cast<float>() + g_sample_offset) * resolution_);
 }
 
 
@@ -458,7 +458,7 @@ void Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::voxelToPoint(const Eigen::Vect
                                                                const int stride,
                                                                Eigen::Vector3f& point_W) const
 {
-    point_W = T_WM_ * ((voxel_coord.cast<float>() + stride * sample_offset_frac) * resolution_);
+    point_W = T_WM_ * ((voxel_coord.cast<float>() + stride * g_sample_offset) * resolution_);
 }
 
 

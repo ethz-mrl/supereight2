@@ -40,8 +40,8 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
         map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
     const Eigen::Isometry3f T_CW = measurements.depth.T_WC.inverse();
     // Transformation from the octree frame V (in voxels) to the sensor frame C (in meters).
-    const Eigen::Affine3f T_CV = T_CW * map.getTWM() * Eigen::Scaling(map.getRes())
-        * Eigen::Translation3f(sample_offset_frac);
+    const Eigen::Affine3f T_CV =
+        T_CW * map.getTWM() * Eigen::Scaling(map.getRes()) * Eigen::Translation3f(g_sample_offset);
     const Octree<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>& octree = map.getOctree();
 
 #pragma omp parallel for
@@ -108,7 +108,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                     const int child_size = octantops::scale_to_size(child_data_union.scale);
                     const Eigen::Vector3f child_sample_coord_f =
                         child_data_union.coord.template cast<float>()
-                        + sample_offset_frac * child_size;
+                        + g_sample_offset * child_size;
                     const auto interp_field_value =
                         visitor::interpField(octree, child_sample_coord_f, child_data_union.scale);
                     if (interp_field_value) {

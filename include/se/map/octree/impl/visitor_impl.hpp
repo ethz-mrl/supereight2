@@ -703,7 +703,7 @@ interpImpl(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF v
 
     // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out of
     // the 8 voxels nearest to the query point.
-    const Eigen::Vector3f base_coord_f = voxel_coord_f - sample_offset_frac;
+    const Eigen::Vector3f base_coord_f = voxel_coord_f - g_sample_offset;
     const Eigen::Vector3i base_coord = base_coord_f.template cast<int>();
     // The following top-down view shows the bottom 4 out of the 8 voxels nearest to voxel_coord_f
     // to clarify why the above computation is made.
@@ -776,7 +776,7 @@ interpImpl(const OctreeT& octree,
         // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out
         // of the 8 voxels nearest to the query point.
         const int stride = octantops::scale_to_size(scale);
-        const Eigen::Vector3f base_coord_f = 1.0f / stride * voxel_coord_f - sample_offset_frac;
+        const Eigen::Vector3f base_coord_f = 1.0f / stride * voxel_coord_f - g_sample_offset;
         const Eigen::Vector3i base_coord = stride * base_coord_f.template cast<int>();
         if (!octree.aabb().contains(base_coord)) {
             return std::nullopt;
@@ -943,7 +943,7 @@ gradImpl(const OctreeT& octree, const Eigen::Vector3f& voxel_coord_f, ValidF val
     assert(voxel_coord_f.z() < octree.getSize());
     // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out of
     // the 8 voxels nearest to the query point.
-    const Eigen::Vector3f base_coord_f = voxel_coord_f - sample_offset_frac;
+    const Eigen::Vector3f base_coord_f = voxel_coord_f - g_sample_offset;
     const Eigen::Vector3i base_coord = base_coord_f.template cast<int>();
     // Gather the data at the sample points.
     const auto sample_coords = detail::gradient_sample_coords(octree, base_coord, 0);
@@ -1020,7 +1020,7 @@ gradImpl(const OctreeT& octree,
     for (Scale scale = init_scale; scale <= BlockType::max_scale; scale++) {
         const int stride = octantops::scale_to_size(scale);
         const Eigen::Vector3f scaled_voxel_coord_f =
-            1.0f / stride * voxel_coord_f - sample_offset_frac;
+            1.0f / stride * voxel_coord_f - g_sample_offset;
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
 
         const OctantBase* const octant_ptr =

@@ -86,8 +86,8 @@ Eigen::Vector3f compute_intersection(const OctreeT& octree,
 {
     const field_t value_0 = get_field(visitor::getData(octree, coord_0));
     const field_t value_1 = get_field(visitor::getData(octree, coord_1));
-    const Eigen::Vector3f point_0_M = coord_0.cast<float>() + se::sample_offset_frac;
-    const Eigen::Vector3f point_1_M = coord_1.cast<float>() + se::sample_offset_frac;
+    const Eigen::Vector3f point_0_M = coord_0.cast<float>() + g_sample_offset;
+    const Eigen::Vector3f point_1_M = coord_1.cast<float>() + g_sample_offset;
     return point_0_M
         + (OctreeT::DataType::surface_boundary - value_0) / (value_1 - value_0)
         * (point_1_M - point_0_M);
@@ -734,7 +734,7 @@ void gather_dual_data(const OctreeT& octree,
         dual_corner_coords_i[offset_idx] = primal_corner_coord + logical_dual_offset[offset_idx];
         dual_corner_coords_f[offset_idx] =
             ((dual_corner_coords_i[offset_idx] / stride) * stride).cast<float>()
-            + stride * se::sample_offset_frac; // TODO:  OctreeT<FieldType>::sample_offset_frac_
+            + stride * g_sample_offset;
         data_arr[offset_idx] = block_ptr->data(dual_corner_coords_f[offset_idx].cast<int>(), scale);
     }
     for (size_t neighbour_idx = 1; neighbour_idx < neighbours.size(); ++neighbour_idx) {
@@ -750,8 +750,7 @@ void gather_dual_data(const OctreeT& octree,
             dual_corner_coords_f[offset_idx] =
                 ((dual_corner_coords_i[offset_idx] / neighbour_stride) * neighbour_stride)
                     .cast<float>()
-                + neighbour_stride
-                    * se::sample_offset_frac; // TODO: OctreeT<FieldType>::sample_offset_frac_
+                + neighbour_stride * g_sample_offset;
             data_arr[offset_idx] = block_neighbour_ptr->data(
                 dual_corner_coords_f[offset_idx].cast<int>(), neighbour_scale);
         }

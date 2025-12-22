@@ -38,8 +38,8 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT>::Upd
         map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
     const Eigen::Isometry3f T_CW = measurements.depth.T_WC.inverse();
     // Transformation from the octree frame V (in voxels) to the sensor frame C (in meters).
-    const Eigen::Affine3f T_CV = T_CW * map.getTWM() * Eigen::Scaling(map.getRes())
-        * Eigen::Translation3f(sample_offset_frac);
+    const Eigen::Affine3f T_CV =
+        T_CW * map.getTWM() * Eigen::Scaling(map.getRes()) * Eigen::Translation3f(g_sample_offset);
 
 #pragma omp parallel for
     for (size_t i = 0; i < block_ptrs.size(); i++) {
