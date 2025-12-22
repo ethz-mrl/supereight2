@@ -9,10 +9,10 @@
 #define SE_COLOUR_UTILS_HPP
 
 #include <Eigen/Core>
+#include <array>
 #include <se/common/rgb.hpp>
 #include <se/common/rgba.hpp>
 #include <se/common/scale.hpp>
-#include <vector>
 
 
 
@@ -35,15 +35,15 @@ namespace colours {
  * </table>
  */
 // The HTML table above was generated using: ./scripts/scale-colours.sh html
-static const std::vector<RGB> scale = {
-    {102, 194, 165},
-    {252, 141, 98},
-    {141, 160, 203},
-    {231, 138, 195},
-    {166, 216, 84},
-    {255, 217, 47},
-    {229, 196, 148},
-    {179, 179, 179},
+static const std::array scale = {
+    RGB{102, 194, 165},
+    RGB{252, 141, 98},
+    RGB{141, 160, 203},
+    RGB{231, 138, 195},
+    RGB{166, 216, 84},
+    RGB{255, 217, 47},
+    RGB{229, 196, 148},
+    RGB{179, 179, 179},
 };
 
 } // namespace colours
