@@ -13,11 +13,10 @@
 #include <se/map/utils/octant_util.hpp>
 #include <set>
 
-/**
- * Helper wrapper to allocate and de-allocate octants in the octree.
- * The actual allocation and deallocation of memory is still only handled by the octree class.
- */
 namespace se {
+/** Helper functions for allocating and de-allocating octants. The actual allocation and
+ * deallocation of memory is still only handled by the octree class.
+ */
 namespace allocator {
 
 /**
