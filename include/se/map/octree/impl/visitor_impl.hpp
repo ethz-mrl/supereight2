@@ -331,7 +331,6 @@ void gather_local(const OctantBase* leaf_ptr,
         const typename OctreeT::DataType node_data = node_ptr->data();
         std::fill_n(neighbour_data, 8, node_data);
     }
-    return;
 }
 
 
@@ -364,7 +363,6 @@ void gather_4(const OctantBase* leaf_ptr,
         neighbour_data[offsets[2]] = node_data;
         neighbour_data[offsets[3]] = node_data;
     }
-    return;
 }
 
 
