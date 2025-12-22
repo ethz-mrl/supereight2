@@ -27,6 +27,8 @@ namespace se {
  * | 16×16×16             | 4                  |
  * | ...                  | ...                |
  * | NxNxN                | log<sub>2</sub>(N) |
+ *
+ * See se::colours::scale for the colours used to visualize each scale.
  */
 typedef int Scale;
 
