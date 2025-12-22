@@ -13,10 +13,8 @@
 #include <se/map/octree/allocator.hpp>
 #include <se/map/octree/fetcher.hpp>
 
-/**
- * Helper wrapper to traverse the octree. All functions take a const octree references and as no manipulation of the octree is done.
- */
 namespace se {
+/** Helper functions to traverse and query an octree. */
 namespace visitor {
 
 
