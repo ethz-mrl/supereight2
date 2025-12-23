@@ -65,7 +65,7 @@ namespace keyops {
  * \param[in] key The key to be varified
  * \return True if the key is valid, False otherwise.
  */
-inline bool is_valid(const se::key_t key, const se::scale_t limit = KEY_SCALE_LIMIT);
+inline bool is_valid(const key_t key, const scale_t limit = KEY_SCALE_LIMIT);
 
 /**
  * \brief Verify if a coordinate can be expressed in a key.
@@ -82,7 +82,7 @@ inline bool is_valid(const Eigen::Vector3i& coord);
  * \param[in] value The value to be expanded
  * \return The expanded value
  */
-inline se::code_t expand(unsigned long long value);
+inline code_t expand(unsigned long long value);
 
 /**
  * \brief Compresses a value
@@ -91,7 +91,7 @@ inline se::code_t expand(unsigned long long value);
  * \param[in] value The value to be compressed
  * \return The compressed value
  */
-inline se::key_t compact(uint64_t value);
+inline key_t compact(uint64_t value);
 
 /**
  * \brief Encodes given coordinates and scale in a key.
@@ -106,7 +106,7 @@ inline se::key_t compact(uint64_t value);
  *
  * \return True if no detail is lost, false otherwise
  */
-inline bool encode_key(const Eigen::Vector3i& coord, const se::scale_t scale, se::key_t& key);
+inline bool encode_key(const Eigen::Vector3i& coord, const scale_t scale, key_t& key);
 
 /**
  * \brief Encodes given coordinates and scale in a key.
@@ -120,7 +120,7 @@ inline bool encode_key(const Eigen::Vector3i& coord, const se::scale_t scale, se
  *
  * \return The encoded key
  */
-inline se::key_t encode_key(const Eigen::Vector3i& coord, const se::scale_t scale);
+inline key_t encode_key(const Eigen::Vector3i& coord, const scale_t scale);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -135,7 +135,7 @@ inline se::key_t encode_key(const Eigen::Vector3i& coord, const se::scale_t scal
  *
  * \return True if no detail is lost, false otherwise
  */
-inline bool encode_key(const se::key_t code, const se::scale_t scale, se::key_t& key);
+inline bool encode_key(const key_t code, const scale_t scale, key_t& key);
 
 /**
  * \brief Encodes given morton code and scale in a key.
@@ -149,7 +149,7 @@ inline bool encode_key(const se::key_t code, const se::scale_t scale, se::key_t&
  *
  * \return The encoded key
  */
-inline se::key_t encode_key(const se::key_t code, const se::scale_t scale);
+inline key_t encode_key(const key_t code, const scale_t scale);
 
 /**
  * \brief Extracts the 3D coordinates and scale from a given key.
@@ -158,7 +158,7 @@ inline se::key_t encode_key(const se::key_t code, const se::scale_t scale);
  * \param[out] coord    The 3D coordinates of the key
  * \param[out] scale    The the scale of the key
  */
-inline void decode_key(const se::key_t key, Eigen::Vector3i& coord, scale_t& scale);
+inline void decode_key(const key_t key, Eigen::Vector3i& coord, scale_t& scale);
 
 /**
  * \brief Compute the Morton code for given x,y,z coordinates.
@@ -166,7 +166,7 @@ inline void decode_key(const se::key_t key, Eigen::Vector3i& coord, scale_t& sca
  * \param[in]  coord    The coordinates to be encoded
  * \param[out] code     The Morten code representing the coordinates
  */
-inline void encode_code(const Eigen::Vector3i& coord, se::code_t& code);
+inline void encode_code(const Eigen::Vector3i& coord, code_t& code);
 
 /**
  * \brief Compute the x,y,z coordinates for a given Morton code.
@@ -174,7 +174,7 @@ inline void encode_code(const Eigen::Vector3i& coord, se::code_t& code);
  * \param[in]  code     The code to be encoded
  * \param[out] coord    The coordinates representing the Morton code
  */
-inline void decode_code(const se::code_t code, Eigen::Vector3i& coord);
+inline void decode_code(const code_t code, Eigen::Vector3i& coord);
 
 
 
@@ -186,7 +186,7 @@ inline void decode_code(const se::code_t code, Eigen::Vector3i& coord);
  *
  * \return The child index
  */
-inline idx_t code_to_child_idx(const se::code_t code, const scale_t scale);
+inline idx_t code_to_child_idx(const code_t code, const scale_t scale);
 
 /**
  * \brief Reduce a key to only its Morton code.
@@ -195,7 +195,7 @@ inline idx_t code_to_child_idx(const se::code_t code, const scale_t scale);
  *
  * \return The Morton code of the key
  */
-inline se::code_t key_to_code(const se::key_t key);
+inline code_t key_to_code(const key_t key);
 
 /**
  * \brief Reduce a key to only its Morton code.
@@ -204,7 +204,7 @@ inline se::code_t key_to_code(const se::key_t key);
  *
  * \return The Morton code of the key
  */
-inline Eigen::Vector3i key_to_coord(const se::key_t key);
+inline Eigen::Vector3i key_to_coord(const key_t key);
 
 /**
  * \brief Reduce a key to only its scale.
@@ -213,7 +213,7 @@ inline Eigen::Vector3i key_to_coord(const se::key_t key);
  *
  * \return The scale of the key
  */
-inline scale_t key_to_scale(const se::key_t key);
+inline scale_t key_to_scale(const key_t key);
 
 /**
  * \brief For a given key, change the key scale and reduce detail from Morton code up to given the scale.
@@ -224,7 +224,7 @@ inline scale_t key_to_scale(const se::key_t key);
  *
  * \return True if the key can be reduced to the given scale, False otherwise
  */
-inline bool key_at_scale(const se::key_t key, const se::scale_t scale, se::key_t& key_at_scale);
+inline bool key_at_scale(const key_t key, const scale_t scale, key_t& key_at_scale);
 
 /**
  * \brief Compute the direct parent key for a given key.
@@ -232,7 +232,7 @@ inline bool key_at_scale(const se::key_t key, const se::scale_t scale, se::key_t
  * \param[in] key           The key to compute the direct parent from
  * \param[in] parent_key    The parent key
  */
-inline void parent_key(const se::key_t key, se::key_t& parent_key);
+inline void parent_key(const key_t key, key_t& parent_key);
 
 /**
  * \brief Removes the voxel position detail within a block from a key while maintainig the scale information
@@ -244,7 +244,7 @@ inline void parent_key(const se::key_t key, se::key_t& parent_key);
  *
  * \return The filtered block key
  */
-inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scale);
+inline key_t block_key(const key_t key, const scale_t max_block_scale);
 
 /**
  * \brief Compute the child key for a given parent key and child index
@@ -255,9 +255,8 @@ inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scal
  * \param[in]  code_at_scale The morton code segment at the scale e.g. 000, 001, ... , 110, ... , 111
  * \param[out] child_key     The key of the child
  */
-inline void parent_to_child_key(const se::key_t parent_key,
-                                const se::code_t code_at_scale,
-                                se::key_t& child_key);
+inline void
+parent_to_child_key(const key_t parent_key, const code_t code_at_scale, key_t& child_key);
 
 /**
  * \brief Verify if a key is a child of a different key
@@ -270,7 +269,7 @@ inline void parent_to_child_key(const se::key_t parent_key,
  *
  * \return True if child_key expresses a child node/voxel of parent_key
  */
-inline bool is_child(const se::key_t parent_key, const se::key_t child_key);
+inline bool is_child(const key_t parent_key, const key_t child_key);
 
 /**
  * \brief Verify if two keys encode sibling nodes/voxels.
@@ -280,13 +279,13 @@ inline bool is_child(const se::key_t parent_key, const se::key_t child_key);
  *
  * \return True if the keys express siblings nodes/voxels, False otherwise
  */
-inline bool is_siblings(const se::key_t sibling_1_key, const se::key_t sibling_2_key);
+inline bool is_siblings(const key_t sibling_1_key, const key_t sibling_2_key);
 
 /**
  * \brief Sorting template. Default small to larger key sorting.
  */
 template<Sort = Sort::SmallToLarge>
-inline void sort_keys(std::vector<se::key_t>& keys);
+inline void sort_keys(std::vector<key_t>& keys);
 
 /**
  * \brief Sorts the keys from smallest to largest.
@@ -296,7 +295,7 @@ inline void sort_keys(std::vector<se::key_t>& keys);
  * \param[in/out] keys The keys to be sorted
  */
 template<>
-inline void sort_keys<Sort::SmallToLarge>(std::vector<se::key_t>& keys);
+inline void sort_keys<Sort::SmallToLarge>(std::vector<key_t>& keys);
 
 /**
  * \brief Sorts the keys from largest to smallest.
@@ -306,7 +305,7 @@ inline void sort_keys<Sort::SmallToLarge>(std::vector<se::key_t>& keys);
  * \param[in/out] keys
  */
 template<>
-inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys);
+inline void sort_keys<Sort::LargeToSmall>(std::vector<key_t>& keys);
 
 /**
  * \brief Filter keys based on the whole key (i.e. code and scale).
@@ -314,8 +313,8 @@ inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys);
  * \param[in]  keys          The keys to be filtered
  * \param[out] unique_keys   The filtered unique keys
  */
-template<se::Safe SafeB>
-inline void unique_keys(const std::vector<se::key_t>& keys, std::vector<se::key_t>& unique_keys);
+template<Safe SafeB>
+inline void unique_keys(const std::vector<key_t>& keys, std::vector<key_t>& unique_keys);
 
 /**
  * \brief Filter keys based on unique allocation.
@@ -325,10 +324,10 @@ inline void unique_keys(const std::vector<se::key_t>& keys, std::vector<se::key_
  * \param[in]  keys          The keys to be filtered
  * \param[out] unique_keys   The filtered unique keys
  */
-template<se::Safe SafeB>
-inline void unique_allocation(const std::vector<se::key_t>& keys,
+template<Safe SafeB>
+inline void unique_allocation(const std::vector<key_t>& keys,
                               const scale_t max_block_scale,
-                              std::vector<se::key_t>& unique_keys);
+                              std::vector<key_t>& unique_keys);
 
 /**
  * \brief Filter keys at a given scale.
@@ -339,10 +338,10 @@ inline void unique_allocation(const std::vector<se::key_t>& keys,
  * \param[in]  scale         The scale at which to filter the keys
  * \param[out] unique_keys   The filtered unique keys
  */
-template<se::Safe SafeB>
-inline void unique_at_scale(const std::vector<se::key_t>& keys,
-                            const se::scale_t scale,
-                            std::vector<se::key_t>& unique_keys);
+template<Safe SafeB>
+inline void unique_at_scale(const std::vector<key_t>& keys,
+                            const scale_t scale,
+                            std::vector<key_t>& unique_keys);
 
 /**
  * TODO: 6-connectivity + centre
@@ -351,7 +350,7 @@ inline void unique_at_scale(const std::vector<se::key_t>& keys,
  * \param[in]  key                 The key of which to get the neighbours from
  * \param[out] face_neighbour_keys The 6 face neighbour keys
  */
-inline void face_neighbours(const se::key_t key, std::array<se::key_t, 6> face_neighbour_keys);
+inline void face_neighbours(const key_t key, std::array<key_t, 6> face_neighbour_keys);
 
 /**
  * TODO: 26-connectivity
@@ -360,7 +359,7 @@ inline void face_neighbours(const se::key_t key, std::array<se::key_t, 6> face_n
  * \param[in]  key            The key of which to get the neighbours from
  * \param[out] neighbour_keys The 26 neighbour keys
  */
-inline void neighbours(const se::key_t key, std::array<se::key_t, 26> neighbour_keys);
+inline void neighbours(const key_t key, std::array<key_t, 26> neighbour_keys);
 
 /**
  * TODO: 4 siblings (includes key)
@@ -369,7 +368,7 @@ inline void neighbours(const se::key_t key, std::array<se::key_t, 26> neighbour_
  * \param[in]  key          The key of which to get the siblings from
  * \param[out] sibling_keys The eight sibling keys
  */
-inline void siblings(const se::key_t key, std::array<se::key_t, 8> sibling_keys);
+inline void siblings(const key_t key, std::array<key_t, 8> sibling_keys);
 
 } // namespace keyops
 } // namespace se

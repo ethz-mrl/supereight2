@@ -22,12 +22,12 @@
 namespace se {
 namespace keyops {
 
-inline bool is_valid(const se::key_t key, const se::scale_t limit)
+inline bool is_valid(const key_t key, const scale_t limit)
 {
-    se::scale_t scale = key & SCALE_MASK;
+    scale_t scale = key & SCALE_MASK;
     ;
-    se::code_t code = key >> SCALE_OFFSET;
-    se::code_t code_remain = code & ~CODE_MASK[scale];
+    code_t code = key >> SCALE_OFFSET;
+    code_t code_remain = code & ~CODE_MASK[scale];
     return scale <= limit && code_remain == 0;
 }
 
@@ -41,10 +41,10 @@ inline bool is_valid(const Eigen::Vector3i& coord)
 
 
 
-inline se::code_t expand(unsigned long long value)
+inline code_t expand(unsigned long long value)
 {
     assert(value <= 0x7FFFF);      // Limited by 19 bit digits
-    se::key_t x = value & 0x7FFFF; // Further details will be lost
+    key_t x = value & 0x7FFFF;     // Further details will be lost
     x = (x | x << 32) & 0x1f00000000ffff;
     x = (x | x << 16) & 0x1f0000ff0000ff;
     x = (x | x << 8) & 0x100f00f00f00f00f;
@@ -56,10 +56,10 @@ inline se::code_t expand(unsigned long long value)
 
 
 
-inline se::key_t compact(uint64_t value)
+inline key_t compact(uint64_t value)
 {
     assert(value <= 0x49249249249249);      // Limited by 19 bit digits
-    se::key_t x = value & 0x49249249249249; // Further details will be lost
+    key_t x = value & 0x49249249249249;     // Further details will be lost
     x = (x | x >> 2) & 0x10c30c30c30c30c3;
     x = (x | x >> 4) & 0x100f00f00f00f00f;
     x = (x | x >> 8) & 0x1f0000ff0000ff;
@@ -71,14 +71,14 @@ inline se::key_t compact(uint64_t value)
 
 
 
-inline bool encode_key(const Eigen::Vector3i& coord, const se::scale_t scale, se::key_t& key)
+inline bool encode_key(const Eigen::Vector3i& coord, const scale_t scale, key_t& key)
 {
     assert(scale <= KEY_SCALE_LIMIT); // Verify scale is within key limits
     assert(is_valid(coord));          // Verify doesn't surpass max coordinates
 
-    se::code_t code_detailed;
-    se::keyops::encode_code(coord, code_detailed);
-    se::code_t code = code_detailed & CODE_MASK[scale];
+    code_t code_detailed;
+    encode_code(coord, code_detailed);
+    code_t code = code_detailed & CODE_MASK[scale];
     key = code << SCALE_OFFSET | scale;
 
     return (code_detailed == code); // Is details lost due to scale?
@@ -86,14 +86,14 @@ inline bool encode_key(const Eigen::Vector3i& coord, const se::scale_t scale, se
 
 
 
-inline se::key_t encode_key(const Eigen::Vector3i& coord, const se::scale_t scale)
+inline key_t encode_key(const Eigen::Vector3i& coord, const scale_t scale)
 {
     assert(scale <= KEY_SCALE_LIMIT); // Verify scale is within key limits
     assert(is_valid(coord));          // Verify doesn't surpass max coordinates
 
-    se::code_t code_detailed;
-    se::keyops::encode_code(coord, code_detailed);
-    se::code_t code = code_detailed & CODE_MASK[scale];
+    code_t code_detailed;
+    encode_code(coord, code_detailed);
+    code_t code = code_detailed & CODE_MASK[scale];
 
     assert(code_detailed == code); // Is details lost due to scale?
 
@@ -102,11 +102,11 @@ inline se::key_t encode_key(const Eigen::Vector3i& coord, const se::scale_t scal
 
 
 
-inline bool encode_key(const se::key_t code, const se::scale_t scale, se::key_t& key)
+inline bool encode_key(const key_t code, const scale_t scale, key_t& key)
 {
     assert(scale <= KEY_SCALE_LIMIT); // Verify scale is within key limits
 
-    se::code_t code_filtered = code & CODE_MASK[scale];
+    code_t code_filtered = code & CODE_MASK[scale];
 
     key = code << SCALE_OFFSET | scale;
 
@@ -115,7 +115,7 @@ inline bool encode_key(const se::key_t code, const se::scale_t scale, se::key_t&
 
 
 
-inline se::key_t encode_key(const se::key_t code, const se::scale_t scale)
+inline key_t encode_key(const key_t code, const scale_t scale)
 {
     assert(scale <= KEY_SCALE_LIMIT); // Verify scale is within key limits
 
@@ -127,38 +127,38 @@ inline se::key_t encode_key(const se::key_t code, const se::scale_t scale)
 
 
 
-inline void decode_key(const se::key_t key, Eigen::Vector3i& coord, se::scale_t& scale)
+inline void decode_key(const key_t key, Eigen::Vector3i& coord, scale_t& scale)
 {
-    scale = se::keyops::key_to_scale(key);
-    se::code_t code = se::keyops::key_to_code(key);
+    scale = key_to_scale(key);
+    code_t code = key_to_code(key);
 
-    assert(se::keyops::is_valid(key)); // Verify key is valid
+    assert(is_valid(key)); // Verify key is valid
 
-    se::keyops::decode_code(code, coord);
+    decode_code(code, coord);
 }
 
 
 
-inline void encode_code(const Eigen::Vector3i& coord, se::code_t& code)
+inline void encode_code(const Eigen::Vector3i& coord, code_t& code)
 {
     assert(is_valid(coord)); // Verify doesn't surpass max coordinates
 
-    se::key_t x = expand(coord.x());
-    se::key_t y = expand(coord.y()) << 1;
-    se::key_t z = expand(coord.z()) << 2;
+    key_t x = expand(coord.x());
+    key_t y = expand(coord.y()) << 1;
+    key_t z = expand(coord.z()) << 2;
     code = x | y | z;
 }
 
 
 
-inline void decode_code(const se::code_t code, Eigen::Vector3i& coord)
+inline void decode_code(const code_t code, Eigen::Vector3i& coord)
 {
     coord = Eigen::Vector3i(compact(code >> 0ull), compact(code >> 1ull), compact(code >> 2ull));
 }
 
 
 
-inline se::idx_t code_to_child_idx(const se::code_t code, const se::scale_t child_scale)
+inline idx_t code_to_child_idx(const code_t code, const scale_t child_scale)
 {
     assert(child_scale <= KEY_SCALE_LIMIT);       // Verify scale is within key limits
     return (code >> (child_scale * NUM_DIM)) & 7; // The 7 filters the last 3 bits 111
@@ -166,58 +166,58 @@ inline se::idx_t code_to_child_idx(const se::code_t code, const se::scale_t chil
 
 
 
-inline se::code_t key_to_code(const se::key_t key)
+inline code_t key_to_code(const key_t key)
 {
-    assert(se::keyops::is_valid(key)); // Verify key is valid
+    assert(is_valid(key)); // Verify key is valid
 
     return key >> SCALE_OFFSET;
 }
 
 
 
-inline Eigen::Vector3i key_to_coord(const se::key_t key)
+inline Eigen::Vector3i key_to_coord(const key_t key)
 {
-    assert(se::keyops::is_valid(key)); // Verify key is valid
+    assert(is_valid(key)); // Verify key is valid
 
-    se::code_t code = se::keyops::key_to_code(key);
+    code_t code = key_to_code(key);
 
     Eigen::Vector3i coord;
-    se::keyops::decode_code(code, coord);
+    decode_code(code, coord);
     return coord;
 }
 
 
 
-inline se::scale_t key_to_scale(const se::key_t key)
+inline scale_t key_to_scale(const key_t key)
 {
-    assert(se::keyops::is_valid(key)); // Verify key is valid
+    assert(is_valid(key)); // Verify key is valid
 
     return key & SCALE_MASK;
 }
 
 
 
-inline bool key_at_scale(const se::key_t key, const se::scale_t scale, se::key_t& key_at_scale)
+inline bool key_at_scale(const key_t key, const scale_t scale, key_t& key_at_scale)
 {
     assert(is_valid(key));
 
     key_at_scale = (key & (CODE_MASK[scale] << SCALE_OFFSET)) | scale;
 
-    return (se::keyops::key_to_scale(key) <= scale);
+    return (key_to_scale(key) <= scale);
 }
 
 
 
-inline void parent_key(const se::key_t child_key, se::key_t& parent_key)
+inline void parent_key(const key_t child_key, key_t& parent_key)
 {
     assert(is_valid(child_key, KEY_SCALE_LIMIT - 1)); // Verify key is valid
-    const se::scale_t parent_scale = se::keyops::key_to_scale(child_key) + 1;
+    const scale_t parent_scale = key_to_scale(child_key) + 1;
     parent_key = (child_key & (CODE_MASK[parent_scale] << SCALE_OFFSET)) | parent_scale;
 }
 
 
 
-inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scale)
+inline key_t block_key(const key_t key, const scale_t max_block_scale)
 {
     assert(is_valid(key)); // Verify key is valid
     return (key & (CODE_MASK[max_block_scale] << SCALE_OFFSET | SCALE_MASK));
@@ -225,54 +225,51 @@ inline se::key_t block_key(const se::key_t key, const se::scale_t max_block_scal
 
 
 
-inline void parent_to_child_key(const se::key_t parent_key,
-                                const se::code_t code_at_scale,
-                                se::key_t& child_key)
+inline void
+parent_to_child_key(const key_t parent_key, const code_t code_at_scale, key_t& child_key)
 {
-    se::scale_t child_scale = key_to_scale(parent_key) - 1;
+    scale_t child_scale = key_to_scale(parent_key) - 1;
     child_key = parent_key | (code_at_scale << ((child_scale * NUM_DIM) + SCALE_OFFSET));
     child_key = (child_key & ~SCALE_MASK) | child_scale;
 }
 
 
 
-inline bool is_child(const se::key_t parent_key, const se::key_t child_key)
+inline bool is_child(const key_t parent_key, const key_t child_key)
 {
     assert(is_valid(child_key));                       // Verify child is valid
     assert(is_valid(parent_key, KEY_SCALE_LIMIT - 1)); // Verify parent is valid
 
-    const int parent_scale = se::keyops::key_to_scale(parent_key);
-    const int child_scale = se::keyops::key_to_scale(child_key);
+    const int parent_scale = key_to_scale(parent_key);
+    const int child_scale = key_to_scale(child_key);
 
     if (child_scale >= parent_scale) {
         return false;
     }
 
-    const se::code_t parent_code = se::keyops::key_to_code(parent_key);
-    const se::code_t child_code = se::keyops::key_to_code(child_key) & CODE_MASK[parent_scale];
+    const code_t parent_code = key_to_code(parent_key);
+    const code_t child_code = key_to_code(child_key) & CODE_MASK[parent_scale];
 
     return (parent_code ^ child_code) == 0;
 }
 
 
 
-inline bool is_siblings(const se::key_t sibling_1_key, const se::key_t sibling_2_key)
+inline bool is_siblings(const key_t sibling_1_key, const key_t sibling_2_key)
 {
     assert(is_valid(sibling_1_key)); // Verify sibling 1 is valid
     assert(is_valid(sibling_2_key)); // Verify sibling 2 is valid
 
-    const se::scale_t sibling_1_scale = se::keyops::key_to_scale(sibling_1_key);
-    const se::scale_t sibling_2_scale = se::keyops::key_to_scale(sibling_2_key);
+    const scale_t sibling_1_scale = key_to_scale(sibling_1_key);
+    const scale_t sibling_2_scale = key_to_scale(sibling_2_key);
 
     if (sibling_1_scale != sibling_2_scale) {
         return false;
     }
 
-    const se::scale_t parent_scale = sibling_1_scale + 1;
-    const se::code_t sibling_1_code =
-        se::keyops::key_to_code(sibling_1_key) & CODE_MASK[parent_scale];
-    const se::code_t sibling_2_code =
-        se::keyops::key_to_code(sibling_2_key) & CODE_MASK[parent_scale];
+    const scale_t parent_scale = sibling_1_scale + 1;
+    const code_t sibling_1_code = key_to_code(sibling_1_key) & CODE_MASK[parent_scale];
+    const code_t sibling_2_code = key_to_code(sibling_2_key) & CODE_MASK[parent_scale];
 
     return (sibling_1_code ^ sibling_2_code) == 0;
 }
@@ -280,29 +277,29 @@ inline bool is_siblings(const se::key_t sibling_1_key, const se::key_t sibling_2
 
 
 template<>
-inline void sort_keys<Sort::SmallToLarge>(std::vector<se::key_t>& keys)
+inline void sort_keys<Sort::SmallToLarge>(std::vector<key_t>& keys)
 {
-    std::sort(keys.begin(), keys.end(), [](se::key_t i, se::key_t j) { return (i < j); });
+    std::sort(keys.begin(), keys.end(), [](key_t i, key_t j) { return (i < j); });
 }
 
 
 
 template<>
-inline void sort_keys<Sort::LargeToSmall>(std::vector<se::key_t>& keys)
+inline void sort_keys<Sort::LargeToSmall>(std::vector<key_t>& keys)
 {
-    std::sort(keys.begin(), keys.end(), [](se::key_t i, se::key_t j) { return (i > j); });
+    std::sort(keys.begin(), keys.end(), [](key_t i, key_t j) { return (i > j); });
 }
 
 
 
-template<se::Safe SafeB = se::Safe::On>
-inline void unique_keys(std::vector<se::key_t>& keys, std::vector<se::key_t>& unique_keys)
+template<Safe SafeB = Safe::On>
+inline void unique_keys(std::vector<key_t>& keys, std::vector<key_t>& unique_keys)
 {
     if (keys.size() == 0) {
         return;
     }
 
-    if constexpr (SafeB == se::Safe::On) {
+    if constexpr (SafeB == Safe::On) {
         // Sort keys smallest to largest
         SE_PARALLEL_SORT(keys);
     }
@@ -317,26 +314,26 @@ inline void unique_keys(std::vector<se::key_t>& keys, std::vector<se::key_t>& un
 
 
 
-template<se::Safe SafeB = se::Safe::On>
-inline void unique_allocation(std::vector<se::key_t>& keys,
-                              const se::scale_t max_block_scale,
-                              std::vector<se::key_t>& unique_keys)
+template<Safe SafeB = Safe::On>
+inline void unique_allocation(std::vector<key_t>& keys,
+                              const scale_t max_block_scale,
+                              std::vector<key_t>& unique_keys)
 {
     if (keys.size() == 0) {
         return;
     }
 
-    if constexpr (SafeB == se::Safe::On) {
+    if constexpr (SafeB == Safe::On) {
         // Sort keys smallest to largest
         SE_PARALLEL_SORT(keys);
     }
 
-    const se::key_t init_key = se::keyops::block_key(keys.front(), max_block_scale);
+    const key_t init_key = keyops::block_key(keys.front(), max_block_scale);
     unique_keys.push_back(init_key);
 
     for (auto const& key : keys) {
-        se::key_t block_key = se::keyops::block_key(key, max_block_scale);
-        if (se::keyops::is_child(unique_keys.back(), block_key)) {
+        key_t block_key = keyops::block_key(key, max_block_scale);
+        if (is_child(unique_keys.back(), block_key)) {
             unique_keys.back() = block_key;
         }
         else if (unique_keys.back() != block_key) {
@@ -347,24 +344,23 @@ inline void unique_allocation(std::vector<se::key_t>& keys,
 
 
 
-template<se::Safe SafeB = se::Safe::On>
-inline void unique_at_scale(std::vector<se::key_t>& keys,
-                            const se::scale_t scale,
-                            std::vector<se::key_t>& unique_keys)
+template<Safe SafeB = Safe::On>
+inline void
+unique_at_scale(std::vector<key_t>& keys, const scale_t scale, std::vector<key_t>& unique_keys)
 {
     if (keys.size() == 0) {
         return;
     }
 
-    if constexpr (SafeB == se::Safe::On) {
+    if constexpr (SafeB == Safe::On) {
         // Sort keys smallest to largest
         SE_PARALLEL_SORT(keys);
     }
 
-    se::key_t key_at_scale;
-    se::idx_t restart_idx = 1;
+    key_t key_at_scale;
+    idx_t restart_idx = 1;
     for (auto key_itr = keys.begin(); key_itr != keys.end(); ++key_itr) {
-        if (se::keyops::key_at_scale(*key_itr, scale, key_at_scale)) {
+        if (keyops::key_at_scale(*key_itr, scale, key_at_scale)) {
             unique_keys.push_back(key_at_scale);
             break;
         }
@@ -372,7 +368,7 @@ inline void unique_at_scale(std::vector<se::key_t>& keys,
     }
 
     for (auto key_itr = keys.begin() + restart_idx; key_itr != keys.end(); ++key_itr) {
-        if (se::keyops::key_at_scale(*key_itr, scale, key_at_scale)
+        if (keyops::key_at_scale(*key_itr, scale, key_at_scale)
             && unique_keys.back() != key_at_scale) {
             unique_keys.push_back(key_at_scale);
         }
