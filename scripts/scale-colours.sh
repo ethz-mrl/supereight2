@@ -18,7 +18,10 @@ BEGIN {
 		print "<table>\n<tr><th>Scale</th><th>Colour</th></tr>"
 }
 
-/^namespace colours \{$/, /^}( \/\/ namespace colours)?$/ {
+/^namespace colours \{$/ { in_colours = 1 }
+/^}( \/\/ namespace colours)?$/ { in_colours = 0 }
+
+in_colours && /static .* scale = \{$/, /^};$/ {
 	if ($0 ~ "\\{ *[0-9]+, *[0-9]+, *[0-9]+ *}") {
 		sub("^.*\\{", "")
 		sub("}.*$", "")
