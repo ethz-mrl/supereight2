@@ -313,7 +313,7 @@ void gather_local(const OctantBase* leaf_ptr,
                   DataT neighbour_data[8])
 {
     if (leaf_ptr->is_block) {
-        const int stride = octantops::scale_to_size(scale);
+        const int stride = scale::to_size(scale);
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
         neighbour_data[0] = block_ptr->data(base_coord + stride * interp_offsets[0], scale);
@@ -343,7 +343,7 @@ void gather_4(const OctantBase* leaf_ptr,
               DataT neighbour_data[8])
 {
     if (leaf_ptr->is_block) {
-        const int stride = octantops::scale_to_size(scale);
+        const int stride = scale::to_size(scale);
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
         neighbour_data[offsets[0]] =
@@ -375,7 +375,7 @@ void gather_2(const OctantBase* leaf_ptr,
               DataT neighbour_data[8])
 {
     if (leaf_ptr->is_block) {
-        const int stride = octantops::scale_to_size(scale);
+        const int stride = scale::to_size(scale);
         const typename OctreeT::BlockType* block_ptr =
             static_cast<const typename OctreeT::BlockType*>(leaf_ptr);
         neighbour_data[offsets[0]] =
@@ -399,7 +399,7 @@ bool get_neighbours(const OctreeT& octree,
                     const int scale,
                     typename OctreeT::DataType neighbour_data[8])
 {
-    const int stride = octantops::scale_to_size(scale); // Multi-res
+    const int stride = scale::to_size(scale); // Multi-res
 
     // Check for bounds
     const Eigen::Array3i upper_bounds(base_coord + Eigen::Vector3i::Constant(stride));
@@ -775,7 +775,7 @@ interpImpl(const OctreeT& octree,
     for (Scale scale = init_scale; scale <= BlockType::max_scale; scale++) {
         // Subtract the sample offset to get the coordinates of the voxel nearest to the origin out
         // of the 8 voxels nearest to the query point.
-        const int stride = octantops::scale_to_size(scale);
+        const int stride = scale::to_size(scale);
         const Eigen::Vector3f base_coord_f = 1.0f / stride * voxel_coord_f - g_sample_offset;
         const Eigen::Vector3i base_coord = stride * base_coord_f.template cast<int>();
         if (!octree.aabb().contains(base_coord)) {
@@ -796,7 +796,7 @@ interpImpl(const OctreeT& octree,
         if (returned_scale) {
             // Return the correct scale in the case of Nodes.
             *returned_scale =
-                octant_ptr->is_block ? scale : octantops::size_to_scale(octant_ptr->size);
+                octant_ptr->is_block ? scale : scale::from_size(octant_ptr->size);
         }
         // Perform trilinear interpolation.
         // https://en.wikipedia.org/wiki/Trilinear_interpolation#Method
@@ -826,7 +826,7 @@ gradient_sample_coords(const OctreeT& octree, const Eigen::Vector3i& base_coord,
     assert(base_coord.z() < octree.getSize());
     assert(scale >= 0);
 
-    const int stride = octantops::scale_to_size(scale);
+    const int stride = scale::to_size(scale);
     const Eigen::Vector3i octree_min_coord = Eigen::Vector3i::Zero();
     const Eigen::Vector3i octree_max_coord = Eigen::Vector3i::Constant(octree.getSize() - 1);
 
@@ -896,7 +896,7 @@ gradient(const Eigen::Vector3f& t, const std::array<T, 32>& data, const int scal
 
     // Divide by 2 for the numerical gradient computation and then divide by the size in voxels at
     // this scale to get a correctly scaled result for scales greater than 0.
-    const float scaling = 0.5f / octantops::scale_to_size(scale);
+    const float scaling = 0.5f / scale::to_size(scale);
     const Eigen::Vector3f tc = Eigen::Vector3f::Ones() - t;
     Eigen::Matrix<T, 3, 1> grad;
 
@@ -999,7 +999,7 @@ gradImpl(const OctreeT& octree,
                 // boundary of the node where there can be small non-zero gradients. It's a rather
                 // good and simple approximation though.
                 if (returned_scale) {
-                    *returned_scale = octantops::size_to_scale(node.size);
+                    *returned_scale = scale::from_size(node.size);
                 }
                 return GradType::Zero();
             }
@@ -1018,7 +1018,7 @@ gradImpl(const OctreeT& octree,
     const auto* const block_ptr = static_cast<const BlockType*>(octant);
     const Scale init_scale = std::max(desired_scale, block_ptr->current_scale);
     for (Scale scale = init_scale; scale <= BlockType::max_scale; scale++) {
-        const int stride = octantops::scale_to_size(scale);
+        const int stride = scale::to_size(scale);
         const Eigen::Vector3f scaled_voxel_coord_f =
             1.0f / stride * voxel_coord_f - g_sample_offset;
         const Eigen::Vector3i base_coord = stride * scaled_voxel_coord_f.template cast<int>();
@@ -1037,7 +1037,7 @@ gradImpl(const OctreeT& octree,
             if (node.isLeaf() && is_valid(node.data())) {
                 // Attempting to compute the gradient at a node, approximate with 0 as before.
                 if (returned_scale) {
-                    *returned_scale = octantops::size_to_scale(node.size);
+                    *returned_scale = scale::from_size(node.size);
                 }
                 return GradType::Zero();
             }

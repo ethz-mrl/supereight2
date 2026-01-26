@@ -104,7 +104,7 @@ int Octree<DataT, ResT, BlockSize>::getSize() const
 template<typename DataT, Res ResT, int BlockSize>
 int Octree<DataT, ResT, BlockSize>::getMaxScale() const
 {
-    return octantops::size_to_scale(size_);
+    return scale::from_size(size_);
 }
 
 
@@ -113,7 +113,7 @@ template<typename DataT, Res ResT, int BlockSize>
 int Octree<DataT, ResT, BlockSize>::getBlockDepth() const
 {
     // The scale of the root is the same as the depth of the leaves.
-    return getMaxScale() - octantops::size_to_scale(BlockSize);
+    return getMaxScale() - scale::from_size(BlockSize);
 }
 
 

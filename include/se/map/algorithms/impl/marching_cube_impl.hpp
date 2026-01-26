@@ -278,7 +278,7 @@ void gather_dual_data(const BlockT* block_ptr,
 
     // In the local case:        actual_dual_offset = actual_dual_scaling * norm_dual_offset_f and
     // dual_corner_coords_f = primal_corner_coord_f + actual_dual_scaling * norm_dual_offset_f
-    const float actual_dual_scaling = (float) octantops::scale_to_size(scale) / 2;
+    const float actual_dual_scaling = (float) scale::to_size(scale) / 2;
     for (int corner_idx = 0; corner_idx < 8; corner_idx++) {
         dual_corner_coords_i[corner_idx] = primal_corner_coord + logical_dual_offset[corner_idx];
         dual_corner_coords_f[corner_idx] =
@@ -729,7 +729,7 @@ void gather_dual_data(const OctreeT& octree,
         }
     }
 
-    const int stride = octantops::scale_to_size(scale);
+    const int stride = scale::to_size(scale);
     for (const auto& offset_idx : neighbours[0]) {
         dual_corner_coords_i[offset_idx] = primal_corner_coord + logical_dual_offset[offset_idx];
         dual_corner_coords_f[offset_idx] =
@@ -743,7 +743,7 @@ void gather_dual_data(const OctreeT& octree,
         const auto* const block_neighbour_ptr = static_cast<const typename OctreeT::BlockType*>(
             se::fetcher::template block<OctreeT>(logical_dual_corner_coord, octree.getRoot()));
         const int neighbour_scale = std::max(block_neighbour_ptr->current_scale, scale);
-        const int neighbour_stride = octantops::scale_to_size(neighbour_scale);
+        const int neighbour_stride = scale::to_size(neighbour_scale);
         for (const auto& offset_idx : neighbours[neighbour_idx]) {
             dual_corner_coords_i[offset_idx] =
                 primal_corner_coord + logical_dual_offset[offset_idx];
@@ -907,7 +907,7 @@ dual_marching_cube_kernel(const OctreeT& octree,
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
         const int voxel_scale =
             std::clamp(min_desired_scale, block_ptr->current_scale, OctreeT::BlockType::max_scale);
-        const int voxel_stride = octantops::scale_to_size(voxel_scale);
+        const int voxel_stride = scale::to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
@@ -1033,7 +1033,7 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
     for (size_t block_idx = 0; block_idx < block_ptrs.size(); block_idx++) {
         const typename OctreeT::BlockType* const block_ptr = block_ptrs[block_idx];
         const int voxel_scale = block_ptr->current_scale;
-        const int voxel_stride = octantops::scale_to_size(voxel_scale);
+        const int voxel_stride = scale::to_size(voxel_scale);
         const Eigen::Vector3i& start_coord = block_ptr->coord;
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))

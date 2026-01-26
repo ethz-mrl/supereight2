@@ -83,7 +83,7 @@ TEST(KeyOps, CodeToChildIdx)
     // Verify that the child idx extration from the code is correct
     Eigen::Vector3i coord = Eigen::Vector3i::Zero();
     for (se::scale_t s = 0; s < 8; ++s) {
-        coord += se::octantops::scale_to_size(s)
+        coord += se::scale::to_size(s)
             * Eigen::Vector3i((s & 1) > 0, (s & 2) > 0, (s & 4) > 0);
     }
 
@@ -222,7 +222,7 @@ TEST(KeyOps, IsSibling)
 
         for (se::idx_t child_idx = 0; child_idx < 8; ++child_idx) {
             Eigen::Vector3i child_coord = parent_coord
-                + se::octantops::scale_to_size(s)
+                + se::scale::to_size(s)
                     * Eigen::Vector3i(
                         (child_idx & 1) > 0, (child_idx & 2) > 0, (child_idx & 4) > 0);
             se::key_t child_key;

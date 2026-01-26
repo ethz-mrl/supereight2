@@ -265,7 +265,7 @@ inline void advance_ray(const MapT& map,
             return;
         }
 
-        const int node_size = octantops::scale_to_size(scale);
+        const int node_size = scale::to_size(scale);
         Eigen::Vector3i curr_node =
             node_size * (((ray_coord_f).array().floor()) / node_size).cast<int>();
 

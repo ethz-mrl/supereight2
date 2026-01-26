@@ -10,9 +10,9 @@
 #define SE_COMMON_SCALE_IMPL_HPP
 
 namespace se {
-namespace octantops {
+namespace scale {
 
-constexpr Scale size_to_scale(const int octant_size)
+constexpr Scale from_size(const int octant_size)
 {
     assert(math::is_power_of_two(octant_size));
     return math::log2_const(octant_size);
@@ -20,13 +20,13 @@ constexpr Scale size_to_scale(const int octant_size)
 
 
 
-constexpr int scale_to_size(const Scale octant_scale)
+constexpr int to_size(const Scale octant_scale)
 {
     assert(octant_scale >= 0);
     return 1 << octant_scale;
 }
 
-} // namespace octantops
+} // namespace scale
 } // namespace se
 
 #endif // SE_COMMON_SCALE_IMPL_HPP

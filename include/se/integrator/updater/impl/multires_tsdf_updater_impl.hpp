@@ -105,7 +105,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
                 else {
                     // This child hasn't been observed before, initialize to the interpolated field
                     // value.
-                    const int child_size = octantops::scale_to_size(child_data_union.scale);
+                    const int child_size = scale::to_size(child_data_union.scale);
                     const Eigen::Vector3f child_sample_coord_f =
                         child_data_union.coord.template cast<float>()
                         + g_sample_offset * child_size;
@@ -146,7 +146,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Multi, BlockSize>, SensorT>::Upda
         }
 
         block.current_scale = curr_scale;
-        const int stride = octantops::scale_to_size(curr_scale);
+        const int stride = scale::to_size(curr_scale);
 
         for (int x = 0; x < BlockType::size; x += stride) {
             for (int y = 0; y < BlockType::size; y += stride) {

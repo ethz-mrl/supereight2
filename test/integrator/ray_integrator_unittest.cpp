@@ -36,7 +36,7 @@ static void expect_valid_scale_data(const BlockType& block,
                                     const Eigen::Vector3i& parent_coord,
                                     const int scale)
 {
-    const int stride = se::octantops::scale_to_size(scale);
+    const int stride = se::scale::to_size(scale);
 
     const auto& parent_min_data = block.minData(parent_coord, scale);
     const auto& parent_max_data = block.maxData(parent_coord, scale);
@@ -259,7 +259,7 @@ TEST(RayIntegrator, Propagation)
         blocks.pop();
         // Test each voxel for all scales except the finest.
         for (int scale = block->max_scale; scale > block->current_scale; scale--) {
-            const int stride = se::octantops::scale_to_size(scale);
+            const int stride = se::scale::to_size(scale);
             for (int z = 0; z < block->size; z += stride) {
                 for (int y = 0; y < block->size; y += stride) {
                     for (int x = 0; x < block->size; x += stride) {

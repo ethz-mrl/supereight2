@@ -428,7 +428,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                                        const bool low_variance,
                                        [[maybe_unused]] const bool project_inside)
 {
-    const int stride = octantops::scale_to_size(scale);
+    const int stride = scale::to_size(scale);
     const int size_at_scale = BlockType::size >> scale;
     const int size_at_scale_sq = math::sq(size_at_scale);
     auto* const data_at_scale = block.blockDataAtScale(scale);

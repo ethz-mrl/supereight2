@@ -372,7 +372,7 @@ Map<Data<FldT, ColB, IdB>, ResT, BlockSize>::saveScaleSlices(const std::string& 
         }
         else {
             const NodeType* node_ptr = static_cast<const NodeType*>(leaf_ptr);
-            return (node_ptr->isLeaf()) ? se::octantops::size_to_scale(node_ptr->size) : -1;
+            return (node_ptr->isLeaf()) ? se::scale::from_size(node_ptr->size) : -1;
         }
     };
 

@@ -25,7 +25,7 @@ static void expect_valid_block_at_scale(const BlockType& block,
     fail_msg << "for block (" << block.coord.transpose() << ") in voxel ("
              << parent_coord.transpose() << ") at scale " << parent_scale;
 
-    const int parent_size = se::octantops::scale_to_size(parent_scale);
+    const int parent_size = se::scale::to_size(parent_scale);
     const int child_scale = parent_scale - 1;
     const auto& parent_min_data = block.minData(parent_coord, parent_scale);
     const auto& parent_max_data = block.maxData(parent_coord, parent_scale);
@@ -70,7 +70,7 @@ static void expect_valid_block(const BlockType& block)
     // Test that the data of all children are within the minimum and maximum data of their
     // parent. Skip the finest scale since it has no children.
     for (int scale = block.max_scale; scale > block.current_scale; scale--) {
-        const int size_at_scale = se::octantops::scale_to_size(scale);
+        const int size_at_scale = se::scale::to_size(scale);
         // Iterate over all the octants at this scale.
         for (int z = 0; z < BlockType::size; z += size_at_scale) {
             for (int y = 0; y < BlockType::size; y += size_at_scale) {

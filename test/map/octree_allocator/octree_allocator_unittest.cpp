@@ -54,11 +54,11 @@ TEST(SingleResAllocation, BlockKey)
         Eigen::Vector3i(253, 74, 135), Eigen::Vector3i(114, 244, 65), Eigen::Vector3i(38, 104, 85)};
 
     se::scale_t max_tree_scale = 8;
-    unsigned int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    unsigned int octree_size = se::scale::to_size(max_tree_scale);
 
     // SCALE 0
     constexpr se::scale_t max_block_scale_0 = 0;
-    constexpr size_t block_size_0 = se::octantops::scale_to_size(max_block_scale_0);
+    constexpr size_t block_size_0 = se::scale::to_size(max_block_scale_0);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_0> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;
@@ -93,7 +93,7 @@ TEST(SingleResAllocation, BlockKey)
 
     // SCALE 1
     constexpr se::scale_t max_block_scale_1 = 1;
-    constexpr size_t block_size_1 = se::octantops::scale_to_size(max_block_scale_1);
+    constexpr size_t block_size_1 = se::scale::to_size(max_block_scale_1);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_1> OctreeType1;
     typedef OctreeType1::BlockType BlockType1;
@@ -128,7 +128,7 @@ TEST(SingleResAllocation, BlockKey)
 
     // SCALE 2
     constexpr se::scale_t max_block_scale_2 = 2;
-    constexpr size_t block_size_2 = se::octantops::scale_to_size(max_block_scale_2);
+    constexpr size_t block_size_2 = se::scale::to_size(max_block_scale_2);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_2> OctreeType2;
     typedef OctreeType2::BlockType BlockType2;
@@ -163,7 +163,7 @@ TEST(SingleResAllocation, BlockKey)
 
     // SCALE 3
     constexpr se::scale_t max_block_scale_3 = 3;
-    constexpr size_t block_size_3 = se::octantops::scale_to_size(max_block_scale_3);
+    constexpr size_t block_size_3 = se::scale::to_size(max_block_scale_3);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_3> OctreeType3;
     typedef OctreeType3::BlockType BlockType3;
@@ -198,7 +198,7 @@ TEST(SingleResAllocation, BlockKey)
 
     // SCALE 4
     constexpr se::scale_t max_block_scale_4 = 4;
-    constexpr size_t block_size_4 = se::octantops::scale_to_size(max_block_scale_4);
+    constexpr size_t block_size_4 = se::scale::to_size(max_block_scale_4);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_4> OctreeType4;
     typedef OctreeType4::BlockType BlockType4;
@@ -236,7 +236,7 @@ TEST(SingleResAllocation, BlockKey)
 TEST(SingleResAllocation, BlockCoord)
 {
     se::scale_t max_tree_scale = 8;
-    unsigned int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    unsigned int octree_size = se::scale::to_size(max_tree_scale);
 
     typedef se::Octree<se::TSDFData, se::Res::Single> OctreeType;
     typedef OctreeType::NodeType NodeType;
@@ -289,7 +289,7 @@ TEST(SingleResAllocation, BlockKeys)
 
     // Create an octree.
     constexpr se::scale_t max_tree_scale = 8;
-    constexpr int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    constexpr int octree_size = se::scale::to_size(max_tree_scale);
     OctreeType octree(octree_size);
 
     // The coordinates of some voxels.
@@ -383,7 +383,7 @@ TEST(SingleResAllocation, BlockKeys)
 TEST(SingleResAllocation, BlockCoords)
 {
     se::scale_t max_tree_scale = 8;
-    unsigned int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    unsigned int octree_size = se::scale::to_size(max_tree_scale);
 
     typedef se::Octree<se::TSDFData, se::Res::Single> OctreeType;
     typedef OctreeType::NodeType NodeType;
@@ -415,9 +415,9 @@ TEST(SingleResAllocation, BlockCoords)
     // Sort the blocks in ascending order by their corresponding se::key_t.
     std::sort(block_ptrs.begin(), block_ptrs.end(), [](const auto& a, const auto& b) {
         se::key_t key_a;
-        se::keyops::encode_key(a->coord, se::octantops::size_to_scale(a->size), key_a);
+        se::keyops::encode_key(a->coord, se::scale::from_size(a->size), key_a);
         se::key_t key_b;
-        se::keyops::encode_key(b->coord, se::octantops::size_to_scale(b->size), key_b);
+        se::keyops::encode_key(b->coord, se::scale::from_size(b->size), key_b);
         return key_a < key_b;
     });
 

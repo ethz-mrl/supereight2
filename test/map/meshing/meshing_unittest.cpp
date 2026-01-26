@@ -104,7 +104,7 @@ create_octree_scale()
     se::allocator::blocks(allocation_list, *octree_ptr, octree_ptr->getRoot());
 
     const int curr_scale = 1;
-    const int curr_stride = se::octantops::scale_to_size(curr_scale);
+    const int curr_stride = se::scale::to_size(curr_scale);
 
     for (auto block_ptr_itr = se::BlocksIterator<OctreeType>(octree_ptr.get());
          block_ptr_itr != se::BlocksIterator<OctreeType>();

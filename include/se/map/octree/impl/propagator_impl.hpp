@@ -32,9 +32,9 @@ void propagateBlockUp(const OctreeT& /* octree */,
     const Eigen::Vector3i block_coord = block_ptr->coord;
     const int block_size = BlockType::size;
 
-    for (int child_scale = init_scale; child_scale < octantops::size_to_scale(block_size);
+    for (int child_scale = init_scale; child_scale < scale::from_size(block_size);
          ++child_scale) {
-        const int child_stride = octantops::scale_to_size(child_scale);
+        const int child_stride = scale::to_size(child_scale);
         const int parent_stride = 2 * child_stride;
 
         for (int z = 0; z < block_size; z += parent_stride) {
@@ -86,7 +86,7 @@ void propagateBlockDown(const OctreeT& octree,
     const Eigen::Vector3i block_coord = block_ptr->coord;
     const int block_size = BlockType::size;
     for (int parent_scale = block_ptr->current_scale; parent_scale > target_scale; --parent_scale) {
-        const int parent_stride = octantops::scale_to_size(parent_scale);
+        const int parent_stride = scale::to_size(parent_scale);
         for (int z = 0; z < block_size; z += parent_stride) {
             for (int y = 0; y < block_size; y += parent_stride) {
                 for (int x = 0; x < block_size; x += parent_stride) {

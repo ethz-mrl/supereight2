@@ -31,11 +31,11 @@ TEST(VisitorTSDFSingleRes, Interpolation)
     typedef se::TSDFData DataType;
 
     se::scale_t max_tree_scale = 5;
-    unsigned int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    unsigned int octree_size = se::scale::to_size(max_tree_scale);
 
     // SCALE 0
     constexpr se::scale_t max_block_scale_3 = 3;
-    constexpr size_t block_size_3 = se::octantops::scale_to_size(max_block_scale_3);
+    constexpr size_t block_size_3 = se::scale::to_size(max_block_scale_3);
 
     typedef se::Octree<DataType, se::Res::Single, block_size_3> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;
@@ -120,11 +120,11 @@ TEST(VisitorTSDFMultiRes, Interpolation)
     typedef se::TSDFData DataType;
 
     se::scale_t max_tree_scale = 5;
-    unsigned int octree_size = se::octantops::scale_to_size(max_tree_scale);
+    unsigned int octree_size = se::scale::to_size(max_tree_scale);
 
     // SCALE 0
     constexpr se::scale_t max_block_scale_3 = 3;
-    constexpr size_t block_size_3 = se::octantops::scale_to_size(max_block_scale_3);
+    constexpr size_t block_size_3 = se::scale::to_size(max_block_scale_3);
 
     typedef se::Octree<DataType, se::Res::Multi, block_size_3> OctreeType0;
     typedef OctreeType0::BlockType BlockType0;

@@ -56,7 +56,7 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
             const float angle_to_prev_ray = std::acos(ray.normalized().dot(ray_.normalized()));
             const float dist_to_prev_update = std::sin(angle_to_prev_ray) * ray.norm();
             if (dist_to_prev_update
-                < map_res_ * octantops::scale_to_size(computed_integration_scale_)) {
+                < map_res_ * scale::to_size(computed_integration_scale_)) {
                 return false;
             }
         }
@@ -151,7 +151,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         if (!map_.template pointToVoxel<se::Safe::On>(r_i_W, voxel_coord)) {
             // Outside Map, before we had a break, now we have to check when we are getting into the map
             r_i_S -=
-                0.5 * map_res_ * octantops::scale_to_size(free_space_scale_) * ray_dir_S;
+                0.5 * map_res_ * scale::to_size(free_space_scale_) * ray_dir_S;
             continue;
             // break;
         }
@@ -159,13 +159,13 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         if (voxel_coord == last_visited_voxel_) {
             // can jump to next sample
             r_i_S -=
-                0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
+                0.5 * map_res_ * scale::to_size(computed_integration_scale_) * ray_dir_S;
             continue;
         }
         last_visited_voxel_ = voxel_coord;
 
         if ((*this)(r_i_S, voxel_coord, ray_state, root_ptr)) {
-            r_i_S -= 0.5 * map_res_ * octantops::scale_to_size(computed_integration_scale_) * ray_dir_S;
+            r_i_S -= 0.5 * map_res_ * scale::to_size(computed_integration_scale_) * ray_dir_S;
             // Nothing else to do...
         }
         else {

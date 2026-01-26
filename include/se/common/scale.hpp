@@ -35,15 +35,16 @@ typedef int Scale;
 
 
 
-namespace octantops {
+/** Operations on se::Scale. */
+namespace scale {
 
 /** Return the octree scale corresponding to \p octant_size in voxels. */
-constexpr Scale size_to_scale(const int octant_size);
+constexpr Scale from_size(const int octant_size);
 
 /** Return the octant size in voxels corresponding to \p octant_scale. */
-constexpr int scale_to_size(const Scale octant_scale);
+constexpr int to_size(const Scale octant_scale);
 
-} // namespace octantops
+} // namespace scale
 
 } // namespace se
 
