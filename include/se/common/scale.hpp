@@ -18,15 +18,16 @@ namespace se {
  * the scale a useful way to specify a desired resolution, irrespective of the number of levels in
  * the octree.
  *
- * | Volume size (voxels) | Scale              |
- * |:--------------------:|:------------------:|
- * | 1×1×1                | 0                  |
- * | 2×2×2                | 1                  |
- * | 4×4×4                | 2                  |
- * | 8×8×8                | 3                  |
- * | 16×16×16             | 4                  |
- * | ...                  | ...                |
- * | NxNxN                | log<sub>2</sub>(N) |
+ * | Volume size (voxels)                      | Scale              |
+ * |:-----------------------------------------:|:------------------:|
+ * | 1×1×1                                     | 0                  |
+ * | 2×2×2                                     | 1                  |
+ * | 4×4×4                                     | 2                  |
+ * | 8×8×8                                     | 3                  |
+ * | 16×16×16                                  | 4                  |
+ * | ...                                       | ...                |
+ * | N×N×N                                     | log<sub>2</sub>(N) |
+ * | 2<sup>M</sup>×2<sup>M</sup>×2<sup>M</sup> | M                  |
  *
  * See se::colours::scale for the colours used to visualize each scale.
  */
