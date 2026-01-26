@@ -25,7 +25,7 @@ setData(OctreeT& octree, const Eigen::Vector3i& voxel_coord, const typename Octr
     }
 
     unsigned int node_size = octree.getSize();
-    for (; node_size >= OctreeT::block_size; node_size = node_size >> 1) {
+    for (; node_size >= OctreeT::block_size; node_size = node_size / 2) {
         typename OctreeT::NodeType* node_ptr =
             std::static_pointer_cast<typename OctreeT::NodeType>(octant_ptr);
         se::OctantBase* octant_tmp_ptr = nullptr;

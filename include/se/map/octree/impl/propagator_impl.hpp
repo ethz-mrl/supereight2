@@ -35,7 +35,7 @@ void propagateBlockUp(const OctreeT& /* octree */,
     for (int child_scale = init_scale; child_scale < octantops::size_to_scale(block_size);
          ++child_scale) {
         const int child_stride = octantops::scale_to_size(child_scale);
-        const int parent_stride = child_stride << 1;
+        const int parent_stride = 2 * child_stride;
 
         for (int z = 0; z < block_size; z += parent_stride) {
             for (int y = 0; y < block_size; y += parent_stride) {

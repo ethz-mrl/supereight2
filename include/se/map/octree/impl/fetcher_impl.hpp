@@ -34,12 +34,12 @@ const OctantBase* octant(const Eigen::Vector3i& octant_coord,
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->size >> 1;
+    int child_size = parent_ptr->size / 2;
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
                                 OctreeT::BlockType::size); // Not smaller than block size
-    for (; child_size >= size_desired; child_size = child_size >> 1) {
+    for (; child_size >= size_desired; child_size = child_size / 2) {
         idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
         child_ptr = parent_ptr->getChild(child_idx);
@@ -72,12 +72,12 @@ const OctantBase* finest_octant(const Eigen::Vector3i& octant_coord,
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->size >> 1;
+    int child_size = parent_ptr->size / 2;
     const OctantBase* child_ptr = nullptr;
 
     int size_desired = std::max(octantops::scale_to_size(scale_desired),
                                 OctreeT::BlockType::size); // Not smaller than block size
-    for (; child_size >= size_desired; child_size = child_size >> 1) {
+    for (; child_size >= size_desired; child_size = child_size / 2) {
         idx_t child_idx = ((octant_coord.x() & child_size) > 0)
             + 2 * ((octant_coord.y() & child_size) > 0) + 4 * ((octant_coord.z() & child_size) > 0);
         child_ptr = parent_ptr->getChild(child_idx);
@@ -109,10 +109,10 @@ const OctantBase* block(const Eigen::Vector3i& block_coord, const OctantBase* co
 {
     const typename OctreeT::NodeType* parent_ptr =
         static_cast<const typename OctreeT::NodeType*>(base_parent_ptr);
-    int child_size = parent_ptr->size >> 1;
+    int child_size = parent_ptr->size / 2;
     const OctantBase* child_ptr = nullptr;
 
-    for (; child_size >= OctreeT::BlockType::size; child_size = child_size >> 1) {
+    for (; child_size >= OctreeT::BlockType::size; child_size = child_size / 2) {
         idx_t child_idx = ((block_coord.x() & child_size) > 0)
             + 2 * ((block_coord.y() & child_size) > 0) + 4 * ((block_coord.z() & child_size) > 0);
         child_ptr = parent_ptr->getChild(child_idx);

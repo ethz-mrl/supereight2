@@ -225,7 +225,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const auto* const parent_data_at_parent_scale =
                     block_ptr->blockDataAtScale(parent_scale);
 
-                const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
+                const unsigned int size_at_buffer_scale_li = 2 * size_at_parent_scale_li;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {
@@ -369,7 +369,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                 const auto* const parent_data_at_parent_scale =
                     block_ptr->blockDataAtScale(parent_scale);
 
-                const unsigned int size_at_buffer_scale_li = size_at_parent_scale_li << 1;
+                const unsigned int size_at_buffer_scale_li = 2 * size_at_parent_scale_li;
                 const unsigned int size_at_buffer_scale_sq = math::sq(size_at_buffer_scale_li);
 
                 for (unsigned int z = 0; z < size_at_parent_scale_li; z++) {

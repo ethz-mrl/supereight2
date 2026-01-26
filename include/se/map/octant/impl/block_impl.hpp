@@ -842,7 +842,7 @@ Block<DataT, ResT, BlockSize>::Block(Node<DataT, ResT>* parent_ptr,
                    parent_ptr),
         BlockData<DataT, ResT, BlockSize>(init_data)
 {
-    assert(BlockSize == (parent_ptr->size >> 1));
+    assert(BlockSize == (parent_ptr->size / 2));
 }
 
 
