@@ -143,7 +143,8 @@ target_include_directories(mvs_test
         ${EIGEN3_INCLUDE_DIRS}
     )
 
-target_link_libraries(mvs_test 
+target_link_libraries(mvs_test
+    ${LIB_NAME}
     ${OpenCV_LIBS}
     ${TORCH_LIBRARIES}
     SRL::Supereight2

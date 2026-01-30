@@ -1,0 +1,21 @@
+cd build/release
+
+# Euroc datset
+./app/mvs_test ../../config/euroc_supereight.yaml \
+    /usr/wiss/juja/storage/local/juja/euroc/V1_01_easy/mav0/ \
+    /storage/group/srl/slamAndMapping/tro24-results/euroc/V1_01_easy/df-updext-4e808fb/run0/se2-postmap/
+
+# NTNU dataset
+./app/mvs_test ../../config/ntnu_mjolnir_supereight.yaml \
+    /usr/wiss/juja/storage/group/srl/slamAndMapping/NTNU-BWT/mission_1/ \
+    /usr/wiss/juja/storage/group/srl/slamAndMapping/NTNU-BWT/mission_1/results/mesh-reint/
+
+# Elios3-DTU-Lidar
+./app/supereight_occupancy_multi_lidar ../../config/elios3_tum.yaml
+
+# Gazebo 
+./app/detect ~/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_01/gazebo_bwt.yaml
+
+# Test code to closed edge detection
+make -j 21 && ./app/test_closed_edges /usr/wiss/juja/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/meshes/edges_1400.ply \
+    2>&1 | tee -a /usr/wiss/juja/storage/group/srl/slamAndMapping/Autoassess/gazebo/bwt_00/output.log
