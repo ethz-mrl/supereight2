@@ -12,6 +12,7 @@
 #include <se/common/system_utils.hpp>
 #include <se/supereight.hpp>
 #include <se/map/octree/fetcher.hpp>
+#include <se/image/util.hpp>
 
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
@@ -218,10 +219,8 @@ int main(int argc, char** argv)
             if (config.app.enable_rendering) {
                 se::image::remap(input_colour_img, downsampled_colour_img, downsample_map);
                 se::image::rgb_to_rgba(downsampled_colour_img, output_colour_img);
-                convert_to_output_depth_img(processed_depth_img,
-                                            sensor.near_plane,
-                                            sensor.far_plane,
-                                            output_depth_img.data());
+                se::image::depth_to_rgba(processed_depth_img, output_depth_img,
+                                         sensor.near_plane, sensor.far_plane);
                 tracker.renderTrackingResult(output_tracking_img.data());
                 if (frame % config.app.rendering_rate == 0) {
                     se::raycaster::render_volume_scale(scale_render,
