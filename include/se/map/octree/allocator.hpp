@@ -10,7 +10,8 @@
 #define SE_ALLOCATOR_HPP
 
 #include <Eigen/StdVector>
-#include <se/map/utils/octant_util.hpp>
+#include <se/common/scale.hpp>
+#include <se/map/octant/octant.hpp>
 #include <set>
 
 namespace se {

@@ -8,10 +8,8 @@
 #ifndef SE_ITERATOR_HPP
 #define SE_ITERATOR_HPP
 
-#include <se/map/utils/octant_util.hpp>
+#include <se/map/octant/octant.hpp>
 #include <stack>
-
-
 
 namespace se {
 

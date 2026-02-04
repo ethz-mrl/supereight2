@@ -6,6 +6,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <se/common/scale.hpp>
 #include <se/map/octree/allocator.hpp>
 #include <se/map/octree/octree.hpp>
 
@@ -412,7 +413,14 @@ TEST(SingleResAllocation, BlockCoords)
         se::allocator::blocks(voxel_coords, octree, octree.getRoot());
 
     se::keyops::sort_keys(voxel_keys);
-    se::octantops::sort_blocks<BlockType>(block_ptrs);
+    // Sort the blocks in ascending order by their corresponding se::key_t.
+    std::sort(block_ptrs.begin(), block_ptrs.end(), [](const auto& a, const auto& b) {
+        se::key_t key_a;
+        se::keyops::encode_key(a->coord, se::octantops::size_to_scale(a->size), key_a);
+        se::key_t key_b;
+        se::keyops::encode_key(b->coord, se::octantops::size_to_scale(b->size), key_b);
+        return key_a < key_b;
+    });
 
     for (se::idx_t i = 0; i < block_ptrs.size(); ++i) {
         Eigen::Vector3i voxel_coord;

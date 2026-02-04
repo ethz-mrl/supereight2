@@ -9,8 +9,9 @@
 #include <Eigen/StdVector>
 #include <gtest/gtest.h>
 #include <se/common/math_util.hpp>
+#include <se/common/scale.hpp>
+#include <se/map/octant/octant.hpp>
 #include <se/map/utils/key_util.hpp>
-#include <se/map/utils/octant_util.hpp>
 
 TEST(KeyOps, EncodeDecodeCode)
 {

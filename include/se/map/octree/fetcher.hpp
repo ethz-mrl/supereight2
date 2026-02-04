@@ -9,7 +9,7 @@
 #ifndef SE_FETCHER_HPP
 #define SE_FETCHER_HPP
 
-#include <se/map/utils/octant_util.hpp>
+#include <se/map/octant/octant.hpp>
 
 namespace se {
 namespace fetcher {
