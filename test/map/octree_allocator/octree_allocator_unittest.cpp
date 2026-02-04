@@ -387,7 +387,6 @@ TEST(SingleResAllocation, BlockCoords)
 
     typedef se::Octree<se::TSDFData, se::Res::Single> OctreeType;
     typedef OctreeType::NodeType NodeType;
-    typedef OctreeType::BlockType BlockType;
 
     OctreeType octree(octree_size);
 
