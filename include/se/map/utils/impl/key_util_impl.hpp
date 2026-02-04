@@ -16,7 +16,7 @@
 #    include <parallel/algorithm>
 #    define SE_PARALLEL_SORT(keys) __gnu_parallel::sort(keys.begin(), keys.end())
 #else
-#    define SE_PARALLEL_SORT(keys) se::keyops::sort_keys<se::Sort::SmallToLarge>(keys);
+#    define SE_PARALLEL_SORT(keys) std::sort(keys.begin(), keys.end())
 #endif
 
 namespace se {
