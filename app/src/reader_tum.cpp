@@ -41,17 +41,14 @@ struct TUMImageEntry {
 /** A timestamped ground truth pose and its associated depth and RGB images.
  */
 struct TUMPoseEntry {
-    double timestamp;
-    Eigen::Vector3f position;
-    Eigen::Quaternionf orientation;
+    double timestamp = NAN;
+    Eigen::Vector3f position = Eigen::Vector3f::Zero();
+    Eigen::Quaternionf orientation = Eigen::Quaternionf::Identity();
     std::string depth_filename;
     std::string rgb_filename;
 
-    /** Initialize an invalid TUMPoseEntry.
-     */
-    TUMPoseEntry() : timestamp(NAN)
-    {
-    }
+    /** Construct an invalid TUMPoseEntry. */
+    TUMPoseEntry() = default;
 
     TUMPoseEntry(const double t,
                  const Eigen::Vector3f& p,
