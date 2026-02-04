@@ -412,7 +412,7 @@ TEST(SingleResAllocation, BlockCoords)
     std::vector<se::OctantBase*> block_ptrs =
         se::allocator::blocks(voxel_coords, octree, octree.getRoot());
 
-    se::keyops::sort_keys(voxel_keys);
+    std::sort(voxel_keys.begin(), voxel_keys.end());
     // Sort the blocks in ascending order by their corresponding se::key_t.
     std::sort(block_ptrs.begin(), block_ptrs.end(), [](const auto& a, const auto& b) {
         se::key_t key_a;

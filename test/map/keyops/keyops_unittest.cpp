@@ -272,7 +272,7 @@ TEST(KeyOps, UniqueKeys)
         keys.push_back(key_tmp);
     }
 
-    se::keyops::sort_keys(keys);
+    std::sort(keys.begin(), keys.end());
     std::vector<se::key_t> unique_keys;
     se::keyops::unique_keys(keys, unique_keys);
 
@@ -308,7 +308,7 @@ TEST(KeyOps, UniqueAllocation)
         keys.push_back(key_tmp);
     }
 
-    se::keyops::sort_keys(keys);
+    std::sort(keys.begin(), keys.end());
     std::vector<se::key_t> unique_keys;
 
     se::keyops::unique_allocation(keys, max_block_scale, unique_keys);

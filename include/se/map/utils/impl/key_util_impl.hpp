@@ -276,22 +276,6 @@ inline bool is_siblings(const key_t sibling_1_key, const key_t sibling_2_key)
 
 
 
-template<>
-inline void sort_keys<Sort::SmallToLarge>(std::vector<key_t>& keys)
-{
-    std::sort(keys.begin(), keys.end(), [](key_t i, key_t j) { return (i < j); });
-}
-
-
-
-template<>
-inline void sort_keys<Sort::LargeToSmall>(std::vector<key_t>& keys)
-{
-    std::sort(keys.begin(), keys.end(), [](key_t i, key_t j) { return (i > j); });
-}
-
-
-
 template<Safe SafeB = Safe::On>
 inline void unique_keys(std::vector<key_t>& keys, std::vector<key_t>& unique_keys)
 {

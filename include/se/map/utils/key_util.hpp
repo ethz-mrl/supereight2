@@ -282,32 +282,6 @@ inline bool is_child(const key_t parent_key, const key_t child_key);
 inline bool is_siblings(const key_t sibling_1_key, const key_t sibling_2_key);
 
 /**
- * \brief Sorting template. Default small to larger key sorting.
- */
-template<Sort = Sort::SmallToLarge>
-inline void sort_keys(std::vector<key_t>& keys);
-
-/**
- * \brief Sorts the keys from smallest to largest.
- *        - At a given scale a dimension will be prioritised z > y > z (MSB > LSB)
- *        - For equivalent Morton codes smaller scales will be prioritised over larger scales (child first).
- *
- * \param[in/out] keys The keys to be sorted
- */
-template<>
-inline void sort_keys<Sort::SmallToLarge>(std::vector<key_t>& keys);
-
-/**
- * \brief Sorts the keys from largest to smallest.
- *        - At a given scale a dimension will be prioritised z > y > z (MSB > LSB)
- *        - For equivalent Morton codes larger scales will be prioritised over smaller scales (parent first).
- *
- * \param[in/out] keys
- */
-template<>
-inline void sort_keys<Sort::LargeToSmall>(std::vector<key_t>& keys);
-
-/**
  * \brief Filter keys based on the whole key (i.e. code and scale).
  *
  * \param[in]  keys          The keys to be filtered
