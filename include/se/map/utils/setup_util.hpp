@@ -49,14 +49,6 @@ enum class Res {
 /** Whether to enable certain safety and bounds checks. */
 enum class Safe { On = true, Off = false };
 
-/** The sort order. */
-enum class Sort {
-    /** Ascending. */
-    SmallToLarge,
-    /** Descending. */
-    LargeToSmall,
-};
-
 } // namespace se
 
 #endif // SE_SETUP_UTIL_HPP
