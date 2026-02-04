@@ -25,11 +25,9 @@ namespace str_utils {
 bool begins_with(const std::string& s, const std::string& prefix)
 {
     if (s.size() >= prefix.size()) {
-        return (s.compare(0, prefix.length(), prefix) == 0);
+        return s.compare(0, prefix.length(), prefix) == 0;
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 
@@ -37,11 +35,9 @@ bool begins_with(const std::string& s, const std::string& prefix)
 bool ends_with(const std::string& s, const std::string& suffix)
 {
     if (s.size() >= suffix.size()) {
-        return (s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0);
+        return s.compare(s.length() - suffix.length(), suffix.length(), suffix) == 0;
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 
@@ -50,9 +46,9 @@ bool is_int(const std::string& s, const bool accept_negative)
 {
     // Try to parse the string as a int.
     try {
-        size_t int_len = 0;
-        const int i = std::stoi(s, &int_len, 0);
-        return ((int_len == s.size()) && (accept_negative || (i >= 0)));
+        size_t chars_processed;
+        const int i = std::stoi(s, &chars_processed, 0);
+        return chars_processed == s.size() && (accept_negative || i >= 0);
     }
     catch (const std::exception& e) {
         return false;
@@ -65,9 +61,9 @@ bool is_float(const std::string& s, const bool accept_negative)
 {
     // Try to parse the string as a float.
     try {
-        size_t int_len = 0;
-        const float f = std::stof(s, &int_len);
-        return ((int_len == s.size()) && (accept_negative || (f >= 0.0f)));
+        size_t chars_processed;
+        const float f = std::stof(s, &chars_processed);
+        return chars_processed == s.size() && (accept_negative || f >= 0.0f);
     }
     catch (const std::exception& e) {
         return false;
