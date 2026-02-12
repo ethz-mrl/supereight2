@@ -30,10 +30,10 @@ sensor:
   azimuth_angles:             []
   near_plane:                 0.6
   far_plane:                  30.0
-  T_BS: [ 1.0,  0.0,  0.0, 0.0,
-          0.0,  1.0,  0.0, 0.0,
-          0.0,  0.0,  1.0, 0.05,
-          0.0,  0.0,  0.0, 1.0000 ]
+  T_BS: [ 0.0, -1.0,  0.0, 0.0178,
+          0.0,  0.0, -1.0,-0.0799,
+          1.0,  0.0,  0.0,-0.1005,
+          0.0,  0.0,  0.0, 1.0000 ] # This is T_{Sensor, not Body}{LiDAR}, so trajectory should be T_{W}{Sensor}
   elevation_resolution_angle: 1.4062 # only used for ray-based integration [degree]
   azimuth_resolution_angle:   0.3516 # only used for ray-based integration [degree]
 
