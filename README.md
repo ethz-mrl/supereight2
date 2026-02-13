@@ -33,7 +33,7 @@ Install the dependencies
 On Debian/Ubuntu you can install all of the above by running:
 
 ``` sh
-sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev libtbb-dev freeglut3-dev libopenni2-dev make
+sudo apt --yes install git g++ cmake libeigen3-dev libopencv-dev libtbb-dev freeglut3-dev libopenni2-dev make libpcl-dev libopenmpi-dev
 ```
 
 Clone the repository and its submodules:

@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.10...3.16)
 
 find_package(GLUT)
 find_package(OpenGL)
+find_package(MPI REQUIRED)
 find_package(PCL COMPONENTS io)
 find_package(PkgConfig) # For OpenNI2
 if(PKG_CONFIG_FOUND)
