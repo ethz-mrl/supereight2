@@ -41,6 +41,12 @@ struct LeicaPoseEntry {
 
         // This is based on OKVIS2 trajectory output format
         timestamp = std::stol(columns[0].c_str());
+        // for rpg format
+        // const std::vector<std::string> columns = se::str_utils::split_str(s, ' ', true);
+        // uint64_t seconds;
+        // uint64_t nanos;
+        // sscanf(columns[0].c_str(), "%lu.%9lu", &seconds, &nanos);
+        // timestamp = seconds * 1000000000ULL + nanos;
         position =
             Eigen::Vector3f(std::stof(columns[1]), std::stof(columns[2]), std::stof(columns[3]));
         // Eigen::Quaternionf(w,x,y,z)
