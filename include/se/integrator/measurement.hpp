@@ -62,7 +62,30 @@ Measurements(const Measurement<SensorT, float>&,
 
 template<typename SensorT>
 Measurements(const Measurement<SensorT, float>&,
+             std::nullopt_t,
+             const Measurement<SensorT, id_t>&) -> Measurements<SensorT>;
+
+template<typename SensorT>
+Measurements(const Measurement<SensorT, float>&,
              const Measurement<SensorT, colour_t>&,
+             const Measurement<SensorT, id_t>&,
+             const Image<float>*) -> Measurements<SensorT>;
+
+template<typename SensorT>
+Measurements(const Measurement<SensorT, float>&,
+             std::nullopt_t,
+             std::nullopt_t,
+             const Image<float>*) -> Measurements<SensorT>;
+
+template<typename SensorT>
+Measurements(const Measurement<SensorT, float>&,
+             const Measurement<SensorT, colour_t>&,
+             std::nullopt_t,
+             const Image<float>*) -> Measurements<SensorT>;
+
+template<typename SensorT>
+Measurements(const Measurement<SensorT, float>&,
+             std::nullopt_t,
              const Measurement<SensorT, id_t>&,
              const Image<float>*) -> Measurements<SensorT>;
 
