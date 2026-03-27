@@ -77,6 +77,101 @@ xargs rm < install_manifest.txt
 
 
 
+## AUTOASSESS
+
+To run the provided scripts with the sample data, install the required dependency:
+
+```bash
+pip install rosbags
+```
+
+### Troubleshooting
+
+The AUTOASSESS WP6 functionality currently does **not** depend on Torch or nanoflann. If you encounter build issues related to these dependencies in the [Build](#build) section, you can temporarily disable them by commenting out lines **123–188** in `app/CMakeLists.txt`. If the problem persists, please contact the repository owner for further assistance.
+
+### Semantic Fusion
+
+### LiDAR Mapping
+
+An example ROS1 bag recorded using the ScoutDI drone is available for download [here](https://inside.autoassess.eu/f/416943).
+
+#### 1. Extract dataset from ROS1 bag
+
+Update the `BAG_PATH` and `OUTPUT_DIR` fields in `scripts/extract_scoutdi_bag.py`, then run:
+
+```
+python scripts/extract_scoutdi_bag.py
+```
+
+This will generate a dataset with the following structure:
+
+```
+├── extrinsics_lidar.txt    # Extrinsics from LiDAR sensor to body frame (base_link -> LiDAR sensor)
+├── lidar.csv               # Timestamped LiDAR scans
+├── trajectory.csv          # Timestamped body poses (map -> base_link)
+├── ut_measurement.csv      # Timestamped thickness measurements
+└── ut_pose_dynamic.csv     # Timestamped dynamic UT probe (face) poses (base_link -> ut_face)
+```
+
+Update `config/scoutdi_test.yaml`:
+
+* Set `sensor[T_BS]` using the values from `extrinsics_lidar.txt`
+* `reader[sequence_path]`: path to extracted dataset
+* `app[mesh_path]`: path to saved mesh files
+
+#### 2. Extract Ouster metadata
+
+Update `BAG_PATH` in the `scripts/inspect_ouster_metadata.py` and run:
+
+```
+python scripts/inspect_ouster_metadata.py
+```
+
+Use the output to update the following fields in the `config/scoutdi_test.yaml`:
+
+* `sensor[width]`
+* `sensor[height]`
+* `sensor[elevation_resolution_angle]`
+* `sensor[azimuth_resolution_angle]`
+
+#### 3. Run LiDAR mapping
+
+```
+./build/release/app/supereight_occupancy_multi_lidar config/scoutdi_test.yaml
+```
+
+
+### NDT Measurement Registration
+
+First, run [LiDAR mapping](#lidar-mapping) in the previous section. Then update the following fields in `scripts/NDT_measurement_registration.py`:
+
+* `MESH_FILE`: path to saved mesh file in `app[mesh_path]`
+* `FILE_TRAJ`: path to extracted `trajectory.csv`
+* `FILE_UT_POSE`: path to extracted `ut_pose_dynamic.csv`
+* `FILE_UT_MEAS`: path to extracted `ut_measurement.csv`
+* `OUTPUT_FILE`: output path for saved `ut_global_registered.csv`
+* `OUTPUT_PCD`: output path for saved `ut_measurements_colored.ply`
+
+Run the following command:
+
+```
+python scripts/NDT_measurement_registration.py
+```
+
+Note that the file `ut_global_registered.csv` contains the final registered NDT measurements aligned with the LiDAR map, with the following format:
+
+```
+timestamp	thickness	x	y	z
+```
+
+* timestamp: measurement timestamp
+* thickness: recorded thickness value
+* x, y, z: global coordinates of the measured point in the map frame
+
+The color-coded measurement points are saved in `ut_measurements_colored.ply` which can be opened with standard 3D visualization tools (e.g., MeshLab or CloudCompare).
+
+
+
 ## API documentation
 
 Online API documentation can be found
