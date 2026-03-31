@@ -3,6 +3,8 @@
 
 cmake_minimum_required(VERSION 3.10...3.16)
 
+option(ENABLE_NON_AUTOASSESS "Enable AUTOASSESS-unrelated components" OFF)
+
 find_package(GLUT)
 find_package(OpenGL)
 find_package(MPI REQUIRED)
@@ -120,69 +122,129 @@ target_compile_definitions(supereight_occupancy_multi_lidar PRIVATE _FILE_OFFSET
 add_executable(supereight2_sizes src/supereight2_sizes.cpp)
 target_compile_options(supereight2_sizes PRIVATE ${SE_PRIVATE_CXX_FLAGS})
 target_link_libraries(supereight2_sizes PRIVATE SRL::Supereight2 ${LIB_NAME})
-# For the main_mvs.cpp
-find_package(OpenCV REQUIRED)
-find_package(Torch REQUIRED)
-find_package(Eigen3 REQUIRED)
 
-add_executable(mvs_test 
-    src/main_mvs.cpp
-    src/reader_tum.cpp
-    src/reader_leica.cpp
-    src/reader_newercollege.cpp
-    src/reader_raw.cpp
-    src/montage.cpp
-    src/reader_interiornet.cpp
-    src/reader_openni.cpp
-    src/config.cpp
-    src/reader.cpp
-    src/reader_base.cpp)
+# Compile the apps for each configuration in SE_SEMANTIC_APP_CONFIG.
+set(SE_SEMANTIC_APP_CONFIG
+  "TSDFColId Single PinholeCamera"
+  "TSDFColId Multi PinholeCamera"
+  "OccupancyColId Multi PinholeCamera"
+)
+foreach(APP_CONFIG ${SE_SEMANTIC_APP_CONFIG})
+  # Replace spaces with semicolons to convert the string to a CMake list.
+  string(REPLACE " " ";" APP_CONFIG ${APP_CONFIG})
+  # Get the field, resolution and sensor type from the list.
+  list(GET APP_CONFIG 0 FIELD)
+  list(GET APP_CONFIG 1 RES)
+  list(GET APP_CONFIG 2 SENSOR)
+  # Convert to lower case.
+  string(TOLOWER ${FIELD} FIELD_LC)
+  string(TOLOWER ${RES} RES_LC)
+  string(TOLOWER ${SENSOR} SENSOR_LC)
 
-target_include_directories(mvs_test
-    PUBLIC
-        include
-        ${EIGEN3_INCLUDE_DIRS}
-    )
-
-target_link_libraries(mvs_test
-    ${LIB_NAME}
-    ${OpenCV_LIBS}
-    ${TORCH_LIBRARIES}
-    SRL::Supereight2
-    SRL::Projection
-    )
-
-# For the main_detect.cpp
-find_package(nanoflann)
-add_executable(detect
-  src/main_detect.cpp
-  src/montage.cpp) 
-
-target_compile_options(detect PRIVATE ${SE_PRIVATE_CXX_FLAGS})
-target_include_directories(detect BEFORE PRIVATE include)
-target_link_libraries(detect PRIVATE SRL::Supereight2 ${LIB_NAME} nanoflann::nanoflann)
-
-if(OPENMP_FOUND)
-  target_link_libraries(detect PRIVATE OpenMP::OpenMP_CXX)
-endif()
-# Allow handling large files in 32-bit systems
-target_compile_definitions(detect PRIVATE _FILE_OFFSET_BITS=64)
-
-# Compile with GUI support
-if(GLUT_FOUND)
-  target_link_libraries(detect
-    PRIVATE
-      ${GLUT_LIBRARIES}
-      ${OPENGL_LIBRARIES}
-  )
-  target_compile_definitions(detect PRIVATE "-DSE_GLUT")
-  if(NOT APPLE)
-    target_link_libraries(detect PRIVATE GL)
+  # Generate an app main be replacing the field, resolution and sensor in main_semantic.cpp and writing the
+  # results in GENERATED_MAIN. Do nothing if main_semantic.cpp hasn't changed since GENERATED_MAIN was
+  # written.
+  set(INPUT_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/src/main_semantic.cpp")
+  set(GENERATED_MAIN "${CMAKE_CURRENT_BINARY_DIR}/main_${FIELD_LC}_${RES_LC}_${SENSOR_LC}.cpp")
+  if("${INPUT_MAIN}" IS_NEWER_THAN "${GENERATED_MAIN}")
+    file(READ "${INPUT_MAIN}" FILE_CONTENT)
+    string(REPLACE "se::TSDF" "se::${FIELD}" FILE_CONTENT "${FILE_CONTENT}")
+    string(REPLACE "se::Res::Single" "se::Res::${RES}" FILE_CONTENT "${FILE_CONTENT}")
+    string(REPLACE "se::PinholeCamera" "se::${SENSOR}" FILE_CONTENT "${FILE_CONTENT}")
+    file(WRITE "${GENERATED_MAIN}" "${FILE_CONTENT}")
   endif()
+
+  # Compile the app using the generated file.
+  set(EXE_NAME "supereight_${FIELD_LC}_${RES_LC}_${SENSOR_LC}")
+  add_executable(${EXE_NAME} ${GENERATED_MAIN} "src/montage.cpp")
+  target_compile_options(${EXE_NAME} PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+  target_include_directories(${EXE_NAME} BEFORE PRIVATE include)
+  target_link_libraries(${EXE_NAME} PRIVATE SRL::Supereight2 ${LIB_NAME})
+  if(OPENMP_FOUND)
+    target_link_libraries(${EXE_NAME} PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+  # Allow handling large files in 32-bit systems
+  target_compile_definitions(${EXE_NAME} PRIVATE _FILE_OFFSET_BITS=64)
+
+  # Compile with GUI support
+  if(GLUT_FOUND)
+    target_link_libraries(${EXE_NAME}
+      PRIVATE
+        ${GLUT_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+    )
+    target_compile_definitions(${EXE_NAME} PRIVATE "-DSE_GLUT")
+    if(NOT APPLE)
+      target_link_libraries(${EXE_NAME} PRIVATE GL)
+    endif()
+  endif()
+endforeach()
+
+if (ENABLE_NON_AUTOASSESS)
+  # For the main_mvs.cpp
+  find_package(OpenCV REQUIRED)
+  find_package(Torch REQUIRED)
+  find_package(Eigen3 REQUIRED)
+
+  add_executable(mvs_test 
+      src/main_mvs.cpp
+      src/reader_tum.cpp
+      src/reader_leica.cpp
+      src/reader_newercollege.cpp
+      src/reader_raw.cpp
+      src/montage.cpp
+      src/reader_interiornet.cpp
+      src/reader_openni.cpp
+      src/config.cpp
+      src/reader.cpp
+      src/reader_base.cpp)
+
+  target_include_directories(mvs_test
+      PUBLIC
+          include
+          ${EIGEN3_INCLUDE_DIRS}
+      )
+
+  target_link_libraries(mvs_test
+      ${LIB_NAME}
+      ${OpenCV_LIBS}
+      ${TORCH_LIBRARIES}
+      SRL::Supereight2
+      SRL::Projection
+      )
+
+  # For the main_detect.cpp
+  find_package(nanoflann)
+  add_executable(detect
+    src/main_detect.cpp
+    src/montage.cpp) 
+
+  target_compile_options(detect PRIVATE ${SE_PRIVATE_CXX_FLAGS})
+  target_include_directories(detect BEFORE PRIVATE include)
+  target_link_libraries(detect PRIVATE SRL::Supereight2 ${LIB_NAME} nanoflann::nanoflann)
+
+  if(OPENMP_FOUND)
+    target_link_libraries(detect PRIVATE OpenMP::OpenMP_CXX)
+  endif()
+  # Allow handling large files in 32-bit systems
+  target_compile_definitions(detect PRIVATE _FILE_OFFSET_BITS=64)
+
+  # Compile with GUI support
+  if(GLUT_FOUND)
+    target_link_libraries(detect
+      PRIVATE
+        ${GLUT_LIBRARIES}
+        ${OPENGL_LIBRARIES}
+    )
+    target_compile_definitions(detect PRIVATE "-DSE_GLUT")
+    if(NOT APPLE)
+      target_link_libraries(detect PRIVATE GL)
+    endif()
+  endif()
+
+  # Test closed edge detector.
+  add_executable(test_closed_edges src/test_closed_edges.cpp)
+
+  # Make sure the include path is used:
+  target_link_libraries(test_closed_edges PRIVATE ${LIB_NAME} nanoflann::nanoflann)
 endif()
-
-# Test closed edge detector.
-add_executable(test_closed_edges src/test_closed_edges.cpp)
-
-# Make sure the include path is used:
-target_link_libraries(test_closed_edges PRIVATE ${LIB_NAME} nanoflann::nanoflann)

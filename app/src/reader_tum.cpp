@@ -298,6 +298,49 @@ void associate_images(std::vector<TUMImageEntry>& depth_images,
 
 
 
+void associate_images(std::vector<TUMImageEntry>& depth_images,
+                      std::vector<TUMImageEntry>& rgb_images,
+                      std::vector<TUMImageEntry>& mask_images,
+                      const double max_timestamp_dist)
+{
+    // Compute the timestamps of all depth images
+    std::vector<double> depth_timestamps(depth_images.size());
+    std::transform(depth_images.begin(),
+                   depth_images.end(),
+                   depth_timestamps.begin(),
+                   [](const auto& e) { return e.timestamp; });
+    // Compute the timestamps of all RGB images
+    std::vector<double> rgb_timestamps(rgb_images.size());
+    std::transform(rgb_images.begin(), rgb_images.end(), rgb_timestamps.begin(), [](const auto& e) {
+        return e.timestamp;
+    });
+    // Try to associate each depth image with an RGB image
+    std::vector<TUMImageEntry> associated_depth_images;
+    std::vector<TUMImageEntry> associated_rgb_images;
+    std::vector<TUMImageEntry> associated_mask_images;
+    for (size_t i = 0; i < depth_timestamps.size(); ++i) {
+        const auto r = closest_timestamp(depth_timestamps[i], rgb_timestamps);
+        const double timestamp_dist = std::fabs(depth_timestamps[i] - r.first);
+        if (timestamp_dist <= max_timestamp_dist) {
+            // Found a match, add to the associated images
+            associated_depth_images.push_back(depth_images[i]);
+            associated_rgb_images.push_back(rgb_images[r.second]);
+            associated_mask_images.push_back(mask_images[r.second]);
+        }
+        else {
+            std::cerr << "Warning: Could not match depth image " << depth_images[i].filename
+                      << " to any RGB image.\nThe closest timestamp distance was " << timestamp_dist
+                      << " > " << max_timestamp_dist << "\n";
+        }
+    }
+    // Update the input vectors to contain only the associated images
+    depth_images = associated_depth_images;
+    rgb_images = associated_rgb_images;
+    mask_images = associated_mask_images;
+}
+
+
+
 /** Interpolate the gt_poses at the depth image timestamps.
  * The interpolation is only considered valid if the time difference of the
  * poses used is at most max_timestamp_dist. Depth and RGB image pairs with no
@@ -349,6 +392,56 @@ interpolate_poses(std::vector<TUMImageEntry>& depth_images,
 }
 
 
+
+std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>
+interpolate_poses(std::vector<TUMImageEntry>& depth_images,
+                  std::vector<TUMImageEntry>& rgb_images,
+                  std::vector<TUMImageEntry>& mask_images,
+                  const std::vector<TUMPoseEntry>& gt_poses,
+                  const double max_timestamp_dist)
+{
+    std::vector<TUMImageEntry> output_depth_images;
+    std::vector<TUMImageEntry> output_rgb_images;
+    std::vector<TUMImageEntry> output_mask_images;
+    std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>> associated_poses;
+    // Interpolate the ground truth poses at the depth image timestamps
+    for (size_t i = 0; i < depth_images.size(); ++i) {
+        const double depth_timestamp = depth_images[i].timestamp;
+        const auto poses = surrounding_poses(depth_timestamp, gt_poses);
+        // Ignore depth and RGB images with no matching ground truth
+        const double timestamp_diff = poses.second.timestamp - poses.first.timestamp;
+        const double timestamp_dist = std::fabs(timestamp_diff);
+        if (std::isnan(timestamp_dist) || timestamp_dist > max_timestamp_dist) {
+            std::cerr << "Warning: Could not interpolate pose for depth image "
+                      << depth_images[i].filename
+                      << ".\nThe timestamp distance between the surrounding poses was "
+                      << timestamp_dist << " > " << max_timestamp_dist << "\n";
+            continue;
+        }
+        // Matched a ground truth pose, keep the image pair
+        output_depth_images.push_back(depth_images[i]);
+        output_rgb_images.push_back(rgb_images[i]);
+        output_mask_images.push_back(mask_images[i]);
+        // Compute the interpolation parameter in the interval [0, 1]. Just set it
+        // to 0 if an exact match was found.
+        const double t = (poses.second.timestamp != poses.first.timestamp)
+            ? (depth_timestamp - poses.first.timestamp) / timestamp_diff
+            : 0.0;
+        // Interpolate the pose
+        const Eigen::Vector3f p = (1.0f - t) * poses.first.position + t * poses.second.position;
+        const Eigen::Quaternionf o = poses.first.orientation.slerp(t, poses.second.orientation);
+        associated_poses.push_back(Eigen::Isometry3f::Identity());
+        associated_poses.back().translation() = p;
+        associated_poses.back().linear() = o.toRotationMatrix();
+    }
+    // Update the input vectors
+    depth_images = output_depth_images;
+    rgb_images = output_rgb_images;
+    mask_images = output_mask_images;
+    return associated_poses;
+}
+
+
 // TUMReader implementation
 constexpr float se::TUMReader::tum_inverse_scale_;
 constexpr double se::TUMReader::max_match_timestamp_dist_;
@@ -373,8 +466,15 @@ se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
     // Read the image information from depth.txt and rgb.txt.
     std::vector<TUMImageEntry> depth_images = read_tum_image_list(sequence_path_ + "/depth.txt");
     std::vector<TUMImageEntry> rgb_images = read_tum_image_list(sequence_path_ + "/rgb.txt");
-    // Associate the depth with the RGB images
-    associate_images(depth_images, rgb_images, max_match_timestamp_dist_);
+
+    std::vector<TUMImageEntry> mask_images;
+    if (stdfs::is_directory(sequence_path_ + "/mask") && stdfs::is_regular_file(sequence_path_ + "/mask.txt")) {
+        mask_images = read_tum_image_list(sequence_path_ + "/mask.txt");
+        associate_images(depth_images, rgb_images, mask_images, max_match_timestamp_dist_);
+    } else {
+        associate_images(depth_images, rgb_images, max_match_timestamp_dist_);
+    }
+    
     // Read and associate the ground truth file if needed
     if (!ground_truth_file_.empty()) {
         // Read the the ground truth poses and timestamps
@@ -384,8 +484,12 @@ se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
             return;
         }
 
-        associated_gt_poses_ =
-            interpolate_poses(depth_images, rgb_images, gt_poses, max_interp_timestamp_dist_);
+        if (!mask_images.empty()) {
+            associated_gt_poses_ = interpolate_poses(depth_images, rgb_images, mask_images, gt_poses, max_interp_timestamp_dist_);
+        } else {
+            associated_gt_poses_ = interpolate_poses(depth_images, rgb_images, gt_poses, max_interp_timestamp_dist_);
+        }
+
         if (associated_gt_poses_.empty()) {
             std::cerr << "Error: Could not associate any ground truth poses to depth images\n";
             status_ = se::ReaderStatus::error;
@@ -401,6 +505,10 @@ se::TUMReader::TUMReader(const se::Reader::Config& c) : se::Reader(c)
     // Get the filenames of the RGB images.
     rgb_filenames_.resize(rgb_images.size());
     std::transform(rgb_images.begin(), rgb_images.end(), rgb_filenames_.begin(), [](const auto& e) {
+        return e.filename;
+    });
+    mask_filenames_.resize(mask_images.size());
+    std::transform(mask_images.begin(), mask_images.end(), mask_filenames_.begin(), [](const auto& e) {
         return e.filename;
     });
     // Get the total number of frames.
@@ -534,6 +642,46 @@ se::ReaderStatus se::TUMReader::nextColour(se::Image<RGB>& colour_image)
 
     cv::Mat wrapper_mat(colour_data.rows, colour_data.cols, CV_8UC3, colour_image.data());
     colour_data.copyTo(wrapper_mat);
+
+    return se::ReaderStatus::ok;
+}
+
+
+
+se::ReaderStatus se::TUMReader::nextSegment(Image<se::id_t>& segment_image)
+{
+    if (frame_ >= num_frames_) {
+        return se::ReaderStatus::error;
+    }
+    const std::string filename = sequence_path_ + "/" + mask_filenames_[frame_];
+
+    constexpr int desired_type = CV_16UC1;
+    cv::Mat image = cv::imread(filename.c_str(), cv::IMREAD_UNCHANGED);
+
+    if (image.empty()) {
+        return se::ReaderStatus::error;
+    }
+    if (image.type() == CV_8UC1) {
+        // DEBUG for broken dataset.
+        cv::Mat mask = image == cv::Mat(image.rows, image.cols, image.type(), 255);
+        image = image + cv::Mat::ones(image.rows, image.cols, image.type());
+        image.setTo(0, mask);
+        // DEBUG
+        image.convertTo(image, CV_16UC1);
+    }
+    else if (image.type() != desired_type) {
+        std::cerr << "Error: invalid mask image type " << image.type() << "\n";
+        return se::ReaderStatus::error;
+    }
+
+    // Resize the output image if needed.
+    if (segment_image.width() != image.cols || segment_image.height() != image.rows) {
+        segment_image = se::Image<se::id_t>(image.cols, image.rows);
+    }
+
+    cv::Mat wrapper_mat(
+        segment_image.height(), segment_image.width(), desired_type, segment_image.data());
+    image.copyTo(wrapper_mat);
 
     return se::ReaderStatus::ok;
 }

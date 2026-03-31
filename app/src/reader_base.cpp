@@ -249,6 +249,14 @@ se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
     return nextDataImpl(depth_image, &colour_image, &T_WB);
 }
 
+se::ReaderStatus se::Reader::nextData(se::Image<float>& depth_image,
+                                      se::Image<RGB>& colour_image,
+                                      se::Image<se::id_t>& segment_image,
+                                      Eigen::Isometry3f& T_WB)
+{
+    return nextDataImpl(depth_image, &colour_image, &segment_image, &T_WB);
+}
+
 se::ReaderStatus se::Reader::nextData(
     const float batch_interval,
     std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
@@ -538,6 +546,55 @@ se::ReaderStatus se::Reader::nextDataImpl(se::Image<float>& depth_image,
         if (!good()) {
             if (verbose_ >= 1) {
                 std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
+            }
+            return status_;
+        }
+    }
+    if (T_WB) {
+        status_ = mergeStatus(nextPose(*T_WB), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextPose() status: " << status_ << "\n";
+            }
+        }
+    }
+    return status_;
+}
+
+
+se::ReaderStatus se::Reader::nextDataImpl(se::Image<float>& depth_image,
+                                          se::Image<se::RGB>* colour_image,
+                                          se::Image<se::id_t>* segment_image,
+                                          Eigen::Isometry3f* T_WB)
+{
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to reader status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    nextFrame();
+    status_ = nextDepth(depth_image);
+    if (!good()) {
+        if (verbose_ >= 1) {
+            std::clog << "Stopping reading due to nextDepth() status: " << status_ << "\n";
+        }
+        return status_;
+    }
+    if (colour_image) {
+        status_ = mergeStatus(nextColour(*colour_image), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextColour() status: " << status_ << "\n";
+            }
+            return status_;
+        }
+    }
+    if (segment_image) {
+        status_ = mergeStatus(nextSegment(*segment_image), status_);
+        if (!good()) {
+            if (verbose_ >= 1) {
+                std::clog << "Stopping reading due to nextSegment() status: " << status_ << "\n";
             }
             return status_;
         }

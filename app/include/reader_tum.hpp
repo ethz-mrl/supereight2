@@ -9,6 +9,7 @@
 #define __READER_TUM_HPP
 
 #include "reader_base.hpp"
+#include <se/common/id.hpp>
 
 namespace se {
 
@@ -57,12 +58,16 @@ class TUMReader : public Reader {
 
     std::vector<std::string> rgb_filenames_;
 
+    std::vector<std::string> mask_filenames_;
+
     std::vector<Eigen::Isometry3f, Eigen::aligned_allocator<Eigen::Isometry3f>>
         associated_gt_poses_;
 
     ReaderStatus nextDepth(Image<float>& depth_image);
 
     ReaderStatus nextColour(Image<RGB>& colour_image);
+
+    ReaderStatus nextSegment(Image<se::id_t>& segment_image);
 };
 
 

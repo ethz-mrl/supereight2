@@ -17,6 +17,7 @@
 #include <fstream>
 #include <se/common/str_utils.hpp>
 #include <se/image/image.hpp>
+#include <se/common/id.hpp>
 
 namespace se {
 
@@ -212,6 +213,11 @@ class Reader {
     ReaderStatus
     nextData(Image<float>& depth_image, Image<RGB>& colour_image, Eigen::Isometry3f& T_WB);
 
+    ReaderStatus nextData(Image<float>& depth_image,
+                          Image<RGB>& colour_image,
+                          Image<se::id_t>& segment_image,
+                          Eigen::Isometry3f& T_WB);
+
     /** Read the ground truth pose at the provided frame number.
      * Each line in the ground truth file should correspond to a single
      * depth/colour image pair and have a format<br>
@@ -358,6 +364,11 @@ class Reader {
      */
     virtual ReaderStatus nextColour(Image<RGB>& colour_image);
 
+    virtual ReaderStatus nextSegment(Image<se::id_t>& /* segment_image */)
+    {
+        return se::ReaderStatus::eof;
+    }
+
     /** Read next batch of ray measurements.
      *
      * \param[in]  batch_interval (Time) Interval over which measurements are aggregated
@@ -384,6 +395,11 @@ class Reader {
 
     ReaderStatus
     nextDataImpl(Image<float>& depth_image, Image<RGB>* colour_image, Eigen::Isometry3f* T_WB);
+
+    ReaderStatus nextDataImpl(Image<float>& depth_image,
+                              Image<RGB>* colour_image,
+                              Image<se::id_t>* segment_image,
+                              Eigen::Isometry3f* T_WB);
 };
 
 std::ostream& operator<<(std::ostream& os, const Reader::Config& c);
