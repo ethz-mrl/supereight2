@@ -26,6 +26,17 @@ constexpr int to_size(const Scale octant_scale)
     return 1 << octant_scale;
 }
 
+
+
+constexpr RGB to_colour(const Scale octant_scale)
+{
+    assert(octant_scale >= 0);
+    if (static_cast<size_t>(octant_scale) < colours.size()) {
+        return colours[octant_scale];
+    }
+    return colours.back();
+}
+
 } // namespace scale
 } // namespace se
 

@@ -35,17 +35,6 @@ RGBA blend(const RGBA a, const RGBA b, const float alpha)
 
 } // namespace colour
 
-
-
-RGB scale_colour(const Scale scale)
-{
-    assert(scale >= 0);
-    if (static_cast<size_t>(scale) < colours::scale.size()) {
-        return colours::scale[scale];
-    }
-    return colours::scale.back();
-}
-
 } // namespace se
 
 #endif // SE_COLOUR_UTILS_IMPL_HPP

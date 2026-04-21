@@ -12,7 +12,7 @@
 #include <Eigen/Geometry>
 #include <fstream>
 #include <iostream>
-#include <se/common/colour_utils.hpp>
+#include <se/common/scale.hpp>
 #include <se/common/str_utils.hpp>
 #include <se/map/algorithms/mesh.hpp>
 

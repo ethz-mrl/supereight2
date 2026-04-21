@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-FileCopyrightText: 2024 Smart Robotics Lab, Imperial College London, Technical University of Munich
-# SPDX-FileCopyrightText: 2024-2025 Sotiris Papatheodorou
+# SPDX-FileCopyrightText: 2024-2026 Sotiris Papatheodorou
 # SPDX-License-Identifier: BSD-3-Clause
 
 # Show the supereight2 scale colours by parsing the source code. Assumes a
@@ -18,10 +18,10 @@ BEGIN {
 		print "<table>\n<tr><th>Scale</th><th>Colour</th></tr>"
 }
 
-/^namespace colours \{$/ { in_colours = 1 }
-/^}( \/\/ namespace colours)?$/ { in_colours = 0 }
+/^namespace scale \{$/ { in_colours = 1 }
+/^}( \/\/ namespace scale)?$/ { in_colours = 0 }
 
-in_colours && /static .* scale = \{$/, /^};$/ {
+in_colours && /static .* colours = \{$/, /^};$/ {
 	if ($0 ~ "\\{ *[0-9]+, *[0-9]+, *[0-9]+ *}") {
 		sub("^.*\\{", "")
 		sub("}.*$", "")
@@ -37,4 +37,4 @@ END {
 	if (html)
 		print "</table>"
 }
-' "$(dirname "$0")/../include/se/common/colour_utils.hpp"
+' "$(dirname "$0")/../include/se/common/scale.hpp"

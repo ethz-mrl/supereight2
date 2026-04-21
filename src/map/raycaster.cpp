@@ -74,7 +74,9 @@ void render_volume_scale(se::Image<RGBA>& render,
         render,
         surface_points_W,
         surface_normals_W,
-        [&surface_scale](const size_t pixel_idx) { return scale_colour(surface_scale[pixel_idx]); },
+        [&surface_scale](const size_t pixel_idx) {
+            return scale::to_colour(surface_scale[pixel_idx]);
+        },
         light_source_W,
         ambient_light);
 }

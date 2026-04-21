@@ -102,7 +102,7 @@ int save_mesh_vtk(const Mesh<FaceT>& mesh_M,
             rgb = face.colour.face.value_or(se::RGB());
         }
         else {
-            rgb = scale_colour(face.scale);
+            rgb = scale::to_colour(face.scale);
         }
         file << rgb.r / 255.0f << " " << rgb.g / 255.0f << " " << rgb.b / 255.0f << "\n";
     }
@@ -182,7 +182,7 @@ int save_mesh_ply(const Mesh<FaceT>& mesh_M,
             rgb = mesh_M[f].colour.face.value_or(se::RGB());
         }
         else {
-            rgb = scale_colour(mesh_M[f].scale);
+            rgb = scale::to_colour(mesh_M[f].scale);
         }
         file << " " << static_cast<int>(rgb.r) << " " << static_cast<int>(rgb.g) << " "
              << static_cast<int>(rgb.b) << "\n";

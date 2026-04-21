@@ -10,7 +10,6 @@
 #define SE_RAYCASTER_HPP
 
 #include <optional>
-#include <se/common/colour_utils.hpp>
 #include <se/common/eigen_utils.hpp>
 #include <se/common/math_util.hpp>
 #include <se/common/rgb.hpp>

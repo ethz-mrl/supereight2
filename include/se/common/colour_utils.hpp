@@ -17,38 +17,6 @@
 
 
 namespace se {
-/** Colours used for visualization. */
-namespace colours {
-
-/** The colours used to visualize each value of se::Scale.
- *
- * <table>
- * <tr><th>Scale</th><th>Colour</th></tr>
- * <tr><td>0</td><td style="color:#66c2a5">████</td></tr>
- * <tr><td>1</td><td style="color:#fc8d62">████</td></tr>
- * <tr><td>2</td><td style="color:#8da0cb">████</td></tr>
- * <tr><td>3</td><td style="color:#e78ac3">████</td></tr>
- * <tr><td>4</td><td style="color:#a6d854">████</td></tr>
- * <tr><td>5</td><td style="color:#ffd92f">████</td></tr>
- * <tr><td>6</td><td style="color:#e5c494">████</td></tr>
- * <tr><td>7</td><td style="color:#b3b3b3">████</td></tr>
- * </table>
- */
-// The HTML table above was generated using: ./scripts/scale-colours.sh html
-static const std::array scale = {
-    RGB{102, 194, 165},
-    RGB{252, 141, 98},
-    RGB{141, 160, 203},
-    RGB{231, 138, 195},
-    RGB{166, 216, 84},
-    RGB{255, 217, 47},
-    RGB{229, 196, 148},
-    RGB{179, 179, 179},
-};
-
-} // namespace colours
-
-
 
 /** Functions for processing colours. */
 namespace colour {
@@ -65,14 +33,6 @@ static inline RGB blend(const RGB a, const RGB b, const float alpha);
 static inline RGBA blend(const RGBA a, const RGBA b, const float alpha);
 
 } // namespace colour
-
-
-
-/** Return the color from se::colours::scale that should be used to visualize the supplied \p scale.
- * If the scale is greater or equal to the number of colours in se::colours::scale then the last
- * colour will be returned.
- */
-static inline RGB scale_colour(const Scale scale);
 
 } // namespace se
 
