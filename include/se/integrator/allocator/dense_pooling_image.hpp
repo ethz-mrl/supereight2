@@ -22,15 +22,9 @@ struct Pixel {
     Value max;
 
     // STATUS Crossing: Voxel image intersection
-    // outside  := 2;
-    // crossing := 1;
-    // inside   := 0;
     enum statusCrossing { inside = 0, crossing = 1, outside = 2 };
 
     // STATUS Known: Voxel content
-    // unknown          := 2;
-    // partially known  := 1;
-    // known            := 0;
     enum statusKnown { known = 0, part_known = 1, unknown = 2 };
 
     statusCrossing status_crossing;
@@ -41,9 +35,6 @@ struct Pixel {
     Pixel(Value min, Value max, statusCrossing status_crossing, statusKnown status_known) :
             min(min), max(max), status_crossing(status_crossing), status_known(status_known){};
 
-    // Inside pixel //
-
-    // Init known pixel
     static Pixel knownPixel()
     {
         Pixel knownPixel(std::numeric_limits<Value>::max(),
@@ -53,7 +44,6 @@ struct Pixel {
         return knownPixel;
     };
 
-    // Init unknown pixel
     static Pixel unknownPixel()
     {
         Pixel unknownPixel(std::numeric_limits<Value>::max(),
@@ -62,8 +52,6 @@ struct Pixel {
                            statusKnown::unknown);
         return unknownPixel;
     };
-
-    // Crossing pixel //
 
     static Pixel crossingKnownPixel()
     {
@@ -74,7 +62,6 @@ struct Pixel {
         return crossingPixel;
     };
 
-    // Init crossing partially known pixel
     static Pixel crossingPartKnownPixel()
     {
         Pixel crossingPixel(std::numeric_limits<Value>::max(),
@@ -93,9 +80,6 @@ struct Pixel {
         return crossingPixel;
     };
 
-    // Outside pixel //
-
-    // Init outside pixel
     static Pixel outsidePixelBatch()
     {
         Pixel outsidePixel(0, 0, statusCrossing::outside, statusKnown::unknown);
