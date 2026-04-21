@@ -11,7 +11,6 @@
 
 #include <cassert>
 #include <memory>
-#include <se/common/colour_utils.hpp>
 
 namespace se {
 

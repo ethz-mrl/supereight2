@@ -15,6 +15,7 @@
 #include <Eigen/StdVector>
 #include <chrono>
 #include <fstream>
+#include <se/common/rgb.hpp>
 #include <se/common/str_utils.hpp>
 #include <se/image/image.hpp>
 

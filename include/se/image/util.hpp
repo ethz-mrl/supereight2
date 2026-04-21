@@ -9,6 +9,8 @@
 #ifndef SE_IMAGE_UTIL_HPP
 #define SE_IMAGE_UTIL_HPP
 
+#include <se/common/rgb.hpp>
+#include <se/common/rgba.hpp>
 #include <se/image/image.hpp>
 
 namespace se {
