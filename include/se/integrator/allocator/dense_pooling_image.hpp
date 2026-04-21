@@ -26,8 +26,8 @@ struct Pixel {
 
     Value min;
     Value max;
-    StatusCrossing status_crossing;
-    StatusKnown status_known;
+    StatusCrossing crossing;
+    StatusKnown known;
 
     static Pixel knownPixel()
     {

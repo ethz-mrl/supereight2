@@ -235,7 +235,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
 
             /// CASE 0.3 (OUT OF BOUNDS): The node is outside frustum (i.e left, right, below, above) or
             ///                           all pixel values are unknown -> return intermediately
-            if (pooling_pixel.status_known == se::Pixel::StatusKnown::Unknown) {
+            if (pooling_pixel.known == se::Pixel::StatusKnown::Unknown) {
                 return;
             }
 
@@ -269,12 +269,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
             }
 
             /// CASE 2 (FRUSTUM BOUNDARY): The node is crossing the frustum boundary
-            if (pooling_pixel.status_crossing == se::Pixel::StatusCrossing::Crossing) {
+            if (pooling_pixel.crossing == se::Pixel::StatusCrossing::Crossing) {
                 should_split = true;
             }
 
             /// CASE 3: The node is inside the frustum, but projects into partially known pixel
-            else if (pooling_pixel.status_known == se::Pixel::StatusKnown::PartKnown) {
+            else if (pooling_pixel.known == se::Pixel::StatusKnown::PartKnown) {
                 should_split = true;
             }
 
@@ -283,7 +283,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
                 should_split = true;
             }
 
-            projects_inside = (pooling_pixel.status_known == se::Pixel::StatusKnown::Known);
+            projects_inside = (pooling_pixel.known == se::Pixel::StatusKnown::Known);
         }
     }
 
@@ -436,7 +436,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
 
             /// CASE 0.3 (OUT OF BOUNDS): The node is outside frustum (i.e left, right, below, above) or
             ///                           all pixel values are unknown -> return intermediately
-            if (pooling_pixel.status_known == se::Pixel::StatusKnown::Unknown) {
+            if (pooling_pixel.known == se::Pixel::StatusKnown::Unknown) {
                 return;
             }
 
@@ -470,12 +470,12 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
             }
 
             /// CASE 2 (FRUSTUM BOUNDARY): The node is crossing the frustum boundary
-            if (pooling_pixel.status_crossing == se::Pixel::StatusCrossing::Crossing) {
+            if (pooling_pixel.crossing == se::Pixel::StatusCrossing::Crossing) {
                 should_split = true;
             }
 
             /// CASE 3: The node is inside the frustum, but projects into partially known pixel
-            else if (pooling_pixel.status_known == se::Pixel::StatusKnown::PartKnown) {
+            else if (pooling_pixel.known == se::Pixel::StatusKnown::PartKnown) {
                 should_split = true;
             }
 
@@ -487,7 +487,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
             else {
             }
 
-            projects_inside = (pooling_pixel.status_known == se::Pixel::StatusKnown::Known);
+            projects_inside = (pooling_pixel.known == se::Pixel::StatusKnown::Known);
         }
     }
     else {
