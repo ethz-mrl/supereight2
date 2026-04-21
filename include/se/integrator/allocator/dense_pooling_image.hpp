@@ -18,15 +18,14 @@ using Value = float;
 using Status = int;
 
 struct Pixel {
-    Value min;
-    Value max;
-
     // STATUS Crossing: Voxel image intersection
     enum statusCrossing { inside = 0, crossing = 1, outside = 2 };
 
     // STATUS Known: Voxel content
     enum statusKnown { known = 0, part_known = 1, unknown = 2 };
 
+    Value min;
+    Value max;
     statusCrossing status_crossing;
     statusKnown status_known;
 
