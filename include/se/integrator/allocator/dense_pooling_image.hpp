@@ -37,53 +37,47 @@ struct Pixel {
 
     static Pixel knownPixel()
     {
-        Pixel knownPixel(std::numeric_limits<Value>::max(),
-                         std::numeric_limits<Value>::min(),
-                         statusCrossing::inside,
-                         statusKnown::known);
-        return knownPixel;
+        return Pixel(std::numeric_limits<Value>::max(),
+                     std::numeric_limits<Value>::min(),
+                     statusCrossing::inside,
+                     statusKnown::known);
     };
 
     static Pixel unknownPixel()
     {
-        Pixel unknownPixel(std::numeric_limits<Value>::max(),
-                           std::numeric_limits<Value>::min(),
-                           statusCrossing::inside,
-                           statusKnown::unknown);
-        return unknownPixel;
+        return Pixel(std::numeric_limits<Value>::max(),
+                     std::numeric_limits<Value>::min(),
+                     statusCrossing::inside,
+                     statusKnown::unknown);
     };
 
     static Pixel crossingKnownPixel()
     {
-        Pixel crossingPixel(std::numeric_limits<Value>::max(),
-                            std::numeric_limits<Value>::min(),
-                            statusCrossing::crossing,
-                            statusKnown::known);
-        return crossingPixel;
+        return Pixel(std::numeric_limits<Value>::max(),
+                     std::numeric_limits<Value>::min(),
+                     statusCrossing::crossing,
+                     statusKnown::known);
     };
 
     static Pixel crossingPartKnownPixel()
     {
-        Pixel crossingPixel(std::numeric_limits<Value>::max(),
-                            std::numeric_limits<Value>::min(),
-                            statusCrossing::crossing,
-                            statusKnown::part_known);
-        return crossingPixel;
+        return Pixel(std::numeric_limits<Value>::max(),
+                     std::numeric_limits<Value>::min(),
+                     statusCrossing::crossing,
+                     statusKnown::part_known);
     };
 
     static Pixel crossingUnknownPixel()
     {
-        Pixel crossingPixel(std::numeric_limits<Value>::max(),
-                            std::numeric_limits<Value>::min(),
-                            statusCrossing::crossing,
-                            statusKnown::unknown);
-        return crossingPixel;
+        return Pixel(std::numeric_limits<Value>::max(),
+                     std::numeric_limits<Value>::min(),
+                     statusCrossing::crossing,
+                     statusKnown::unknown);
     };
 
     static Pixel outsidePixelBatch()
     {
-        Pixel outsidePixel(0, 0, statusCrossing::outside, statusKnown::unknown);
-        return outsidePixel;
+        return Pixel(0, 0, statusCrossing::outside, statusKnown::unknown);
     };
 };
 
