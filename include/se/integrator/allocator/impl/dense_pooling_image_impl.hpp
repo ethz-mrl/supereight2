@@ -294,11 +294,11 @@ DensePoolingImage<PinholeCamera>::poolBoundingBox(int u_min, int u_max, int v_mi
                 pixel_batch.min = pixel.min;
             }
 
-            if (pixel.status_known == 2) {
+            if (pixel.status_known == Pixel::statusKnown::unknown) {
                 count_unknown_pixel++;
                 count_partly_known_pixel++;
             }
-            else if (pixel.status_known == 1) {
+            else if (pixel.status_known == Pixel::statusKnown::part_known) {
                 count_partly_known_pixel++;
             }
 
@@ -659,11 +659,11 @@ DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_
                     pixel_batch.min = pixel.min;
                 }
 
-                if (pixel.status_known == 2) {
+                if (pixel.status_known == Pixel::statusKnown::unknown) {
                     count_unknown_pixel++;
                     count_partly_known_pixel++;
                 }
-                else if (pixel.status_known == 1) {
+                else if (pixel.status_known == Pixel::statusKnown::part_known) {
                     count_partly_known_pixel++;
                 }
 
@@ -698,11 +698,11 @@ DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_
                     pixel_batch.min = pixel.min;
                 }
 
-                if (pixel.status_known == 2) {
+                if (pixel.status_known == Pixel::statusKnown::unknown) {
                     count_unknown_pixel++;
                     count_partly_known_pixel++;
                 }
-                else if (pixel.status_known == 1) {
+                else if (pixel.status_known == Pixel::statusKnown::part_known) {
                     count_partly_known_pixel++;
                 }
 

@@ -283,7 +283,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
                 should_split = true;
             }
 
-            projects_inside = (pooling_pixel.status_known == se::Pixel::known);
+            projects_inside = (pooling_pixel.status_known == se::Pixel::statusKnown::known);
         }
     }
 
@@ -487,7 +487,7 @@ VolumeCarver<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSiz
             else {
             }
 
-            projects_inside = (pooling_pixel.status_known == se::Pixel::known);
+            projects_inside = (pooling_pixel.status_known == se::Pixel::statusKnown::known);
         }
     }
     else {
