@@ -54,7 +54,7 @@ namespace scale {
  * </table>
  */
 // The HTML table above was generated using: ./scripts/scale-colours.sh html
-static const std::array colours = {
+static constexpr std::array colours = {
     RGB{102, 194, 165},
     RGB{252, 141, 98},
     RGB{141, 160, 203},
