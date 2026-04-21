@@ -96,7 +96,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
             Pixel& pixel = pooling_image_[1][x + image_width_ * y];
 
             if (y >= 1 && y < image_height_ - 1 && x >= 1 && x < image_width_ - 1) {
-                pixel.status_crossing = Pixel::statusCrossing::inside; // inside (0)
+                pixel.status_crossing = Pixel::StatusCrossing::Inside; // inside (0)
             }
 
 
@@ -135,10 +135,10 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
                 + pooling_image_[0][left + bottom * image_width_].status_known
                 + pooling_image_[0][left + y * image_width_].status_known;
             if (unknown_factor == 18) // All pixel are unknown -> 9 * unknown (2) = 18
-                pixel.status_known = Pixel::statusKnown::unknown; // unknown (2)
+                pixel.status_known = Pixel::StatusKnown::Unknown; // unknown (2)
             else if (unknown_factor > 0)                          // Some pixel are unknown
-                pixel.status_known = Pixel::statusKnown::
-                    part_known; // paritally known (1) - else known (0) - see initialization value;
+                pixel.status_known = Pixel::StatusKnown::
+                    PartKnown; // paritally known (1) - else known (0) - see initialization value;
         }
     }
     // Compute remaining pixel batch for remaining resolutions (5x5, 9x9, 17x17, 33x33, ...)
@@ -153,7 +153,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
                 int left, right, top, bottom;
                 if (x - s_half < 0) {
                     left = 0;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     left = x - s_half;
@@ -161,7 +161,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
 
                 if ((x + s_half) >= image_width_) {
                     right = image_width_ - 1;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     right = x + s_half;
@@ -169,7 +169,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
 
                 if (y - s_half < 0) {
                     top = 0;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     top = y - s_half;
@@ -177,7 +177,7 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
 
                 if ((y + s_half) >= image_height_) {
                     bottom = image_height_ - 1;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     bottom = y + s_half;
@@ -211,13 +211,13 @@ inline DensePoolingImage<PinholeCamera>::DensePoolingImage(const se::Image<float
                     + pooling_image_[l - 1][left + bottom * image_width_].status_known
                     + pooling_image_[l - 1][right + bottom * image_width_].status_known;
                 if (unknown_factor == 8) // All pixel are unknown -> 4 * unknown (2) = 8
-                    pixel.status_known = Pixel::statusKnown::unknown; // unknown (2)
+                    pixel.status_known = Pixel::StatusKnown::Unknown; // unknown (2)
                 else if (unknown_factor > 0)                          // Some pixel are unknown
-                    pixel.status_known = Pixel::statusKnown::
-                        part_known; // paritally known (1) - else known (0) - see initialization value;
+                    pixel.status_known = Pixel::StatusKnown::
+                        PartKnown; // paritally known (1) - else known (0) - see initialization value;
 
                 if (y >= s && y < image_height_ - s && x >= s && x < image_width_ - s) {
-                    pixel.status_crossing = Pixel::statusCrossing::inside; // inside (0)
+                    pixel.status_crossing = Pixel::StatusCrossing::Inside; // inside (0)
                 }
             }
         }
@@ -294,11 +294,11 @@ DensePoolingImage<PinholeCamera>::poolBoundingBox(int u_min, int u_max, int v_mi
                 pixel_batch.min = pixel.min;
             }
 
-            if (pixel.status_known == Pixel::statusKnown::unknown) {
+            if (pixel.status_known == Pixel::StatusKnown::Unknown) {
                 count_unknown_pixel++;
                 count_partly_known_pixel++;
             }
-            else if (pixel.status_known == Pixel::statusKnown::part_known) {
+            else if (pixel.status_known == Pixel::StatusKnown::PartKnown) {
                 count_partly_known_pixel++;
             }
 
@@ -314,10 +314,10 @@ DensePoolingImage<PinholeCamera>::poolBoundingBox(int u_min, int u_max, int v_mi
     }
 
     if (count_pixel == count_unknown_pixel) {
-        pixel_batch.status_known = Pixel::statusKnown::unknown;
+        pixel_batch.status_known = Pixel::StatusKnown::Unknown;
     }
     else if (count_partly_known_pixel > 0) {
-        pixel_batch.status_known = Pixel::statusKnown::part_known;
+        pixel_batch.status_known = Pixel::StatusKnown::PartKnown;
     }
 
     return pixel_batch;
@@ -381,7 +381,7 @@ DensePoolingImage<PinholeCamera>::conservativeQuery(const Eigen::Vector2i& bb_mi
     // Check if the pixel batch is partly inside the image. Given the previous check this is equivalent to
     // not entirely inside or outside the image
     if (!u_in || !v_in) {
-        pix.status_crossing = Pixel::statusCrossing::crossing;
+        pix.status_crossing = Pixel::StatusCrossing::Crossing;
 
         return pix;
     }
@@ -434,7 +434,7 @@ inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<flo
             Pixel& pixel = pooling_image_[1][x + image_width_ * y];
 
             if (y >= 1 && y < image_height_ - 1) {
-                pixel.status_crossing = Pixel::statusCrossing::inside; // inside (0)
+                pixel.status_crossing = Pixel::StatusCrossing::Inside; // inside (0)
             }
 
             /// Adapted range image LiDAR boundaries due to 360deg view.
@@ -474,10 +474,10 @@ inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<flo
                 + pooling_image_[0][left + bottom * image_width_].status_known
                 + pooling_image_[0][left + y * image_width_].status_known;
             if (unknown_factor == 18) // All pixel are unknown -> 9 * unknown (2) = 18
-                pixel.status_known = Pixel::statusKnown::unknown; // unknown (2)
+                pixel.status_known = Pixel::StatusKnown::Unknown; // unknown (2)
             else if (unknown_factor > 0)                          // Some pixel are unknown
-                pixel.status_known = Pixel::statusKnown::
-                    part_known; // paritally known (1) - else known (0) - see initialization value;
+                pixel.status_known = Pixel::StatusKnown::
+                    PartKnown; // paritally known (1) - else known (0) - see initialization value;
         }
     }
 
@@ -509,7 +509,7 @@ inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<flo
 
                 if (y - s_half < 0) {
                     top = 0;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     top = y - s_half;
@@ -517,7 +517,7 @@ inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<flo
 
                 if ((y + s_half) >= image_height_) {
                     bottom = image_height_ - 1;
-                    pixel.status_crossing = Pixel::statusCrossing::crossing; // crossing (1)
+                    pixel.status_crossing = Pixel::StatusCrossing::Crossing; // crossing (1)
                 }
                 else {
                     bottom = y + s_half;
@@ -552,16 +552,16 @@ inline DensePoolingImage<RangeImageLidar>::DensePoolingImage(const se::Image<flo
                     + pooling_image_[l - 1][right + bottom * image_width_].status_known;
                 if (unknown_factor == 8) // All pixel are unknown -> 4 * unknown (2) = 8
                 {
-                    pixel.status_known = Pixel::statusKnown::unknown; // unknown (2)
+                    pixel.status_known = Pixel::StatusKnown::Unknown; // unknown (2)
                 }
                 else if (unknown_factor > 0) // Some pixel are unknown
                 {
-                    pixel.status_known = Pixel::statusKnown::
-                        part_known; // paritally known (1) - else known (0) - see initialization value;
+                    pixel.status_known = Pixel::StatusKnown::
+                        PartKnown; // paritally known (1) - else known (0) - see initialization value;
                 }
 
                 if (y >= s && y < image_height_ - s && x >= s && x < image_width_ - s) {
-                    pixel.status_crossing = Pixel::statusCrossing::inside; // inside (0)
+                    pixel.status_crossing = Pixel::StatusCrossing::Inside; // inside (0)
                 }
             }
         }
@@ -659,11 +659,11 @@ DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_
                     pixel_batch.min = pixel.min;
                 }
 
-                if (pixel.status_known == Pixel::statusKnown::unknown) {
+                if (pixel.status_known == Pixel::StatusKnown::Unknown) {
                     count_unknown_pixel++;
                     count_partly_known_pixel++;
                 }
-                else if (pixel.status_known == Pixel::statusKnown::part_known) {
+                else if (pixel.status_known == Pixel::StatusKnown::PartKnown) {
                     count_partly_known_pixel++;
                 }
 
@@ -698,11 +698,11 @@ DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_
                     pixel_batch.min = pixel.min;
                 }
 
-                if (pixel.status_known == Pixel::statusKnown::unknown) {
+                if (pixel.status_known == Pixel::StatusKnown::Unknown) {
                     count_unknown_pixel++;
                     count_partly_known_pixel++;
                 }
-                else if (pixel.status_known == Pixel::statusKnown::part_known) {
+                else if (pixel.status_known == Pixel::StatusKnown::PartKnown) {
                     count_partly_known_pixel++;
                 }
 
@@ -719,10 +719,10 @@ DensePoolingImage<RangeImageLidar>::poolBoundingBox(int u_min, int u_max, int v_
     }
 
     if (count_pixel == count_unknown_pixel) {
-        pixel_batch.status_known = Pixel::statusKnown::unknown;
+        pixel_batch.status_known = Pixel::StatusKnown::Unknown;
     }
     else if (count_partly_known_pixel > 0) {
-        pixel_batch.status_known = Pixel::statusKnown::part_known;
+        pixel_batch.status_known = Pixel::StatusKnown::PartKnown;
     }
 
     return pixel_batch;
@@ -769,7 +769,7 @@ inline Pixel DensePoolingImage<RangeImageLidar>::conservativeQuery(const Eigen::
     // Check if the pixel batch is partly inside the image. Given the previous check this is equivalent to
     // not entirely inside or outside the image
     if (!v_in) {
-        pix.status_crossing = Pixel::statusCrossing::crossing;
+        pix.status_crossing = Pixel::StatusCrossing::Crossing;
         return pix;
     }
     else {

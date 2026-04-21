@@ -19,59 +19,59 @@ using Status = int;
 
 struct Pixel {
     // STATUS Crossing: Voxel image intersection
-    enum statusCrossing { inside = 0, crossing = 1, outside = 2 };
+    enum StatusCrossing { Inside = 0, Crossing = 1, Outside = 2 };
 
     // STATUS Known: Voxel content
-    enum statusKnown { known = 0, part_known = 1, unknown = 2 };
+    enum StatusKnown { Known = 0, PartKnown = 1, Unknown = 2 };
 
     Value min;
     Value max;
-    statusCrossing status_crossing;
-    statusKnown status_known;
+    StatusCrossing status_crossing;
+    StatusKnown status_known;
 
     static Pixel knownPixel()
     {
         return Pixel{std::numeric_limits<Value>::max(),
                      std::numeric_limits<Value>::min(),
-                     statusCrossing::inside,
-                     statusKnown::known};
+                     StatusCrossing::Inside,
+                     StatusKnown::Known};
     };
 
     static Pixel unknownPixel()
     {
         return Pixel{std::numeric_limits<Value>::max(),
                      std::numeric_limits<Value>::min(),
-                     statusCrossing::inside,
-                     statusKnown::unknown};
+                     StatusCrossing::Inside,
+                     StatusKnown::Unknown};
     };
 
     static Pixel crossingKnownPixel()
     {
         return Pixel{std::numeric_limits<Value>::max(),
                      std::numeric_limits<Value>::min(),
-                     statusCrossing::crossing,
-                     statusKnown::known};
+                     StatusCrossing::Crossing,
+                     StatusKnown::Known};
     };
 
     static Pixel crossingPartKnownPixel()
     {
         return Pixel{std::numeric_limits<Value>::max(),
                      std::numeric_limits<Value>::min(),
-                     statusCrossing::crossing,
-                     statusKnown::part_known};
+                     StatusCrossing::Crossing,
+                     StatusKnown::PartKnown};
     };
 
     static Pixel crossingUnknownPixel()
     {
         return Pixel{std::numeric_limits<Value>::max(),
                      std::numeric_limits<Value>::min(),
-                     statusCrossing::crossing,
-                     statusKnown::unknown};
+                     StatusCrossing::Crossing,
+                     StatusKnown::Unknown};
     };
 
     static Pixel outsidePixelBatch()
     {
-        return Pixel{0, 0, statusCrossing::outside, statusKnown::unknown};
+        return Pixel{0, 0, StatusCrossing::Outside, StatusKnown::Unknown};
     };
 };
 
