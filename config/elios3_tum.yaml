@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: CC0-1.0
 
 map:
-  dim:                        [81.92, 81.92, 81.92]
-  res:                        0.02
+  dim:                        [61.44, 61.44, 61.44]
+  res:                        0.03
 
 data:
   # tsdf
@@ -46,7 +46,7 @@ tracker:
 
 reader:
   reader_type:                "leica"
-  sequence_path:              "/storage/group/srl/slamAndMapping/Autoassess/elios3-tum/E300L122060007_01584_391_1flight/se2"
+  sequence_path:              "/storage/group/srl/slamAndMapping/Autoassess/elios3-tum/E300L122060007_01581_388_1flight/se2-multisession"
   ground_truth_file:          ""
   fps:                        0.0
   drop_frames:                false
@@ -58,13 +58,13 @@ app:
   enable_ground_truth:        true
   enable_rendering:           true
   enable_gui:                 true
-  mesh_path:                  "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
-  slice_path:                 "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
-  structure_path:             "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap"
+  mesh_path:                  "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01581_388_1flight/se2-3cm-intensityfilter"
+  slice_path:                 "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01581_388_1flight/se2-3cm-intensityfilter"
+  structure_path:             "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01581_388_1flight/se2-3cm-intensityfilter"
   sensor_downsampling_factor: 1
   tracking_rate:              1
   integration_rate:           1
   rendering_rate:             1
-  meshing_rate:               100
+  meshing_rate:               300
   max_frames:                 -1
-  log_file:                   "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01584_391_1flight/se2-postmap/log.tsv"
+  log_file:                   "/storage/group/srl/slamAndMapping/Autoassess/results/E300L122060007_01581_388_1flight/se2-3cm-intensityfilter/log.tsv"

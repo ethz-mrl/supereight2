@@ -357,7 +357,10 @@ se::ReaderStatus se::LeicaReader::nextRayBatch(
         T_WB.translation() = r * pos_curr_ + (1. - r) * pos_prev_;
         T_WB.linear() = ori_prev_.slerp(r, ori_curr_).toRotationMatrix();
         if (cnt % downsampleRate == 0) {
-            rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
+            // Filter out noisy measurements. These values are 10/90 percentiles in a sample data in BWT.
+            if (ray.intensity >= 40.0 && ray.intensity <= 266.0) {
+                rayPoseBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(T_WB, ray.position));
+            }
         }
         cnt ++;
     }
