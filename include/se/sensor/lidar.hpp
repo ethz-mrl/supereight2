@@ -58,7 +58,7 @@ class Lidar : public SensorBase<Lidar> {
     static std::string typeImpl();
 
     /** \brief the maximum ray angle between subsequent measurements*/
-    float max_ray_angle;
+    float min_ray_angle;
     float min_elevation_rad;
     float max_elevation_rad;
     /** \brief The horizontal field of view in radians. */
