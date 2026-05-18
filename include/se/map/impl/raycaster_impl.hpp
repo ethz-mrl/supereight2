@@ -502,7 +502,7 @@ raycast(MapT& map,
 
         f_tt = get_field(data);
         if (f_tt <= 0.1f && f_tt >= -0.5f) {
-            const std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
+            const std::optional<field_t> field_value = [&]() {
                 if constexpr (MapT::res_ == Res::Single) {
                     return map.interpField(point_W);
                 }
