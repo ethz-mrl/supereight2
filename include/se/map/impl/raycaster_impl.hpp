@@ -464,25 +464,20 @@ raycast(MapT& map,
     VoxelBlockRayIterator<MapT> ray(map, ray_origin_W, ray_dir_W, t_near, t_far);
     ray.next();
 
-    const float step = map.getRes();
-    const float largestep = MapT::BlockType::size * step;
-
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
     if (t_min <= 0.f) {
         return std::nullopt;
     }
     const float t_max = ray.tmax();
 
-    float t = t_min;
-
-    const float truncation_boundary =
-        map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
-
     if (t_near >= t_max) {
         return std::nullopt;
     }
     // first walk with largesteps until we found a hit
+    const float step = map.getRes();
+    const float largestep = MapT::BlockType::size * step;
     float stepsize = largestep;
+    float t = t_min;
     Eigen::Vector3f point_W = ray_origin_W + ray_dir_W * t;
     typename MapT::DataType data = map.template getData<Safe::On>(point_W);
     float f_t = get_field(data);
@@ -492,6 +487,8 @@ raycast(MapT& map,
         // The ray starts inside the surface.
         return std::nullopt;
     }
+    const float truncation_boundary =
+        map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
     for (; t < t_far; t += stepsize) {
         data = map.template getData<Safe::On>(point_W);
         if (!is_valid(data)) {
