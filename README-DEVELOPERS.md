@@ -89,6 +89,72 @@ multiple parts of the code.
 
 
 
+## Performance considerations
+
+### Exploiting the CPU cache
+
+> ... today’s CPUs do not access memory byte by byte. Instead, they fetch memory
+> in chunks of (typically) 64 bytes, called cache lines. When you read a
+> particular memory location, the entire cache line is fetched from the main
+> memory into the cache. And, accessing other values from the same cache line is
+> cheap!
+
+[Source](http://igoro.com/archive/gallery-of-processor-cache-effects/)
+
+Thus you should design both algorithms and data structures in a way that
+increase CPU cache hits to the extent possible.
+
+* Write algorithms so that they access data in the order that it's laid out in
+  memory.
+* Design data structures so that their data is laid out in memory in the order
+  that common algorithms will access it.
+
+### Iteration order
+
+It is most efficient to iterate over data in the order that they are stored in
+memory as it makes the most out of the CPU cache.
+
+#### Iterating over se::Image data
+
+Since `se::Image` stores data in row-major order, in order to exploit cache
+locality, the outer loop should iterate over rows and the inner loop over
+columns like this:
+
+``` cpp
+for (int y = 0; y < image.height(); y++) {
+    for (int x = 0; x < image.width(); x++) {
+        do_stuff(image(x, y));
+    }
+}
+```
+
+Or even better using a linear index if you don't care about the pixel
+coordinates:
+
+``` cpp
+for (size_t i = 0; i < image.size(); i++) {
+    do_stuff(image[i]);
+}
+```
+
+#### Iterating over se::BlockData data
+
+Since `se::BlockData` implementations store data in column-major order, in order
+to exploit cache locality, the outer loop should iterate over z and the inner
+loop over x like this:
+
+``` cpp
+for (int z = 0; z < BlockType::size; z++) {
+    for (int y = 0; y < BlockType::size; y++) {
+        for (int x = 0; x < BlockType::size; x++) {
+            do_stuff();
+        }
+    }
+}
+```
+
+
+
 ## Workflows
 
 ### Running more extensive tests
