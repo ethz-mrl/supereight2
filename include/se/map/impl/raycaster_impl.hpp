@@ -465,12 +465,7 @@ raycast(MapT& map,
     ray.next();
 
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
-    if (t_min <= 0.f) {
-        return std::nullopt;
-    }
-    const float t_max = ray.tmax();
-
-    if (t_near >= t_max) {
+    if (t_min <= 0.0f || t_near >= ray.tmax()) {
         return std::nullopt;
     }
     // first walk with largesteps until we found a hit
