@@ -516,19 +516,16 @@ raycast(MapT& map,
         }
 
         if (f_tt < MapT::DataType::surface_boundary) {
-            break;
-        } // got it, jump out of inner loop
+            // Found the surface, calculate accurate intersection.
+            t = t - stepsize * (f_tt - MapT::DataType::surface_boundary) / (f_tt - f_t);
+            Eigen::Vector4f intersection_W = (ray_origin_W + ray_dir_W * t).homogeneous();
+            intersection_W.w() = scale_tt;
+            return intersection_W;
+        }
 
         stepsize = std::max(f_tt * truncation_boundary, step);
         point_W += stepsize * ray_dir_W;
         f_t = f_tt;
-    }
-    // got it, calculate accurate intersection
-    if (f_tt < MapT::DataType::surface_boundary) {
-        t = t - stepsize * (f_tt - MapT::DataType::surface_boundary) / (f_tt - f_t);
-        Eigen::Vector4f intersection_W = (ray_origin_W + ray_dir_W * t).homogeneous();
-        intersection_W.w() = scale_tt;
-        return intersection_W;
     }
     return std::nullopt;
 }
