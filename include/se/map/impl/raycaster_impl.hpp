@@ -464,8 +464,8 @@ raycast(MapT& map,
     VoxelBlockRayIterator<MapT> ray(map, ray_origin_W, ray_dir_W, t_near, t_far);
     ray.next();
 
-    float step = map.getRes();
-    float largestep = MapT::BlockType::size * step;
+    const float step = map.getRes();
+    const float largestep = MapT::BlockType::size * step;
 
     const float t_min = ray.tcmin(); /* Get distance to the first intersected block */
     if (t_min <= 0.f) {
@@ -502,7 +502,7 @@ raycast(MapT& map,
 
         f_tt = get_field(data);
         if (f_tt <= 0.1 && f_tt >= -0.5f) {
-            std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
+            const std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
                 if constexpr (MapT::res_ == Res::Single) {
                     return map.interpField(point_W);
                 }
