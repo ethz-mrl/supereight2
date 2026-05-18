@@ -478,54 +478,55 @@ raycast(MapT& map,
     const float truncation_boundary =
         map.getRes() * map.getDataConfig().field.truncation_boundary_factor;
 
-    if (t_near < t_max) {
-        // first walk with largesteps until we found a hit
-        float stepsize = largestep;
-        Eigen::Vector3f point_W = ray_origin_W + ray_dir_W * t;
-        typename MapT::DataType data = map.template getData<Safe::On>(point_W);
-        float f_t = get_field(data);
-        float f_tt = 0;
-        int scale_tt = 0;
-        // if we are not already in it
-        if (f_t >= MapT::DataType::surface_boundary) {
-            for (; t < t_far; t += stepsize) {
-                data = map.template getData<Safe::On>(point_W);
-                if (!is_valid(data)) {
-                    stepsize = largestep;
-                    point_W += stepsize * ray_dir_W;
-                    continue;
-                }
-
-                f_tt = get_field(data);
-                if (f_tt <= 0.1 && f_tt >= -0.5f) {
-                    std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
-                        if constexpr (MapT::res_ == Res::Single) {
-                            return map.interpField(point_W);
-                        }
-                        else {
-                            return map.interpField(point_W, 0, &scale_tt);
-                        }
-                    }();
-                    if (field_value) {
-                        f_tt = *field_value;
-                    }
-                }
-
-                if (f_tt < MapT::DataType::surface_boundary) {
-                    break;
-                } // got it, jump out of inner loop
-
-                stepsize = std::max(f_tt * truncation_boundary, step);
+    if (t_near >= t_max) {
+        return std::nullopt;
+    }
+    // first walk with largesteps until we found a hit
+    float stepsize = largestep;
+    Eigen::Vector3f point_W = ray_origin_W + ray_dir_W * t;
+    typename MapT::DataType data = map.template getData<Safe::On>(point_W);
+    float f_t = get_field(data);
+    float f_tt = 0;
+    int scale_tt = 0;
+    // if we are not already in it
+    if (f_t >= MapT::DataType::surface_boundary) {
+        for (; t < t_far; t += stepsize) {
+            data = map.template getData<Safe::On>(point_W);
+            if (!is_valid(data)) {
+                stepsize = largestep;
                 point_W += stepsize * ray_dir_W;
-                f_t = f_tt;
+                continue;
             }
-            // got it, calculate accurate intersection
+
+            f_tt = get_field(data);
+            if (f_tt <= 0.1 && f_tt >= -0.5f) {
+                std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
+                    if constexpr (MapT::res_ == Res::Single) {
+                        return map.interpField(point_W);
+                    }
+                    else {
+                        return map.interpField(point_W, 0, &scale_tt);
+                    }
+                }();
+                if (field_value) {
+                    f_tt = *field_value;
+                }
+            }
+
             if (f_tt < MapT::DataType::surface_boundary) {
-                t = t - stepsize * (f_tt - MapT::DataType::surface_boundary) / (f_tt - f_t);
-                Eigen::Vector4f intersection_W = (ray_origin_W + ray_dir_W * t).homogeneous();
-                intersection_W.w() = scale_tt;
-                return intersection_W;
-            }
+                break;
+            } // got it, jump out of inner loop
+
+            stepsize = std::max(f_tt * truncation_boundary, step);
+            point_W += stepsize * ray_dir_W;
+            f_t = f_tt;
+        }
+        // got it, calculate accurate intersection
+        if (f_tt < MapT::DataType::surface_boundary) {
+            t = t - stepsize * (f_tt - MapT::DataType::surface_boundary) / (f_tt - f_t);
+            Eigen::Vector4f intersection_W = (ray_origin_W + ray_dir_W * t).homogeneous();
+            intersection_W.w() = scale_tt;
+            return intersection_W;
         }
     }
     return std::nullopt;
