@@ -460,7 +460,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                     != srl::projection::ProjectionStatus::Successful) {
                     continue;
                 }
-                const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                const Eigen::Vector2i depth_pixel = round_pixel(depth_pixel_f);
                 if (!low_variance && free_only_mask_
                     && (*free_only_mask_)(depth_pixel.x(), depth_pixel.y()) > 0) {
                     // Skip updating occupied space if the current pixel is masked.
@@ -512,8 +512,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                             Eigen::Vector2f colour_pixel_f;
                             if (colour_sensor_->model.project(hit_Cc, &colour_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
-                                const Eigen::Vector2i colour_pixel =
-                                    se::round_pixel(colour_pixel_f);
+                                const Eigen::Vector2i colour_pixel = round_pixel(colour_pixel_f);
                                 data.colour.update(
                                     (*colour_img_)(colour_pixel.x(), colour_pixel.y()),
                                     map_.getDataConfig().field.max_weight);
@@ -533,7 +532,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                                 Eigen::Vector2f id_pixel_f;
                                 if (id_sensor_->model.project(hit_Cid, &id_pixel_f)
                                     == srl::projection::ProjectionStatus::Successful) {
-                                    const Eigen::Vector2i id_pixel = se::round_pixel(id_pixel_f);
+                                    const Eigen::Vector2i id_pixel = round_pixel(id_pixel_f);
                                     data.id.update((*id_img_)(id_pixel.x(), id_pixel.y()));
                                 }
                             }

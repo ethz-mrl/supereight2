@@ -66,7 +66,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT>::Upd
                         != srl::projection::ProjectionStatus::Successful) {
                         continue;
                     }
-                    const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                    const Eigen::Vector2i depth_pixel = round_pixel(depth_pixel_f);
                     const float depth_value =
                         measurements.depth.image(depth_pixel.x(), depth_pixel.y());
                     if (depth_value < measurements.depth.sensor.near_plane) {
@@ -100,8 +100,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT>::Upd
                             Eigen::Vector2f colour_pixel_f;
                             if (measurements.colour->sensor.model.project(hit_Cc, &colour_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
-                                const Eigen::Vector2i colour_pixel =
-                                    se::round_pixel(colour_pixel_f);
+                                const Eigen::Vector2i colour_pixel = round_pixel(colour_pixel_f);
                                 data.colour.update(
                                     measurements.colour->image(colour_pixel.x(), colour_pixel.y()),
                                     map.getDataConfig().field.max_weight);
@@ -118,7 +117,7 @@ Updater<Map<Data<Field::TSDF, ColB, IdB>, Res::Single, BlockSize>, SensorT>::Upd
                             Eigen::Vector2f id_pixel_f;
                             if (measurements.ids->sensor.model.project(hit_Cid, &id_pixel_f)
                                 == srl::projection::ProjectionStatus::Successful) {
-                                const Eigen::Vector2i id_pixel = se::round_pixel(id_pixel_f);
+                                const Eigen::Vector2i id_pixel = round_pixel(id_pixel_f);
                                 data.id.update(measurements.ids->image(id_pixel.x(), id_pixel.y()));
                             }
                         }
