@@ -5,6 +5,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <unordered_map>
 #include <se/common/filesystem.hpp>
 #include <se/common/system_utils.hpp>
 #include <se/image/util.hpp>
@@ -15,6 +16,40 @@
 #include "draw.hpp"
 #include "montage.hpp"
 #include "reader.hpp"
+
+
+struct VoxelKey {
+    int x;
+    int y;
+    int z;
+
+    bool operator==(const VoxelKey& other) const {
+        return x == other.x &&
+               y == other.y &&
+               z == other.z;
+    }
+};
+
+struct VoxelKeyHash {
+    std::size_t operator()(const VoxelKey& k) const {
+        std::size_t h1 = std::hash<int>{}(k.x);
+        std::size_t h2 = std::hash<int>{}(k.y);
+        std::size_t h3 = std::hash<int>{}(k.z);
+
+        return h1 ^ (h2 << 1) ^ (h3 << 2);
+    }
+};
+
+// Convert meter coordinates into voxel coordinates
+VoxelKey makeKey(float x, float y, float z, float resolution = 0.01f)
+{
+    return {
+        static_cast<int>(std::round(x / resolution)),
+        static_cast<int>(std::round(y / resolution)),
+        static_cast<int>(std::round(z / resolution))
+    };
+}
+
 
 int main(int argc, char** argv)
 {
@@ -105,6 +140,22 @@ int main(int argc, char** argv)
                                                        processed_img_res.y());
 
         int frame = 0;
+        struct DefectPixel{
+            int frame_id;
+            int u;
+            int v;
+            // BACKGROUND = 1;
+            // BUCKLING_ID = 2;
+            // SEAM_CORROSION_ID = 3;
+            // EDGE_CORROSION_ID = 4;
+            // SPOT_CORROSION_ID = 5;
+            id_t defect_id;
+
+            DefectPixel(int frame_id_, int u_, int v_, id_t defect_id_)
+                : frame_id(frame_id_), u(u_), v(v_), defect_id(defect_id_) {}
+        };
+        // 3D defect voxel to defect pixels.
+        std::unordered_map<VoxelKey, std::vector<DefectPixel>, VoxelKeyHash> table_2d3d;
         while (frame != config.app.max_frames) {
             se::perfstats.setIter(frame++);
 
@@ -238,6 +289,32 @@ int main(int argc, char** argv)
             }
             TOCK("draw")
 
+            // Compute 2D defect to 3D point indexing
+            TICK("indexing")
+            assert(processed_depth_img.width() == segment_img.width());
+            assert(processed_depth_img.height() == segment_img.height());
+            const uchar BACKGND_ID = 1;
+            const Eigen::Isometry3f T_WSs = T_WS*T_SSs;
+            for (int u = 0; u < segment_img.width(); u++) {
+                for (int v = 0; v < segment_img.height(); v++) {
+                    // If there is a defect (not background).
+                    if (segment_img(u,v) != BACKGND_ID) {
+                        const Eigen::Vector2f uv(static_cast<float>(u), static_cast<float>(v));
+                        const float depth = processed_depth_img(u,v);
+                        if (depth <= sensor.far_plane && depth >= sensor.near_plane) {
+                            Eigen::Vector3f ray_uv;
+                            segment_sensor.model.backProject(uv, &ray_uv);
+                            const Eigen::Vector3f p_Ss = ray_uv * depth;
+                            const Eigen::Vector3f p_W = T_WSs*p_Ss; // this should be rotation + translation.
+                            DefectPixel defect_uv(frame, u, v, segment_img(u,v));
+                            VoxelKey voxel_key = makeKey(p_W.x(), p_W.y(), p_W.z(), config.map.res);
+                            table_2d3d[voxel_key].push_back(defect_uv);
+                        }
+                    }
+                }
+            }
+            TOCK("indexing")
+
             // Save logs, mesh, slices and struct (if enabled)
             TOCK("total")
             const bool last_frame =
@@ -281,6 +358,21 @@ int main(int argc, char** argv)
                                  se::system::memory_usage_self() / (1024.0 * 1024.0),
                                  se::PerfStats::MEMORY);
             se::perfstats.writeToFilestream();
+        }
+
+        // Print first N values.
+        std::cout << "table size = " << table_2d3d.size() << ", voxel resolution = " << config.map.res << std::endl;
+        size_t firstN = 0;
+        for (const auto& ival : table_2d3d) {
+            std::cout << "VoxelKey = " << ival.first.x << ", " << ival.first.y << ", " << ival.first.z << std::endl;
+            for (const auto& jval : ival.second) {
+                std::cout << "  " << jval.frame_id << ", " << jval.u << ", " << jval.v << ", " << jval.defect_id << std::endl;
+            }
+            std::cout << "\n";
+            if (firstN > 10) {
+                break;
+            }
+            firstN ++;
         }
 
         return 0;
