@@ -19,9 +19,9 @@ TEST(KeyOps, EncodeDecodeCode)
     se::code_t code;
     Eigen::Vector3i coord_is;
 
-    for (int x = 513; x < 1028; x += 19) {
+    for (int z = 0; z < 553; z += 11) {
         for (int y = 254; y < 844; y += 13) {
-            for (int z = 0; z < 553; z += 11) {
+            for (int x = 513; x < 1028; x += 19) {
                 Eigen::Vector3i coord_ought(x, y, z);
                 se::keyops::encode_code(coord_ought, code);
                 se::keyops::decode_code(code, coord_is);
@@ -48,9 +48,9 @@ TEST(KeyOps, EncodeDecodeKey)
     se::scale_t scale_is;
     Eigen::Vector3i coord_is;
 
-    for (int x = 513; x < 1028; x += 11) {
+    for (int z = 0; z < 553; z += 23) {
         for (int y = 254; y < 844; y += 19) {
-            for (int z = 0; z < 553; z += 23) {
+            for (int x = 513; x < 1028; x += 11) {
                 for (se::scale_t scale_ought = 0; scale_ought < 5; ++scale_ought) {
                     Eigen::Vector3i voxel_coord(x, y, z);
                     se::keyops::encode_key(voxel_coord, scale_ought, key);
@@ -106,9 +106,9 @@ TEST(KeyOps, KeyToCodeScale)
     se::scale_t scale_is;
     Eigen::Vector3i coord_is;
 
-    for (int x = 513; x < 1028; x += 13) {
+    for (int z = 0; z < 553; z += 29) {
         for (int y = 254; y < 844; y += 7) {
-            for (int z = 0; z < 553; z += 29) {
+            for (int x = 513; x < 1028; x += 13) {
                 for (se::scale_t scale_ought = 0; scale_ought < 5; ++scale_ought) {
                     Eigen::Vector3i voxel_coord(x, y, z);
                     se::keyops::encode_key(voxel_coord, scale_ought, key);
