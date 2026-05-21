@@ -72,8 +72,8 @@ std::vector<se::OctantBase*> RaycastCarver<MapT, SensorT>::operator()()
     std::set<se::key_t> voxel_key_set;
 
 #pragma omp parallel for reduction(merge : voxel_key_set)
-    for (int x = 0; x < depth_img_.width(); ++x) {
-        for (int y = 0; y < depth_img_.height(); ++y) {
+    for (int y = 0; y < depth_img_.height(); ++y) {
+        for (int x = 0; x < depth_img_.width(); ++x) {
             const Eigen::Vector2i pixel(x, y);
             const float depth_value = depth_img_(pixel.x(), pixel.y());
             // Only consider depth values inside the valid sensor range
