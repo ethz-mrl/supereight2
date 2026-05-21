@@ -842,9 +842,9 @@ marching_cube_kernel(const OctreeT& octree,
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
-        for (int x = start_coord.x(); x < last_coord.x(); x++) {
+        for (int z = start_coord.z(); z < last_coord.z(); z++) {
             for (int y = start_coord.y(); y < last_coord.y(); y++) {
-                for (int z = start_coord.z(); z < last_coord.z(); z++) {
+                for (int x = start_coord.x(); x < last_coord.x(); x++) {
                     const uint8_t edge_pattern_idx = meshing::compute_index(
                         octree, block_ptr, x, y, z, meshing::isosurface::occupied);
                     const int* const edges = triTable[edge_pattern_idx];
@@ -912,9 +912,9 @@ dual_marching_cube_kernel(const OctreeT& octree,
         const Eigen::Vector3i last_coord =
             (start_coord + Eigen::Vector3i::Constant(OctreeT::BlockType::size))
                 .cwiseMin(Eigen::Vector3i::Constant(octree.getSize() - 1));
-        for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
+        for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride) {
             for (int y = start_coord.y(); y <= last_coord.y(); y += voxel_stride) {
-                for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride) {
+                for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
                     const Eigen::Vector3i primal_corner_coord = Eigen::Vector3i(x, y, z);
 
                     if (x == last_coord.x() || y == last_coord.y() || z == last_coord.z()) {
@@ -1044,9 +1044,9 @@ dual_marching_cube_kernel_new(const OctreeT& octree,
         meshing::VertexIndexMesh<3> block_mesh;
         std::map<uint64_t, size_t> edge_vertex_map;
 
-        for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
+        for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride) {
             for (int y = start_coord.y(); y <= last_coord.y(); y += voxel_stride) {
-                for (int z = start_coord.z(); z <= last_coord.z(); z += voxel_stride) {
+                for (int x = start_coord.x(); x <= last_coord.x(); x += voxel_stride) {
                     const Eigen::Vector3i primal_corner_coord = Eigen::Vector3i(x, y, z);
 
                     if (x == last_coord.x() || y == last_coord.y() || z == last_coord.z()) {
