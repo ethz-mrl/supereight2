@@ -273,6 +273,83 @@ TEST(MultiResOFusionSystemTest, GetMaxField)
                                   + std::to_string(max_frame) + ".ply");
 }
 
+TEST(MultiResOFusionSystemTest, MaskIntegration)
+{
+    const std::string config_filename(my_argv[1]);
+    se::Config<se::OccupancyMap<se::Res::Multi>, se::PinholeCamera> config(config_filename);
+    se::OccupancyMap<se::Res::Multi> map(config.map, config.data);
+
+    // Output files in a temporary directory.
+    config.app.mesh_path = std::string(tmp + "/meshes");
+    config.app.slice_path = std::string(tmp + "/meshes");
+    config.app.structure_path = std::string(tmp + "/meshes");
+    config.app.log_file = std::string(tmp + "/log.tsv");
+    stdfs::create_directories(config.app.mesh_path);
+    stdfs::create_directories(config.app.slice_path);
+    stdfs::create_directories(config.app.structure_path);
+
+    // Create a pinhole camera and downsample the intrinsics
+    const se::PinholeCamera sensor(config.sensor, config.app.sensor_downsampling_factor);
+
+    const Eigen::Vector2i input_img_res(config.sensor.width, config.sensor.height);
+    se::Image<float> input_depth_img(input_img_res.x(), input_img_res.y());
+    const Eigen::Vector2i processed_img_res = input_img_res / config.app.sensor_downsampling_factor;
+    se::Image<float> processed_depth_img(processed_img_res.x(), processed_img_res.y());
+    se::Image<uint8_t> mask_depth_img(processed_img_res.x(), processed_img_res.y());
+
+    // Set pose to identity
+    const Eigen::Isometry3f T_WS = Eigen::Isometry3f::Identity();
+
+    // Set depth image
+    for (int y = 0; y < input_img_res.y(); y++) {
+        for (int x = 0; x < input_img_res.x(); x++) {
+            input_depth_img(x, y) = (x < input_img_res.x() / 2) ? 2.f : 4.f;
+        }
+    }
+
+    se::preprocessor::downsample_depth(input_depth_img, processed_depth_img);
+
+    for (int y = 0; y < processed_img_res.y(); y++) {
+        for (int x = 0; x < processed_img_res.x(); x++) {
+            mask_depth_img(x, y) = (processed_depth_img(x, y) <= 3.f) ? 0 : 1;
+        }
+    }
+
+    se::MapIntegrator integrator(map);
+    se::Measurements measurement{se::Measurement{processed_depth_img, sensor, T_WS}};
+    measurement.free_only_mask = &mask_depth_img;
+
+    const int max_frame = 1;
+    for (int frame = 0; frame < max_frame; frame++) {
+        integrator.integrateDepth(frame, measurement);
+    }
+
+    //Now, we iterate over all the blocks
+    se::BlocksIterator<decltype(map)::OctreeType> blockIterator(&map.getOctree());
+
+    while (*blockIterator != nullptr) {
+        auto* block = static_cast<typename decltype(map)::BlockType*>(*blockIterator);
+        if (block != nullptr) {
+            Eigen::Vector3i base_coord = block->coord;
+            for (size_t x = 0; x < 8; x++) {
+                for (size_t y = 0; y < 8; y++) {
+                    for (size_t z = 0; z < 8; z++) {
+                        Eigen::Vector3i offset(x, y, z);
+                        auto data = block->data(base_coord + offset);
+                        if (data.field.occupancy > 0.0) {
+                            Eigen::Vector3f pointW;
+                            map.voxelToPoint(base_coord + offset, pointW);
+                            ASSERT_TRUE(pointW.z()
+                                        <= 2.2); //Slack of 10% of distance behind the surface
+                        }
+                    }
+                }
+            }
+        }
+        blockIterator++;
+    }
+}
+
 
 
 TEST(MultiResOFusionSystemTest, DeleteChildren)

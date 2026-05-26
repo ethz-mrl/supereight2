@@ -25,6 +25,7 @@ Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, SensorT>:
         sensor_(measurements.depth.sensor),
         depth_img_(measurements.depth.image),
         sigma_img_(measurements.depth_sigma),
+        free_only_mask_(measurements.free_only_mask),
         T_CW_(measurements.depth.T_WC.inverse()),
         colour_sensor_(measurements.colour ? &measurements.colour->sensor : nullptr),
         colour_img_(measurements.colour ? &measurements.colour->image : nullptr),
@@ -157,8 +158,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                 }
                 octree_.deleteChildren(node_ptr);
             }
-        }     // nodes at depth d
-    }         // depth d
+        } // nodes at depth d
+    } // depth d
 
     updater::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
 }
@@ -249,12 +250,12 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                                             false; // Set falls such that the observe count can work properly
 
                                     } // i
-                                }     // j
-                            }         // k
+                                } // j
+                            } // k
 
                         } // x
-                    }     // y
-                }         // z
+                    } // y
+                } // z
             }
         }
 
@@ -272,8 +273,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                         updater::free_voxel(buffer_data, map_.getDataConfig()));
                     // We don't update colour or identifiers in free space.
                 } // x
-            }     // y
-        }         // z
+            } // y
+        } // z
 
         block_ptr->incrBufferIntegrCount();
 
@@ -298,8 +299,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                     data_at_integration_scale[voxel_idx], map_.getDataConfig()));
                 // We don't update colour or identifiers in free space.
             } // x
-        }     // y
-    }         // z
+        } // y
+    } // z
 
     block_ptr->incrCurrIntegrCount();
 }
@@ -393,15 +394,16 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
                                             false; // Set falls such that the observe count can work properly
 
                                     } // i
-                                }     // j
-                            }         // k
+                                } // j
+                            } // k
 
                         } // x
-                    }     // y
-                }         // z
+                    } // y
+                } // z
             }
         }
 
+        /*This function is updating the buffer, since we update the recommended scale*/
         updateBlockData<true>(
             *block_ptr, block_centre_C, recommended_scale, low_variance, project_inside);
 
@@ -413,6 +415,7 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>, Sens
         block_ptr->resetBuffer();
     }
 
+    /*Here we are updating the currently used block not the buffer*/
     updateBlockData<false>(
         *block_ptr, block_centre_C, integration_scale, low_variance, project_inside);
 }
@@ -458,6 +461,11 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                     continue;
                 }
                 const Eigen::Vector2i depth_pixel = se::round_pixel(depth_pixel_f);
+                if (!low_variance && free_only_mask_
+                    && (*free_only_mask_)(depth_pixel.x(), depth_pixel.y()) > 0) {
+                    // Skip updating occupied space if the current pixel is masked.
+                    continue;
+                }
                 const float depth_value = depth_img_(depth_pixel.x(), depth_pixel.y());
                 if (depth_value < sensor_.near_plane) {
                     continue;
@@ -539,8 +547,8 @@ void Updater<Map<Data<Field::Occupancy, ColB, IdB>, Res::Multi, BlockSize>,
                     block.incrCurrObservedCount(newly_observed);
                 }
             } // x
-        }     // y
-    }         // z
+        } // y
+    } // z
 
     if constexpr (UpdateBuffer) {
         block.incrBufferIntegrCount(project_inside);
