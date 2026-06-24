@@ -38,6 +38,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
                                          map_.getDataConfig()))
 {
     updated_octants_ = updated_octants;
+    octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
 }
 
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
@@ -82,9 +83,6 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
     /// (0) Get Root Pointer
     se::OctantBase* root_ptr = octree_.getRoot();
 
-    /// (1) Allocate all 8 children first level (if not yet allocated)
-    octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
-    
     /// (2) Check validity of measured value (sensor near plane)
     if (ray_dist_ < sensor_.near_plane) {
         return;
