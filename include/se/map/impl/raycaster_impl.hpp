@@ -436,7 +436,7 @@ raycast(MapT& map,
             value_t = value_tt;
             point_W_t = point_W_tt;
         }
-        if (*value_tt > MapT::DataType::surface_boundary
+        if (value_tt && *value_tt > MapT::DataType::surface_boundary
             && *value_t < MapT::DataType::surface_boundary) {
             // We overshot. Need to move backwards for zero crossing.
             t = t
