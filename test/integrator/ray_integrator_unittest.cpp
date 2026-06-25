@@ -96,8 +96,8 @@ TEST(RayIntegrator, SingleRay)
     const Eigen::Vector3f ray(d, 0., 0.);
     std::unordered_set<const se::OctantBase*> updated_octants;
 
-    se::RayIntegrator rayIntegrator(
-        map, sensor, ray, Eigen::Isometry3f::Identity(), 0, &updated_octants);
+    se::RayMeasurement measurement{sensor, Eigen::Isometry3f::Identity(), ray};
+    se::RayIntegrator rayIntegrator(map, measurement, 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
     rayIntegrator.propagateToRoot();
@@ -166,8 +166,23 @@ TEST(RayIntegrator, Propagation)
     // distance of plane wall [m]
     float d = 10.0f;
 
-    std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
+    // ========= Sensor INITIALIZATION  =========
+    se::Lidar::Config sensorConfig;
+    sensorConfig.width = 360;
+    sensorConfig.height = 180;
+    sensorConfig.near_plane = 0.6f;
+    sensorConfig.far_plane = 30.0f;
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
+    sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
+    sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
+
+    //se::Lidar::Config sensorConfig(se_config.sensor);
+    const se::Lidar sensor(sensorConfig);
+
+
+
+    std::vector<se::RayMeasurement<se::Lidar>,
+                Eigen::aligned_allocator<se::RayMeasurement<se::Lidar>>>
         rayBatch;
     size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
     size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
@@ -181,8 +196,8 @@ TEST(RayIntegrator, Propagation)
         for (size_t j = 0; j < num_points_azimuth; j++) {
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
-            rayBatch.push_back(std::pair<Eigen::Isometry3f, Eigen::Vector3f>(
-                Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)));
+            rayBatch.push_back(se::RayMeasurement<se::Lidar>{
+                sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -197,26 +212,12 @@ TEST(RayIntegrator, Propagation)
     const float dim = 25.6f;
     se::OccupancyMap<se::Res::Multi> map(Eigen::Vector3f::Constant(dim), res);
 
-
-    // ========= Sensor INITIALIZATION  =========
-    se::Lidar::Config sensorConfig;
-    sensorConfig.width = 360;
-    sensorConfig.height = 180;
-    sensorConfig.near_plane = 0.6f;
-    sensorConfig.far_plane = 30.0f;
-    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
-    sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
-    sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
-
-    //se::Lidar::Config sensorConfig(se_config.sensor);
-    const se::Lidar sensor(sensorConfig);
-
     // ========= Integrator INITIALIZATION  =========
     se::MapIntegrator integrator(map);
 
     // ========= Integration (Batched)
     std::unordered_set<const se::OctantBase*> updated_octants;
-    integrator.integrateRayBatch(0, rayBatch, sensor, &updated_octants);
+    integrator.integrateRayBatch(0, rayBatch, &updated_octants);
     std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
     // Un-Comment if needed for debugging
     map.getOctree().saveStructure(tmp_ + "/batch_ray_structure.ply");
@@ -263,8 +264,7 @@ TEST(RayIntegrator, Propagation)
             for (int z = 0; z < block->size; z += stride) {
                 for (int y = 0; y < block->size; y += stride) {
                     for (int x = 0; x < block->size; x += stride) {
-                        const Eigen::Vector3i voxel_coord =
-                            block->coord + Eigen::Vector3i(x, y, z);
+                        const Eigen::Vector3i voxel_coord = block->coord + Eigen::Vector3i(x, y, z);
                         expect_valid_scale_data(*block, voxel_coord, scale);
                     }
                 }

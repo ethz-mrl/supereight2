@@ -86,7 +86,7 @@ class MapIntegrator {
      *
      * \tparam SensorT
      * \param[in] timestamp       The timestamp of the batch to be integrated
-     * \param[in] rayPoseBatch    The batch of ray measurements and poses in the world frame
+     * \param[in] rayPoseBatch    The batch of ray measurements
      * \param[in] sensor          The sensor use for the projection
      * \param[in] updated_octants Pointers to the octants updates during integration will be stored
      *                            in \p updated_octants if it's not \p nullptr.
@@ -94,10 +94,8 @@ class MapIntegrator {
     template<typename SensorT>
     void integrateRayBatch(
         const timestamp_t timestamp,
-        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch,
-        const SensorT& sensor,
+        const std::vector<RayMeasurement<SensorT>,
+                          Eigen::aligned_allocator<RayMeasurement<SensorT>>>& rayPoseBatch,
         std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW

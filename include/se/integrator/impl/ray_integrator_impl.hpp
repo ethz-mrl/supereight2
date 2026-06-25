@@ -14,23 +14,21 @@ namespace se {
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
               SensorT>::RayIntegrator(MapType& map,
-                                      const SensorT& sensor,
-                                      const Eigen::Vector3f& ray,
-                                      const Eigen::Isometry3f& T_WS,
+                                      const RayMeasurement<SensorT>& ray_measurement,
                                       const timestamp_t timestamp,
-                                      std::unordered_set<const OctantBase*>* const updated_octants) :
+                                      std::unordered_set<const OctantBase*>* const
+                                          updated_octants) :
         map_(map),
         octree_(map.getOctree()),
-        sensor_(sensor),
         node_set_(octree_.getBlockDepth()),
         config_(map),
-        T_SW_(T_WS.inverse()),
-        ray_(ray),
+        measurement_(&ray_measurement),
         last_visited_voxel_(Eigen::Vector3i::Constant(-1)),
+        T_SW_(ray_measurement.T_WS.inverse()),
         map_res_(map.getRes()),
         free_space_scale_(map_.getDataConfig().field.fs_integr_scale),
         timestamp_(timestamp),
-        ray_dist_(ray_.norm()),
+        ray_dist_(ray_measurement.ray_S.norm()),
         tau_(compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig())),
         three_sigma_(compute_three_sigma(ray_dist_,
                                          config_.sigma_min,
@@ -38,34 +36,35 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
                                          map_.getDataConfig()))
 {
     updated_octants_ = updated_octants;
-    octree_.allocateChildren(static_cast<NodeType*>(root_ptr));
+    octree_.allocateChildren(static_cast<NodeType*>(octree_.getRoot()));
 }
 
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
-                   SensorT>::resetIntegrator(const Eigen::Vector3f& ray,
-                                             const Eigen::Isometry3f& T_WS,
+                   SensorT>::resetIntegrator(const RayMeasurement<SensorT>& ray_measurement,
                                              const timestamp_t timestamp,
                                              bool skip_ray)
 {
     // Check if ray is expected to add new information. From the angle between sequential rays we compute the
     // distance between two measurements and check if that is smaller than the voxel / block at the
     // current integration scale
+    const Eigen::Vector3f& ray = ray_measurement.ray_S;
+
     if (skip_ray) {
-        if ((ray - ray_).norm() < sqrt(3.0f) * map_res_) {
+        if ((ray - measurement_->ray_S).norm() < sqrt(3.0f) * map_res_) {
             // Make sure that measurements can only be jumped in case of not too large deltas
-            const float angle_to_prev_ray = std::acos(ray.normalized().dot(ray_.normalized()));
+            const float angle_to_prev_ray =
+                std::acos(ray.normalized().dot(measurement_->ray_S.normalized()));
             const float dist_to_prev_update = std::sin(angle_to_prev_ray) * ray.norm();
-            if (dist_to_prev_update
-                < map_res_ * scale::to_size(computed_integration_scale_)) {
+            if (dist_to_prev_update < map_res_ * scale::to_size(computed_integration_scale_)) {
                 return false;
             }
         }
     }
 
-    ray_ = ray;
+    measurement_ = &ray_measurement;
+    T_SW_ = ray_measurement.T_WS.inverse();
     ray_dist_ = ray.norm();
-    T_SW_ = T_WS.inverse();
     computed_integration_scale_ = 0;
     tau_ = compute_tau(ray_dist_, config_.tau_min, config_.tau_max, map_.getDataConfig());
     three_sigma_ =
@@ -80,31 +79,30 @@ template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
 void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
                    SensorT>::operator()()
 {
-    /// (0) Get Root Pointer
-    se::OctantBase* root_ptr = octree_.getRoot();
-
-    /// (2) Check validity of measured value (sensor near plane)
-    if (ray_dist_ < sensor_.near_plane) {
+    /// (1) Check validity of measured value (sensor near plane)
+    const SensorT& sensor = measurement_->sensor;
+    if (ray_dist_ < sensor.near_plane) {
         return;
     }
 
-    /// (3) Determine maximum update distance along the ray, cut to maximum of sensor range (far plane)
-    const Eigen::Vector3f ray_dir_S = ray_.normalized();
-    float max_update_dist = std::min(ray_dist_ + tau_, sensor_.far_plane);
-    float min_update_dist = sensor_.near_plane;
+    /// (2) Determine maximum update distance along the ray, cut to maximum of sensor range (far plane)
+    const Eigen::Vector3f ray_dir_S = measurement_->ray_S.normalized();
+    float max_update_dist = std::min(ray_dist_ + tau_, sensor.far_plane);
+    float min_update_dist = sensor.near_plane;
 
-    /// (4) Check if ray crosses map boundaries (Origin or measurement or both) are outside of the map
-    const Eigen::Isometry3f T_WS = T_SW_.inverse();
+    /// (3) Check if ray crosses map boundaries (Origin or measurement or both) are outside of the map
+    const Eigen::Isometry3f& T_WS = measurement_->T_WS;
     const Eigen::Vector3f ray_origin_in_W = T_WS.translation();
-    const Eigen::Vector3f ray_dir_in_W = T_WS.rotation() * ray_.normalized();
-    const Eigen::Vector3f ray_end_in_W = T_WS * ray_;
+    const Eigen::Vector3f ray_dir_in_W = T_WS.rotation() * ray_dir_S;
+    const Eigen::Vector3f ray_end_in_W = T_WS * measurement_->ray_S;
 
     const bool origin_in_map = map_.contains(ray_origin_in_W);
     const bool measurement_in_map = map_.contains(ray_end_in_W);
 
-    if(!origin_in_map || (origin_in_map && !measurement_in_map)){
+    if (!origin_in_map || (origin_in_map && !measurement_in_map)) {
         // The ray is crossing a map boundary, determine crossing points
-        se::VoxelBlockRayIterator<MapType> rayIterator(map_, ray_origin_in_W, ray_dir_in_W, sensor_.near_plane, sensor_.far_plane);
+        se::VoxelBlockRayIterator<MapType> rayIterator(
+            map_, ray_origin_in_W, ray_dir_in_W, sensor.near_plane, sensor.far_plane);
         const float tmax = rayIterator.tmax();
         const float tmin = rayIterator.tmin();
         if (tmax < tmin) {
@@ -113,24 +111,24 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         }
 
         // tmax: Exit point of ray
-        if (tmax == sensor_.far_plane) {
+        if (tmax == sensor.far_plane) {
             // Map boundary where ray exits is further than far plane
-            max_update_dist = sensor_.far_plane; // this should be already implicitly handled
+            max_update_dist = sensor.far_plane; // this should be already implicitly handled
         }
-        else if (tmax < sensor_.far_plane) {
+        else if (tmax < sensor.far_plane) {
             // Map boundary between near and far plane, restrict update distance to tmax
             max_update_dist = tmax;
         }
 
         // Handle Cases with origin outside of map -> tmin: entrance point
         if (!origin_in_map) {
-            if (tmin > sensor_.near_plane) {
+            if (tmin > sensor.near_plane) {
                 // Ray enteres cube at distance tmin
                 min_update_dist = tmin;
             }
-            else if (tmin == sensor_.near_plane) {
+            else if (tmin == sensor.near_plane) {
                 // Origin closer to map than near plane: "entry point" will be inside map
-                min_update_dist = sensor_.near_plane; // this should be already implicitly handled
+                min_update_dist = sensor.near_plane; // this should be already implicitly handled
             }
         }
     }
@@ -148,21 +146,19 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         Eigen::Vector3i voxel_coord;
         if (!map_.template pointToVoxel<se::Safe::On>(r_i_W, voxel_coord)) {
             // Outside Map, before we had a break, now we have to check when we are getting into the map
-            r_i_S -=
-                0.5 * map_res_ * scale::to_size(free_space_scale_) * ray_dir_S;
+            r_i_S -= 0.5 * map_res_ * scale::to_size(free_space_scale_) * ray_dir_S;
             continue;
             // break;
         }
 
         if (voxel_coord == last_visited_voxel_) {
             // can jump to next sample
-            r_i_S -=
-                0.5 * map_res_ * scale::to_size(computed_integration_scale_) * ray_dir_S;
+            r_i_S -= 0.5 * map_res_ * scale::to_size(computed_integration_scale_) * ray_dir_S;
             continue;
         }
         last_visited_voxel_ = voxel_coord;
 
-        if ((*this)(r_i_S, voxel_coord, ray_state, root_ptr)) {
+        if ((*this)(r_i_S, voxel_coord, ray_state, octree_.getRoot())) {
             r_i_S -= 0.5 * map_res_ * scale::to_size(computed_integration_scale_) * ray_dir_S;
             // Nothing else to do...
         }
@@ -207,13 +203,11 @@ se::RayState RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::M
 
 
 template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
-template<class SensorTDummy>
-typename std::enable_if_t<std::is_same<SensorTDummy, se::Lidar>::value, bool>
-RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
-              SensorT>::operator()(const Eigen::Vector3f& ray_sample,
-                                   const Eigen::Vector3i& voxel_coord,
-                                   se::RayState rayState,
-                                   se::OctantBase* octant_ptr)
+bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSize>,
+                   SensorT>::operator()(const Eigen::Vector3f& ray_sample,
+                                        const Eigen::Vector3i& voxel_coord,
+                                        se::RayState rayState,
+                                        se::OctantBase* octant_ptr)
 {
     /// (1.a) Determine closest currently allocated octant
     se::OctantBase* finest_octant_ptr = se::fetcher::finest_octant<OctreeType>(
@@ -233,7 +227,7 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
         const Eigen::Vector3i block_coord = block_ptr->coord;
         Eigen::Vector3f block_centre_point_W;
         map_.voxelToPoint(block_coord, block_size, block_centre_point_W);
-        const Eigen::Vector3f block_centre_point_C = T_SW_ * block_centre_point_W;
+        const Eigen::Vector3f block_centre_point_S = T_SW_ * block_centre_point_W;
 
         // Determine Integration Scale
         int computed_integration_scale;
@@ -241,13 +235,19 @@ RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, BlockSi
             // The block has been already updated, do the free space update at its
             // current scale.
             computed_integration_scale = block_ptr->current_scale;
-        } else {
-            computed_integration_scale = sensor_.blockIntegrationScale(
-                block_centre_point_C, map_res_, last_scale, block_ptr->min_scale, block_ptr->max_scale);
+        }
+        else {
+            computed_integration_scale =
+                measurement_->sensor.blockIntegrationScale(block_centre_point_S,
+                                                           map_res_,
+                                                           last_scale,
+                                                           block_ptr->min_scale,
+                                                           block_ptr->max_scale);
             if (rayState == se::RayState::FreeSpace) {
                 // The block hasn't been updated before, update as free at a
                 // scale no finer than free_space_scale_.
-                computed_integration_scale = std::max(free_space_scale_, computed_integration_scale);
+                computed_integration_scale =
+                    std::max(free_space_scale_, computed_integration_scale);
             }
         }
 
@@ -342,7 +342,8 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
     DataType* data_at_scale = block_ptr->dataAtScale(integration_scale);
     auto& voxel_data = data_at_scale[voxel_idx];
     float range_diff = sample_dist - ray_dist_;
-    ray_integrator::update_voxel(voxel_data, range_diff, tau_, three_sigma_, map_.getDataConfig());
+    ray_integrator::update_voxel(
+        voxel_data, range_diff, *measurement_, tau_, three_sigma_, map_.getDataConfig());
 }
 
 

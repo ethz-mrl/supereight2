@@ -7,6 +7,7 @@
 #ifndef SE_RAY_INTEGRATOR_CORE_HPP
 #define SE_RAY_INTEGRATOR_CORE_HPP
 
+#include <se/integrator/measurement.hpp>
 #include <se/map/octant/octant.hpp>
 
 namespace se {
@@ -23,9 +24,10 @@ namespace ray_integrator {
  *
  * \return True/false if the node has been observed the first time
  */
-template<typename DataT, typename ConfigT>
+template<typename DataT, typename ConfigT, typename SensorT>
 bool update_voxel(DataT& data,
                   const float range_diff,
+                  const RayMeasurement<SensorT>& measurement,
                   const float tau,
                   const float three_sigma,
                   const ConfigT config);

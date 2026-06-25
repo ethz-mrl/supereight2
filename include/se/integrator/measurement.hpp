@@ -53,9 +53,24 @@ struct Measurements {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
+template<typename SensorT>
+struct RayMeasurement {
+    const SensorT& sensor;
+    Eigen::Isometry3f T_WS;
+    Eigen::Vector3f ray_S;
+    std::optional<id_t> id = std::nullopt;
+    std::optional<colour_t> colour = std::nullopt;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
 // Deduction guides to allow template argument deduction from aggregate initialization. They also
 // allow aggregate initialization of std::optional<se::Measurement> members from se::Measurement.
 // https://en.cppreference.com/w/cpp/language/class_template_argument_deduction#User-defined_deduction_guides
+
+template<typename SensorT>
+RayMeasurement(SensorT&, Eigen::Isometry3f, Eigen::Vector3f) -> RayMeasurement<SensorT>;
+
 template<typename SensorT>
 Measurements(const Measurement<SensorT, float>&) -> Measurements<SensorT>;
 

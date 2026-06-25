@@ -12,9 +12,10 @@ namespace se {
 
 namespace ray_integrator {
 
-template<typename DataT, typename ConfigT>
+template<typename DataT, typename ConfigT, typename SensorT>
 bool update_voxel(DataT& data,
                   const float range_diff,
+                  const RayMeasurement<SensorT>& measurement,
                   const float tau,
                   const float three_sigma,
                   const ConfigT config)
@@ -40,6 +41,17 @@ bool update_voxel(DataT& data,
 
     const bool newly_observed = !data.field.observed;
     data.field.update(sample_value, config.field.max_weight);
+    if constexpr (DataT::col_ == Colour::On) {
+        if (measurement.colour) {
+            data.colour.update(*(measurement.colour), config.field.max_weight);
+        }
+    }
+
+    if constexpr (DataT::id_ == Id::On) {
+        if (measurement.id) {
+            data.id.update(*(measurement.id));
+        }
+    }
     return newly_observed;
 }
 
@@ -228,8 +240,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
 
 
                         } // i
-                    }     // j
-                }         // k
+                    } // j
+                } // k
 
                 if (data_count > 0) {
                     parent_data.field.occupancy = mean_occupancy / data_count;
@@ -249,8 +261,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                 }
 
             } // x
-        }     // y
-    }         // z
+        } // y
+    } // z
 
 
 
@@ -331,8 +343,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                                 }
 
                             } // i
-                        }     // j
-                    }         // k
+                        } // j
+                    } // k
 
                     if (data_count > 0) {
                         parent_data.field.occupancy = mean_occupancy / data_count;
@@ -353,8 +365,8 @@ void propagate_block_to_scale(se::OctantBase* octant_ptr, int desired_scale)
                     }
 
                 } // x
-            }     // y
-        }         // z
+            } // y
+        } // z
     }
 }
 
@@ -417,11 +429,11 @@ void propagate_block_down_to_scale(se::OctantBase* octant_ptr, int desired_scale
                                 // block.setData(child_data_idx,child_data); ToDo: check but this should not be needed
 
                             } // i
-                        }     // j
-                    }         // k
-                }             // x
-            }                 // y
-        }                     // z
+                        } // j
+                    } // k
+                } // x
+            } // y
+        } // z
         current_scale--;
     }
 }

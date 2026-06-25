@@ -34,14 +34,12 @@ struct IntegrateDepthImplD {
 template<se::Field FldT, se::Res ResT>
 struct IntegrateRayBatchImplD {
     template<typename SensorT, typename MapT>
-    static void integrate(
-        MapT& map,
-        const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch,
-        const timestamp_t timestamp,
-        std::unordered_set<const OctantBase*>* const updated_octants);
+    static void
+    integrate(MapT& map,
+              const std::vector<RayMeasurement<SensorT>,
+                                Eigen::aligned_allocator<RayMeasurement<SensorT>>>& rayPoseBatch,
+              const timestamp_t timestamp,
+              std::unordered_set<const OctantBase*>* const updated_octants);
 };
 
 
@@ -137,24 +135,21 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
 template<>
 struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     template<typename SensorT, typename MapT>
-    static void integrate(
-        MapT& map,
-        const SensorT& sensor,
-        const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                          Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
-            rayPoseBatch,
-        const timestamp_t timestamp,
-        std::unordered_set<const OctantBase*>* const updated_octants)
+    static void
+    integrate(MapT& map,
+              const std::vector<RayMeasurement<SensorT>,
+                                Eigen::aligned_allocator<RayMeasurement<SensorT>>>& rayPoseBatch,
+              const timestamp_t timestamp,
+              std::unordered_set<const OctantBase*>* const updated_octants)
     {
         se::RayIntegrator<MapT, SensorT> rayIntegrator(
-            map, sensor, rayPoseBatch[0].second, rayPoseBatch[0].first, timestamp, updated_octants);
+            map, rayPoseBatch[0], timestamp, updated_octants);
 
         // do downsampling
         for (size_t i = 0; i < rayPoseBatch.size(); i++) {
             TICK("Ray Integration")
             TICK("allocation-integration")
-            if (rayIntegrator.resetIntegrator(
-                    rayPoseBatch[i].second, rayPoseBatch[i].first, timestamp)) {
+            if (rayIntegrator.resetIntegrator(rayPoseBatch[i], timestamp)) {
                 rayIntegrator();
             }
             TOCK("allocation-integration")
@@ -205,14 +200,12 @@ template<typename MapT>
 template<typename SensorT>
 void MapIntegrator<MapT>::integrateRayBatch(
     const timestamp_t timestamp,
-    const std::vector<std::pair<Eigen::Isometry3f, Eigen::Vector3f>,
-                      Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>&
+    const std::vector<RayMeasurement<SensorT>, Eigen::aligned_allocator<RayMeasurement<SensorT>>>&
         rayPoseBatch,
-    const SensorT& sensor,
     std::unordered_set<const OctantBase*>* const updated_octants)
 {
     se::details::IntegrateRayBatchImpl<MapT>::integrate(
-        map_, sensor, rayPoseBatch, timestamp, updated_octants);
+        map_, rayPoseBatch, timestamp, updated_octants);
 }
 
 

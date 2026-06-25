@@ -39,6 +39,10 @@ int main(int argc, char** argv)
                     Eigen::aligned_allocator<std::pair<Eigen::Isometry3f, Eigen::Vector3f>>>
             ray_pose_batch;
 
+        std::vector<se::RayMeasurement<se::Lidar>,
+                    Eigen::aligned_allocator<se::RayMeasurement<se::Lidar>>>
+            input_ray_pose_batch;
+
         // ========= Map INITIALIZATION  =========
         // Setup the single-res TSDF map w/ default block size of 8 voxels
         // Custom way of setting up the same map:
@@ -83,12 +87,17 @@ int main(int argc, char** argv)
             for (size_t i = 0; i < ray_pose_batch.size(); i++) {
                 ray_pose_batch[i].first = ray_pose_batch[i].first * T_BS;
             }
+
+            for (size_t i = 0; i < ray_pose_batch.size(); i++) {
+                input_ray_pose_batch.push_back(se::RayMeasurement<se::Lidar>{
+                    sensor, ray_pose_batch[i].first, ray_pose_batch[i].second});
+            }
             TOCK("read")
 
             // Integrate depth for a given sensor, depth image, pose and frame number
             TICK("integration")
             if (frame % config.app.integration_rate == 0) {
-                integrator.integrateRayBatch(frame, ray_pose_batch, sensor);
+                integrator.integrateRayBatch(frame, input_ray_pose_batch);
             }
             TOCK("integration")
 

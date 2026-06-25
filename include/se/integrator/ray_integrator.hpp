@@ -19,11 +19,9 @@ template<typename MapT, typename SensorT>
 class RayIntegrator {
     public:
     RayIntegrator(MapT& /* map */,
-                  const SensorT& /* sensor */,
-                  const Eigen::Vector3f& /*ray*/,
-                  const Eigen::Isometry3f& /* T_SW need Lidar frame?*/,
+                  const RayMeasurement<SensorT>& /*ray_measurement*/,
                   const timestamp_t /* timestamp */,
-                  std::unordered_set<const OctantBase*>* const /*updated_octants = nullptr*/) {};
+                  std::unordered_set<const OctantBase*>* const /*updated_octants = nullptr*/){};
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -69,9 +67,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     * \param[in]  timestamp            The timestamp of the ray to be integrated.
     */
     RayIntegrator(MapType& map,
-                  const SensorT& sensor,
-                  const Eigen::Vector3f& ray,
-                  const Eigen::Isometry3f& T_WS,
+                  const RayMeasurement<SensorT>& ray_measurement,
                   const timestamp_t timestamp,
                   std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
 
@@ -85,8 +81,7 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
      *
      * \return False if ray should be skipped. Otherwise true
      */
-    bool resetIntegrator(const Eigen::Vector3f& ray,
-                         const Eigen::Isometry3f& T_WS,
+    bool resetIntegrator(const RayMeasurement<SensorT>& ray_measurement,
                          const timestamp_t timestamp,
                          bool skip_check = false);
 
@@ -130,12 +125,10 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     * \param[in] octant_ptr     Starting point for tree traversal
     * \return False if ray-casting can be terminated (e.g. in case a large free-space leaf node is traversed). True otherwise.
     */
-    template<class SensorTDummy = SensorT>
-    typename std::enable_if_t<std::is_same<SensorTDummy, se::Lidar>::value, bool>
-    operator()(const Eigen::Vector3f& ray_sample,
-               const Eigen::Vector3i& voxel_coord,
-               se::RayState rayState,
-               se::OctantBase* octant_ptr);
+    bool operator()(const Eigen::Vector3f& ray_sample,
+                    const Eigen::Vector3i& voxel_coord,
+                    se::RayState rayState,
+                    se::OctantBase* octant_ptr);
 
 
     /**
@@ -149,17 +142,17 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
 
     MapType& map_;
     OctreeType& octree_;
-    const SensorT& sensor_;
 
     std::vector<std::set<se::OctantBase*>> node_set_;
     std::vector<se::OctantBase*> updated_blocks_vector_;
-    std::unordered_set<se::OctantBase*> updated_blocks_set_; // This set is to keep track of blocks that need to be up-propagated
+    std::unordered_set<se::OctantBase*>
+        updated_blocks_set_; // This set is to keep track of blocks that need to be up-propagated
     std::unordered_set<const se::OctantBase*>* updated_octants_ = nullptr;
     RayIntegratorConfig config_;
 
-    Eigen::Isometry3f T_SW_;
-    Eigen::Vector3f ray_;
+    const RayMeasurement<SensorT>* measurement_;
     Eigen::Vector3i last_visited_voxel_;
+    Eigen::Isometry3f T_SW_;
 
     const float map_res_;
 
