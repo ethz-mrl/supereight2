@@ -398,6 +398,134 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
     ray_integrator::propagate_to_parent_node<NodeType, BlockType>(octree_.getRoot(), timestamp_);
 }
 
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+RayIntegrator<Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize>,
+              SensorT>::RayIntegrator(MapType& map,
+                                      const RayMeasurement<SensorT>& ray_measurement,
+                                      const timestamp_t timestamp,
+                                      std::unordered_set<const OctantBase*>* const
+                                          updated_octants) :
+        map_(map),
+        octree_(map.getOctree()),
+        node_set_(octree_.getBlockDepth()),
+        updated_octants_(updated_octants),
+        config_(map),
+        measurement_(&ray_measurement),
+        map_res_(map.getRes()),
+        timestamp_(timestamp),
+        ray_dist_(ray_measurement.ray_S.norm())
+{
+    octree_.allocateChildren(static_cast<NodeType*>(octree_.getRoot()));
+}
+
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool RayIntegrator<Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize>,
+                   SensorT>::resetIntegrator(const RayMeasurement<SensorT>& ray_measurement,
+                                             const timestamp_t timestamp)
+{
+    if (timestamp < timestamp_) {
+        return false;
+    }
+    measurement_ = &ray_measurement;
+    timestamp_ = timestamp;
+    has_colour_ = ColB == Colour::On && measurement_->colour;
+    has_id_ = IdB == Id::On && measurement_->id;
+    return true;
+}
+
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool RayIntegrator<Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize>,
+                   SensorT>::operator()()
+{
+    const Eigen::Vector3f ray_W = measurement_->T_WS * measurement_->ray_S;
+    ray_dir_W_ = ray_W.normalized();
+
+    // Transformation from the octree frame V (in voxels) to the sensor frame C (in meters).
+    const Eigen::Affine3f T_CV = measurement_->T_WS.inverse() * map_.getTWM()
+        * Eigen::Scaling(map_.getRes()) * Eigen::Translation3f(g_sample_offset);
+    const float measurement_distance = ray_W.norm();
+
+
+    const float step_dist = map_.getRes() / 2.0f;
+    const int num_steps = config_.truncation_boundary / step_dist;
+    Eigen::Vector3i voxel_coord;
+    std::vector<se::OctantBase*> block_ptrs;
+    for (int i = -num_steps; i <= num_steps; i++) {
+        const Eigen::Vector3f integration_point = ray_W + i * step_dist * ray_dir_W_;
+
+        if (map_.template pointToVoxel<se::Safe::On>(integration_point, voxel_coord)) {
+            se::OctantBase* octant_ptr =
+                se::fetcher::block<OctreeType>(voxel_coord, octree_.getRoot());
+            if (octant_ptr == nullptr) {
+                se::key_t voxel_key;
+                se::keyops::encode_key(voxel_coord, octree_.max_block_scale, voxel_key);
+                octant_ptr = se::allocator::block(voxel_key, octree_, octree_.getRoot());
+            }
+
+            //Now, we do the actual data update
+            updateBlock(octant_ptr, voxel_coord, T_CV, measurement_distance);
+            block_ptrs.push_back(octant_ptr);
+        }
+    }
+
+    propagator::propagateTimeStampToRoot(block_ptrs);
+    return true;
+}
+
+
+
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+bool RayIntegrator<Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize>,
+                   SensorT>::updateBlock(se::OctantBase* block_ptr,
+                                         Eigen::Vector3i& voxel_coord,
+                                         const Eigen::Affine3f T_CV,
+                                         const float measurement_distance)
+{
+    assert(block_ptr);
+    assert(block_ptr->is_block);
+    auto& block = *static_cast<BlockType*>(block_ptr);
+    block.timestamp = timestamp_;
+
+    // Compute the coordinates of the voxel sample position in the sensor frame.
+    const Eigen::Vector3f point_C = T_CV * voxel_coord.cast<float>();
+    const float voxel_distance = ray_dir_W_.dot(point_C);
+
+    if (voxel_distance > measurement_->sensor->far_plane
+        || voxel_distance < measurement_->sensor->near_plane) {
+        return false;
+    }
+
+    const field_t sdf_value = measurement_distance - voxel_distance;
+
+    DataType& data = block.data(voxel_coord);
+    const bool field_updated = data.field.update(
+        sdf_value, config_.truncation_boundary, map_.getDataConfig().field.max_weight);
+
+    if (updated_octants_ && field_updated) {
+        updated_octants_->insert(block_ptr);
+    }
+
+    // Update the colour data if possible and only if the field was updated, that is
+    // if we have corresponding depth information.
+    if constexpr (ColB == Colour::On) {
+        if (has_colour_ && field_updated) {
+            data.colour.update(measurement_->colour.value(), map_.getDataConfig().field.max_weight);
+        }
+    }
+
+
+    // Update the identifier data if possible and only if the field was updated, that
+    // is if we have corresponding depth information.
+    if constexpr (IdB == Id::On) {
+        if (has_id_ && field_updated) {
+            data.id.update(measurement_->id.value(), map_.getDataConfig().field.max_weight);
+        }
+    }
+
+    return true;
+}
+
+
 } // namespace se
 
 #endif //SE_RAY_INTEGRATOR_IMPL_HPP

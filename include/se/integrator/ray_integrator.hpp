@@ -8,6 +8,7 @@
 #define SE_RAY_INTEGRATOR_HPP
 
 #include <se/integrator/ray_integrator_core.hpp>
+#include <se/map/octree/propagator.hpp>
 #include <set>
 #include <unordered_set>
 
@@ -164,6 +165,95 @@ class RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, B
     float ray_dist_ = 0.;
     float tau_ = 0.;
     float three_sigma_ = 0.;
+};
+
+
+template<se::Colour ColB, se::Id IdB, int BlockSize, typename SensorT>
+class RayIntegrator<Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize>, SensorT> {
+    public:
+    typedef Map<Data<se::Field::TSDF, ColB, IdB>, se::Res::Single, BlockSize> MapType;
+    typedef typename MapType::DataType DataType;
+    typedef typename MapType::OctreeType OctreeType;
+    typedef typename MapType::NodeType NodeType;
+    typedef typename MapType::BlockType BlockType;
+
+    /**
+    * \brief The config file of the single ray carver
+    *
+    * \param[in] map   The map to allocate the ray in
+    */
+    struct RayIntegratorConfig {
+        RayIntegratorConfig(const MapType& map) :
+                truncation_boundary(map.getDataConfig().field.truncation_boundary_factor
+                                    * map.getRes())
+        {
+        }
+
+        const float truncation_boundary;
+    };
+
+
+    /**
+    * \brief Setup the single ray carver.
+    *
+    * \param[in]  map                  The reference to the map to be updated.
+    * \param[in]  sensor               The sensor model.
+    * \param[in]  ray                  The ray to be integrated.
+    * \param[in]  T_WS                 The transformation from sensor to world frame.
+    * \param[in]  timestamp            The timestamp of the ray to be integrated.
+    */
+    RayIntegrator(MapType& map,
+                  const RayMeasurement<SensorT>& ray_measurement,
+                  const timestamp_t timestamp,
+                  std::unordered_set<const OctantBase*>* const updated_octants = nullptr);
+
+    /**
+     * \brief Reset ray, pose and timestamp for the integrator
+     *
+     * \param[in] ray           The new ray measurement
+     * \param[in] T_WS          The corresponding pose
+     * \param[in] timestamp     The ray timestamp
+     *
+     */
+    bool resetIntegrator(const RayMeasurement<SensorT>& ray_measurement,
+                         const timestamp_t timestamp);
+
+    /**
+     * \brief Allocate and update along the ray using a step size depending on the chosen resolution.
+     * The resolution is chosen based on the angle between neighboring Lidar rays.
+     * Up and down-propagation needed for immediate update is done on-the-fly.
+     */
+    bool operator()();
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+    private:
+    /**
+     * Update Operations
+     */
+
+    bool updateBlock(se::OctantBase* block_ptr,
+                     Eigen::Vector3i& voxel_coord,
+                     const Eigen::Affine3f T_CV,
+                     const float measurement_distance);
+
+    MapType& map_;
+    OctreeType& octree_;
+    std::vector<std::set<se::OctantBase*>> node_set_;
+    std::unordered_set<const se::OctantBase*>* updated_octants_ = nullptr;
+    RayIntegratorConfig config_;
+
+    const RayMeasurement<SensorT>* measurement_;
+    Eigen::Vector3f ray_dir_W_;
+
+    const float map_res_;
+
+    timestamp_t timestamp_;
+    float ray_dist_ = 0.;
+
+    //Members to cache if colour or id has to be integrated
+    bool has_colour_;
+    bool has_id_;
 };
 
 } // namespace se

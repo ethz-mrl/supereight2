@@ -273,3 +273,165 @@ TEST(RayIntegrator, Propagation)
     }
     std::cout << "Checked " << counter << " blocks." << std::endl;
 }
+
+
+TEST(RayIntegrator, MultiRayTSDF)
+{
+    // Temporary directory for test results
+    const std::string tmp_ = stdfs::temp_directory_path() / stdfs::path("supereight_test_results");
+    stdfs::create_directories(tmp_);
+
+    /**
+   * Create plane wall example
+   */
+    const float elevation_min = -15.0f;
+    const float elevation_max = 15.0f;
+    const float azimuth_min = -15.0f;
+    const float azimuth_max = 15.0f;
+    // angular resolution [degree]
+    const float elevation_res = .1f;
+    const float azimuth_res = .1f;
+    // conversion degree <-> rad
+    constexpr float deg_to_rad = M_PI / 180.0f;
+    // distance of plane wall [m]
+    float d = 10.0f;
+
+    // ========= Sensor INITIALIZATION  =========
+    se::Lidar::Config sensorConfig;
+    sensorConfig.width = 360;
+    sensorConfig.height = 180;
+    sensorConfig.near_plane = 0.6f;
+    sensorConfig.far_plane = 30.0f;
+    sensorConfig.T_BS = Eigen::Isometry3f::Identity();
+    sensorConfig.elevation_resolution_angle_ = static_cast<float>(elevation_res);
+    sensorConfig.azimuth_resolution_angle_ = static_cast<float>(azimuth_res);
+
+    //se::Lidar::Config sensorConfig(se_config.sensor);
+    const se::Lidar sensor(sensorConfig);
+
+
+
+    std::vector<se::RayMeasurement<se::Lidar>,
+                Eigen::aligned_allocator<se::RayMeasurement<se::Lidar>>>
+        rayBatch;
+    size_t num_points_elevation = std::floor((elevation_max - elevation_min) / elevation_res);
+    size_t num_points_azimuth = std::floor((azimuth_max - azimuth_min) / azimuth_res);
+
+    float elevation_angle = elevation_min;
+    float azimuth_angle = azimuth_min;
+    float x, y, z;
+    x = d;
+    for (size_t i = 0; i < num_points_elevation; i++) {
+        z = d * tan(elevation_angle * deg_to_rad);
+        for (size_t j = 0; j < num_points_azimuth; j++) {
+            y = d * tan(azimuth_angle * deg_to_rad);
+            // save point
+            rayBatch.push_back(se::RayMeasurement<se::Lidar>{
+                &sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
+            // increase azimuth angle
+            azimuth_angle += azimuth_res;
+        }
+        azimuth_angle = azimuth_min;
+        //increase elevation angle
+        elevation_angle += elevation_res;
+    }
+
+    rayBatch.push_back(se::RayMeasurement<se::Lidar>{
+        &sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, 0, 0)});
+
+    // ========= Map INITIALIZATION  =========
+    const float res = 0.05f;
+    const float dim = 25.6f;
+    se::TSDFMap<> map(Eigen::Vector3f::Constant(dim), res);
+
+    // ========= Integrator INITIALIZATION  =========
+    se::MapIntegrator integrator(map);
+
+    // ========= Integration (Batched)
+    std::unordered_set<const se::OctantBase*> updated_octants;
+    integrator.integrateRayBatch(0, rayBatch, &updated_octants);
+    std::cout << "Number of updated octants: " << updated_octants.size() << std::endl;
+    // Un-Comment if needed for debugging
+    map.getOctree().saveStructure(tmp_ + "/batch_ray_structure.ply");
+    map.getOctree().saveMesh(tmp_ + "/batch_ray_mesh.ply");
+
+    std::queue<const se::TSDFMap<>::NodeType*> nodes;
+    std::queue<const se::TSDFMap<>::BlockType*> blocks;
+    const se::TSDFMap<>::NodeType* const root =
+        static_cast<const se::TSDFMap<>::NodeType*>(map.getOctree().getRoot());
+    ASSERT_TRUE(root);
+    nodes.push(root);
+
+    // Traverse the octree breadth-first from the root and test propagation at the node level.
+    int counter = 0;
+    while (!nodes.empty()) {
+        counter++;
+        const se::TSDFMap<>::NodeType* const node = nodes.front();
+        nodes.pop();
+        // Test the data of all children are within the minimum and maximum data of the parent.
+        for (int child_idx = 0; child_idx < 8; child_idx++) {
+            const se::OctantBase* const child = node->getChild(child_idx);
+            if (child) {
+                // Get the child min/max data and add it to the appropriate traversal queue.
+                if (child->is_block) {
+                    blocks.push(static_cast<const se::TSDFMap<>::BlockType*>(child));
+                }
+                else {
+                    nodes.push(static_cast<const se::TSDFMap<>::NodeType*>(child));
+                }
+            }
+        }
+    }
+    std::cout << "Checked " << counter << " nodes." << std::endl;
+    std::cerr << "The TSDF truncation is "
+              << map.getDataConfig().field.truncation_boundary_factor * map.getRes() << std::endl;
+    counter = 0;
+    // Test propagation within blocks.
+    while (!blocks.empty()) {
+        counter++;
+        const se::TSDFMap<>::BlockType* const block = blocks.front();
+        blocks.pop();
+        // Test each voxel for all scales except the finest.
+        int scale = block->current_scale;
+        const int stride = se::scale::to_size(scale);
+        for (int z = 0; z < block->size; z += stride) {
+            for (int y = 0; y < block->size; y += stride) {
+                for (int x = 0; x < block->size; x += stride) {
+                    const Eigen::Vector3i voxel_coord = block->coord + Eigen::Vector3i(x, y, z);
+                    auto data = block->data(voxel_coord);
+                    if (data.field.weight >= 1.0) {
+                        ASSERT_TRUE(std::abs(data.field.tsdf) <= se::field_t(1));
+                    }
+                }
+            }
+        }
+    }
+    std::cout << "Checked " << counter << " blocks." << std::endl;
+
+    //Now, we want to query the Lidar point that did a straight line, compute in which voxel the surface was and see if the TSDFs are correct
+    Eigen::Vector3f centerPoint(x, 0, 0);
+    //Since we have the point at a distance x, this is not necessarily on the voxel center but it can have an offset. We will calculate it.
+    //we will calculate the voxel coordinate first:
+
+    Eigen::Vector3i voxelCoord;
+    map.pointToVoxel<se::Safe::On>(centerPoint, voxelCoord);
+
+    Eigen::Vector3f pointVoxelCenter;
+    map.voxelToPoint(voxelCoord, pointVoxelCenter);
+
+    Eigen::Vector3f rayDir(1, 0, 0);
+    Eigen::Vector3f projectedVoxelToRay = pointVoxelCenter.dot(rayDir) * rayDir;
+
+    float tsdf = (centerPoint - projectedVoxelToRay).norm();
+
+    //Now we will query the voxel point
+    auto data = map.getData(centerPoint);
+
+    /* Since we are doing multiple-ray integration, and depending on the ray elevation the TSDF for hte same voxel might slightly vary
+    we can not directly use the ASSERT_FLOAT_EQ test here. This is becuase our ground-truth tsdf is computed by taking into account just one 
+    ray and not all rays being integrated. The absolute error I allow is of 0.0001, but the ASSERT_FLOAT_EQ has an accepted error of 4ULPs
+    */
+    EXPECT_NEAR(tsdf / (map.getDataConfig().field.truncation_boundary_factor * map.getRes()),
+                data.field.tsdf,
+                0.0001);
+}

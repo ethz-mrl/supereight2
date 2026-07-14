@@ -165,6 +165,35 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
     }
 };
 
+/**
+ * Multi-res OFusion integration helper struct for partial function specialisation
+ */
+template<>
+struct IntegrateRayBatchImplD<se::Field::TSDF, se::Res::Single> {
+    template<typename SensorT, typename MapT>
+    static void
+    integrate(MapT& map,
+              const std::vector<RayMeasurement<SensorT>,
+                                Eigen::aligned_allocator<RayMeasurement<SensorT>>>& rayPoseBatch,
+              const timestamp_t timestamp,
+              std::unordered_set<const OctantBase*>* const updated_octants)
+    {
+        se::RayIntegrator<MapT, SensorT> rayIntegrator(
+            map, rayPoseBatch[0], timestamp, updated_octants);
+
+        // do downsampling
+        for (size_t i = 0; i < rayPoseBatch.size(); i++) {
+            TICK("Ray Integration")
+            TICK("allocation-integration")
+            if (rayIntegrator.resetIntegrator(rayPoseBatch[i], timestamp)) {
+                rayIntegrator();
+            }
+            TOCK("allocation-integration")
+            TOCK("Ray Integration")
+        }
+    }
+};
+
 
 template<typename MapT>
 using IntegrateDepthImpl = IntegrateDepthImplD<MapT::fld_, MapT::res_>;
