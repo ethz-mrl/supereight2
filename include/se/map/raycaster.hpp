@@ -24,12 +24,12 @@
 namespace se {
 namespace raycaster {
 
-void point_cloud_to_normal(se::Image<Eigen::Vector3f>& normals,
-                           const se::Image<Eigen::Vector3f>& point_cloud,
+void point_cloud_to_normal(Image<Eigen::Vector3f>& normals,
+                           const Image<Eigen::Vector3f>& point_cloud,
                            const bool is_lhc = false);
 
 template<typename MapT>
-inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
+inline typename std::enable_if_t<MapT::fld_ == Field::Occupancy, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
         const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
@@ -41,7 +41,7 @@ raycast(MapT& map,
         const float largestep);
 
 template<typename MapT>
-inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
+inline typename std::enable_if_t<MapT::fld_ == Field::TSDF, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
         const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
@@ -56,11 +56,11 @@ template<typename MapT, typename SensorT>
 void raycast_volume(const MapT& map,
                     const SensorT& sensor,
                     const Eigen::Isometry3f& T_WS,
-                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                    se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale,
-                    se::Image<colour_t>* surface_colour = nullptr,
-                    se::Image<id_t>* surface_id = nullptr);
+                    Image<Eigen::Vector3f>& surface_point_cloud_W,
+                    Image<Eigen::Vector3f>& surface_normals_W,
+                    Image<int8_t>& surface_scale,
+                    Image<colour_t>* surface_colour = nullptr,
+                    Image<id_t>* surface_id = nullptr);
 
 /** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render.
  * The colour of each point is returned by the functor \p get_diffuse_colour which must have the
@@ -79,9 +79,9 @@ void raycast_volume(const MapT& map,
  * containing only ambient and diffuse components (no specular component.
  */
 template<typename GetDiffuseColourF>
-void render_volume(se::Image<RGBA>& render,
-                   const se::Image<Eigen::Vector3f>& surface_points_W,
-                   const se::Image<Eigen::Vector3f>& surface_normals_W,
+void render_volume(Image<RGBA>& render,
+                   const Image<Eigen::Vector3f>& surface_points_W,
+                   const Image<Eigen::Vector3f>& surface_normals_W,
                    const GetDiffuseColourF get_diffuse_colour,
                    const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                    const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
@@ -89,10 +89,10 @@ void render_volume(se::Image<RGBA>& render,
 /** Render the surface represented by \p surface_points_W and \p surface_normals_W into \p render,
  * coloured using the scale from \p surface_scale. Lighting is as in se::raycaster::render_volume().
  */
-void render_volume_scale(se::Image<RGBA>& render,
-                         const se::Image<Eigen::Vector3f>& surface_points_W,
-                         const se::Image<Eigen::Vector3f>& surface_normals_W,
-                         const se::Image<int8_t>& surface_scale,
+void render_volume_scale(Image<RGBA>& render,
+                         const Image<Eigen::Vector3f>& surface_points_W,
+                         const Image<Eigen::Vector3f>& surface_normals_W,
+                         const Image<int8_t>& surface_scale,
                          const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                          const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
 
@@ -100,10 +100,10 @@ void render_volume_scale(se::Image<RGBA>& render,
  * coloured using the colours from \p surface_colour. Lighting is as in
  * se::raycaster::render_volume().
  */
-void render_volume_colour(se::Image<RGBA>& render,
-                          const se::Image<Eigen::Vector3f>& surface_points_W,
-                          const se::Image<Eigen::Vector3f>& surface_normals_W,
-                          const se::Image<RGB>& surface_colour,
+void render_volume_colour(Image<RGBA>& render,
+                          const Image<Eigen::Vector3f>& surface_points_W,
+                          const Image<Eigen::Vector3f>& surface_normals_W,
+                          const Image<RGB>& surface_colour,
                           const Eigen::Vector3f& light_source_W = Eigen::Vector3f::Zero(),
                           const RGB ambient_light = RGB{0x1A, 0x1A, 0x1A});
 

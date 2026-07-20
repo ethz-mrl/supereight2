@@ -30,15 +30,15 @@ namespace raycaster {
  * \return True if valid point could be found before reaching t_max. False otherwise.
  */
 template<typename MapT>
-inline std::optional<se::field_t> find_valid_point(const MapT& map,
-                                                   const Eigen::Vector3f& ray_origin_W,
-                                                   const Eigen::Vector3f& ray_dir_W,
-                                                   const float step_size,
-                                                   const float t_max,
-                                                   float& t,
-                                                   Eigen::Vector3f& point_W)
+inline std::optional<field_t> find_valid_point(const MapT& map,
+                                               const Eigen::Vector3f& ray_origin_W,
+                                               const Eigen::Vector3f& ray_dir_W,
+                                               const float step_size,
+                                               const float t_max,
+                                               float& t,
+                                               Eigen::Vector3f& point_W)
 {
-    std::optional<se::field_t> value = {};
+    std::optional<field_t> value = {};
     typename MapT::DataType peek_data;
 
     Eigen::Vector3f ray_pos_W = ray_origin_W + t * ray_dir_W;
@@ -250,11 +250,11 @@ inline void advance_ray(const MapT& map,
     t_far = voxel_dim * v_far;                                                        // [m]
 
     typename MapT::DataType data =
-        se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
+        visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
 
     while (get_field(data) > -0.2f && scale > 2) { // TODO Verify
         scale -= 1;
-        data = se::visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
+        data = visitor::getMaxData(octree, ray_origin_coord_f.cast<int>(), scale);
     }
 
     Eigen::Vector3f ray_coord_f = ray_origin_coord_f;
@@ -309,17 +309,17 @@ inline void advance_ray(const MapT& map,
         v_add += V_min + 0.01;
         ray_coord_f = (v + v_add) * ray_dir_W + ray_origin_coord_f;
 
-        data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
+        data = visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
 
         if (get_field(data) > -0.2f) {
             while (get_field(data) > -0.2f && scale > 2) {
                 scale -= 1;
-                data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
+                data = visitor::getMaxData(octree, ray_coord_f.cast<int>(), scale);
             }
         }
         else {
             for (int s = scale + 1; s <= max_scale; s++) {
-                data = se::visitor::getMaxData(octree, ray_coord_f.cast<int>(), s);
+                data = visitor::getMaxData(octree, ray_coord_f.cast<int>(), s);
 
                 if (get_field(data) > -0.2f) {
                     break;
@@ -346,7 +346,7 @@ inline void advance_ray(const MapT& map,
  * \return The Surface intersection point in [m] and scale
  */
 template<typename MapT>
-inline typename std::enable_if_t<MapT::fld_ == se::Field::Occupancy, std::optional<Eigen::Vector4f>>
+inline typename std::enable_if_t<MapT::fld_ == Field::Occupancy, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
         const typename MapT::OctreeType& octree,
         const Eigen::Vector3f& ray_origin_W,
@@ -383,8 +383,8 @@ raycast(MapT& map,
 
     // first walk with largesteps until we found a hit
     const float step_size = map.getRes() / 2;
-    std::optional<se::field_t> value_t;
-    std::optional<se::field_t> value_tt;
+    std::optional<field_t> value_t;
+    std::optional<field_t> value_tt;
     Eigen::Vector3f point_W_t = Eigen::Vector3f::Zero();
     Eigen::Vector3f point_W_tt = Eigen::Vector3f::Zero();
     int scale_tt = 0;
@@ -453,7 +453,7 @@ raycast(MapT& map,
 
 
 template<typename MapT>
-inline typename std::enable_if_t<MapT::fld_ == se::Field::TSDF, std::optional<Eigen::Vector4f>>
+inline typename std::enable_if_t<MapT::fld_ == Field::TSDF, std::optional<Eigen::Vector4f>>
 raycast(MapT& map,
         const typename MapT::OctreeType& /* octree */,
         const Eigen::Vector3f& ray_origin_W,
@@ -461,7 +461,7 @@ raycast(MapT& map,
         const float t_near,
         const float t_far)
 {
-    se::VoxelBlockRayIterator<MapT> ray(map, ray_origin_W, ray_dir_W, t_near, t_far);
+    VoxelBlockRayIterator<MapT> ray(map, ray_origin_W, ray_dir_W, t_near, t_far);
     ray.next();
 
     float step = map.getRes();
@@ -482,15 +482,15 @@ raycast(MapT& map,
         // first walk with largesteps until we found a hit
         float stepsize = largestep;
         Eigen::Vector3f point_W = ray_origin_W + ray_dir_W * t;
-        typename MapT::DataType data = map.template getData<se::Safe::On>(point_W);
+        typename MapT::DataType data = map.template getData<Safe::On>(point_W);
         float f_t = get_field(data);
         float f_tt = 0;
         int scale_tt = 0;
         // if we are not already in it
         if (f_t >= MapT::DataType::surface_boundary) {
             for (; t < t_far; t += stepsize) {
-                data = map.template getData<se::Safe::On>(point_W);
-                if (!se::is_valid(data)) {
+                data = map.template getData<Safe::On>(point_W);
+                if (!is_valid(data)) {
                     stepsize = largestep;
                     point_W += stepsize * ray_dir_W;
                     continue;
@@ -498,8 +498,8 @@ raycast(MapT& map,
 
                 f_tt = get_field(data);
                 if (f_tt <= 0.1 && f_tt >= -0.5f) {
-                    std::optional<se::field_t> field_value = [&]() -> std::optional<se::field_t> {
-                        if constexpr (MapT::res_ == se::Res::Single) {
+                    std::optional<field_t> field_value = [&]() -> std::optional<field_t> {
+                        if constexpr (MapT::res_ == Res::Single) {
                             return map.interpField(point_W);
                         }
                         else {
@@ -537,11 +537,11 @@ template<typename MapT, typename SensorT>
 void raycast_volume(const MapT& map,
                     const SensorT& sensor,
                     const Eigen::Isometry3f& T_WS,
-                    se::Image<Eigen::Vector3f>& surface_point_cloud_W,
-                    se::Image<Eigen::Vector3f>& surface_normals_W,
-                    se::Image<int8_t>& surface_scale,
-                    se::Image<colour_t>* surface_colour,
-                    se::Image<id_t>* surface_id)
+                    Image<Eigen::Vector3f>& surface_point_cloud_W,
+                    Image<Eigen::Vector3f>& surface_normals_W,
+                    Image<int8_t>& surface_scale,
+                    Image<colour_t>* surface_colour,
+                    Image<id_t>* surface_id)
 {
     assert(surface_point_cloud_W.width() == surface_normals_W.width());
     assert(surface_point_cloud_W.height() == surface_normals_W.height());
@@ -628,9 +628,9 @@ void raycast_volume(const MapT& map,
 
 
 template<typename GetDiffuseColourF>
-void render_volume(se::Image<RGBA>& render,
-                   const se::Image<Eigen::Vector3f>& surface_points_W,
-                   const se::Image<Eigen::Vector3f>& surface_normals_W,
+void render_volume(Image<RGBA>& render,
+                   const Image<Eigen::Vector3f>& surface_points_W,
+                   const Image<Eigen::Vector3f>& surface_normals_W,
                    const GetDiffuseColourF get_diffuse_colour,
                    const Eigen::Vector3f& light_source_W,
                    const RGB ambient_light)
@@ -653,7 +653,7 @@ void render_volume(se::Image<RGBA>& render,
             const RGB rgb = get_diffuse_colour(pixel_idx);
             const Eigen::Vector3f diffuse = intensity * Eigen::Vector3f(rgb.r, rgb.g, rgb.b);
             Eigen::Vector3f col = diffuse + ambient_light_f;
-            se::eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
+            eigen::clamp(col, Eigen::Vector3f::Zero(), Eigen::Vector3f::Constant(255.0f));
             colour.r = col.x();
             colour.g = col.y();
             colour.b = col.z();
