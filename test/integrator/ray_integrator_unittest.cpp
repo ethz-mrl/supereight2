@@ -96,7 +96,7 @@ TEST(RayIntegrator, SingleRay)
     const Eigen::Vector3f ray(d, 0., 0.);
     std::unordered_set<const se::OctantBase*> updated_octants;
 
-    se::RayMeasurement measurement{sensor, Eigen::Isometry3f::Identity(), ray};
+    se::RayMeasurement measurement{&sensor, Eigen::Isometry3f::Identity(), ray};
     se::RayIntegrator rayIntegrator(map, measurement, 0, &updated_octants);
     rayIntegrator();
     rayIntegrator.propagateBlocksToCoarsestScale();
@@ -197,7 +197,7 @@ TEST(RayIntegrator, Propagation)
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
             rayBatch.push_back(se::RayMeasurement<se::Lidar>{
-                sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
+                &sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }

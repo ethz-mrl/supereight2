@@ -90,7 +90,7 @@ int main(int argc, char** argv)
 
             for (size_t i = 0; i < ray_pose_batch.size(); i++) {
                 input_ray_pose_batch.push_back(se::RayMeasurement<se::Lidar>{
-                    sensor, ray_pose_batch[i].first, ray_pose_batch[i].second});
+                    &sensor, ray_pose_batch[i].first, ray_pose_batch[i].second});
             }
             TOCK("read")
 

@@ -135,7 +135,7 @@ TEST(Map, aabb_ray_batch)
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
             rayBatch.push_back(se::RayMeasurement<se::Lidar>{
-                sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
+                &sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }
@@ -183,7 +183,7 @@ TEST(Map, aabb_ray_batch)
             y = d * tan(azimuth_angle * deg_to_rad);
             // save point
             rayBatch.push_back(se::RayMeasurement<se::Lidar>{
-                sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
+                &sensor, Eigen::Isometry3f::Identity(), Eigen::Vector3f(x, y, z)});
             // increase azimuth angle
             azimuth_angle += azimuth_res;
         }

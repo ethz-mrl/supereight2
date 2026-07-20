@@ -80,7 +80,7 @@ void RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
                    SensorT>::operator()()
 {
     /// (1) Check validity of measured value (sensor near plane)
-    const SensorT& sensor = measurement_->sensor;
+    const SensorT& sensor = *(measurement_->sensor);
     if (ray_dist_ < sensor.near_plane) {
         return;
     }
@@ -238,11 +238,11 @@ bool RayIntegrator<Map<Data<se::Field::Occupancy, ColB, IdB>, se::Res::Multi, Bl
         }
         else {
             computed_integration_scale =
-                measurement_->sensor.blockIntegrationScale(block_centre_point_S,
-                                                           map_res_,
-                                                           last_scale,
-                                                           block_ptr->min_scale,
-                                                           block_ptr->max_scale);
+                measurement_->sensor->blockIntegrationScale(block_centre_point_S,
+                                                            map_res_,
+                                                            last_scale,
+                                                            block_ptr->min_scale,
+                                                            block_ptr->max_scale);
             if (rayState == se::RayState::FreeSpace) {
                 // The block hasn't been updated before, update as free at a
                 // scale no finer than free_space_scale_.
