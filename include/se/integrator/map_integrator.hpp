@@ -33,11 +33,11 @@ namespace allocator {
  * \return The allocated and fetched notes in the band around the surface measurements
  */
 template<typename MapT, typename SensorT>
-std::vector<se::OctantBase*> frustum(MapT& map,
-                                     SensorT& sensor,
-                                     const se::Image<float>& depth_img,
-                                     const Eigen::Isometry3f& T_WS,
-                                     const float band);
+std::vector<OctantBase*> frustum(MapT& map,
+                                 SensorT& sensor,
+                                 const Image<float>& depth_img,
+                                 const Eigen::Isometry3f& T_WS,
+                                 const float band);
 
 } // namespace allocator
 
@@ -58,7 +58,7 @@ namespace fetcher {
  * \return A vector of pointers to Blocks that intersect the sensor frustum.
  */
 template<typename MapT, typename SensorT>
-inline std::vector<se::OctantBase*>
+inline std::vector<OctantBase*>
 frustum(MapT& map, const SensorT& sensor, const Eigen::Isometry3f& T_WS);
 } // namespace fetcher
 

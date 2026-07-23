@@ -17,7 +17,7 @@ namespace details {
 /**
  * Integration helper struct for partial function specialisation
  */
-template<se::Field FldT, se::Res ResT>
+template<Field FldT, Res ResT>
 struct IntegrateDepthImplD {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
@@ -31,7 +31,7 @@ struct IntegrateDepthImplD {
 /**
  * Integration helper struct for partial function specialisation
  */
-template<se::Field FldT, se::Res ResT>
+template<Field FldT, Res ResT>
 struct IntegrateRayBatchImplD {
     template<typename SensorT, typename MapT>
     static void
@@ -48,7 +48,7 @@ struct IntegrateRayBatchImplD {
  * TSDF integration helper struct for partial function specialisation
  */
 template<Res ResT>
-struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
+struct IntegrateDepthImplD<Field::TSDF, ResT> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
@@ -59,17 +59,17 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
         assert(measurements.depth.sensor.model.imageHeight() == measurements.depth.image.height());
         // Allocation
         TICK("allocation")
-        se::RaycastCarver raycast_carver(map,
-                                         measurements.depth.sensor,
-                                         measurements.depth.image,
-                                         measurements.depth.T_WC,
-                                         timestamp);
+        RaycastCarver raycast_carver(map,
+                                     measurements.depth.sensor,
+                                     measurements.depth.image,
+                                     measurements.depth.T_WC,
+                                     timestamp);
         std::vector<OctantBase*> block_ptrs = raycast_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
-        se::Updater updater(map, block_ptrs, timestamp, measurements);
+        Updater updater(map, block_ptrs, timestamp, measurements);
         TOCK("update")
 
         if (updated_octants) {
@@ -86,7 +86,7 @@ struct IntegrateDepthImplD<se::Field::TSDF, ResT> {
  * Multi-res OFusion integration helper struct for partial function specialisation
  */
 template<>
-struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
+struct IntegrateDepthImplD<Field::Occupancy, Res::Multi> {
     template<typename SensorT, typename MapT>
     static void integrate(MapT& map,
                           const timestamp_t timestamp,
@@ -116,12 +116,12 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
             *measurements.depth_sigma,
             measurements.depth.T_WC,
             timestamp); //< process based on variance state and project inside
-        se::VolumeCarverAllocation allocation_list = volume_carver();
+        VolumeCarverAllocation allocation_list = volume_carver();
         TOCK("allocation")
 
         // Update
         TICK("update")
-        se::Updater updater(map, timestamp, measurements);
+        Updater updater(map, timestamp, measurements);
         updater(allocation_list, updated_octants);
         TOCK("update")
     }
@@ -133,7 +133,7 @@ struct IntegrateDepthImplD<se::Field::Occupancy, se::Res::Multi> {
  * Multi-res OFusion integration helper struct for partial function specialisation
  */
 template<>
-struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
+struct IntegrateRayBatchImplD<Field::Occupancy, Res::Multi> {
     template<typename SensorT, typename MapT>
     static void
     integrate(MapT& map,
@@ -142,7 +142,7 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
               const timestamp_t timestamp,
               std::unordered_set<const OctantBase*>* const updated_octants)
     {
-        se::RayIntegrator<MapT, SensorT> rayIntegrator(
+        RayIntegrator<MapT, SensorT> rayIntegrator(
             map, rayPoseBatch[0], timestamp, updated_octants);
 
         // do downsampling
@@ -169,7 +169,7 @@ struct IntegrateRayBatchImplD<se::Field::Occupancy, se::Res::Multi> {
  * Multi-res OFusion integration helper struct for partial function specialisation
  */
 template<>
-struct IntegrateRayBatchImplD<se::Field::TSDF, se::Res::Single> {
+struct IntegrateRayBatchImplD<Field::TSDF, Res::Single> {
     template<typename SensorT, typename MapT>
     static void
     integrate(MapT& map,
@@ -178,7 +178,7 @@ struct IntegrateRayBatchImplD<se::Field::TSDF, se::Res::Single> {
               const timestamp_t timestamp,
               std::unordered_set<const OctantBase*>* const updated_octants)
     {
-        se::RayIntegrator<MapT, SensorT> rayIntegrator(
+        RayIntegrator<MapT, SensorT> rayIntegrator(
             map, rayPoseBatch[0], timestamp, updated_octants);
 
         // do downsampling
@@ -219,7 +219,7 @@ void MapIntegrator<MapT>::integrateDepth(
     const Measurements<SensorT>& measurements,
     std::unordered_set<const OctantBase*>* const updated_octants)
 {
-    se::details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
+    details::IntegrateDepthImpl<MapT>::template integrate<SensorT>(
         map_, timestamp, measurements, updated_octants);
 }
 
@@ -233,8 +233,7 @@ void MapIntegrator<MapT>::integrateRayBatch(
         rayPoseBatch,
     std::unordered_set<const OctantBase*>* const updated_octants)
 {
-    se::details::IntegrateRayBatchImpl<MapT>::integrate(
-        map_, rayPoseBatch, timestamp, updated_octants);
+    details::IntegrateRayBatchImpl<MapT>::integrate(map_, rayPoseBatch, timestamp, updated_octants);
 }
 
 
