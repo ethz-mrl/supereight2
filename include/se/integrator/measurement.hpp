@@ -40,7 +40,7 @@ struct Measurements {
     Measurement<SensorT, float> depth;
     std::optional<Measurement<SensorT, colour_t>> colour = std::nullopt;
     std::optional<Measurement<SensorT, id_t>> ids = std::nullopt;
-    se::Image<float>* depth_sigma = nullptr;
+    Image<float>* depth_sigma = nullptr;
 
     /** Mask for selecting depth image pixels which will be used to update only free space. For mask
      * pixels that are 0 integration happens normally. For mask pixels that are non-zero only voxels
@@ -48,7 +48,7 @@ struct Measurements {
      *
      * \note The mask is ignored in se::Field::TSDF maps.
      */
-    se::Image<uint8_t>* free_only_mask = nullptr;
+    Image<uint8_t>* free_only_mask = nullptr;
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
